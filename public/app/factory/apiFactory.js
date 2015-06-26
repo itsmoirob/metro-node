@@ -8,12 +8,16 @@ angular.module('apiFactory', [])
   };
 
   dataFactory.getSiteSummary = function (id) {
-     return $http.get(urlBase + 'displaySite/site/' + id);
- };
+    return $http.get(urlBase + 'displaySite/site/' + id);
+  };
 
- dataFactory.getSiteInverterGeneration = function (id) {
+  dataFactory.getSiteInverterGeneration = function (id) {
     return $http.get(urlBase + 'displaySite/generation/' + id);
-};
+  };
+
+  dataFactory.getSiteExportGeneration = function (id) {
+    return $http.get(urlBase + 'displaySite/export/' + id);
+  };
 
   return dataFactory;
 }])

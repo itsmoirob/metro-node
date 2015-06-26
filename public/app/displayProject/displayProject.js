@@ -10,6 +10,9 @@ angular.module('displayProject', [
 .controller('DisplayCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
 
   var SP = $stateParams.siteResult;
+  var highChartsData = {
+    data : []
+  };
 
   getSiteSummary(SP); //gets summary array of site
   function getSiteSummary(SP) {
@@ -26,68 +29,90 @@ angular.module('displayProject', [
         options: { draggable: true }
       };
     });
-
-    getSiteInverterGeneration(SP); //gets inverter generation array of site
-    function getSiteInverterGeneration(SP) {
-      dataFactory.getSiteInverterGeneration(SP)
-      .success(function(res){
-        var groupByInverterNumber = _.groupBy(res, 'inverter_number'); //group it by inverter number
-        var display = []; //prepare to set data up to use in highcharts-ng
-        angular.forEach(groupByInverterNumber, function( row, id ) {
-          var length = display.push({
-            id: id,
-            data: []
-          });
-          angular.forEach(row, function(pit) {
-            display[length - 1].data.push([pit.timeU,pit.generation]);
-          });
-        });
-        $scope.siteInverterGeneration = display;
-
-        // Chart for inverter generation
-        $scope.chartConfig = {
-          options: {
-           chart: {
-             zoomType: 'x'
-           },
-           rangeSelector: {
-             enabled: true
-           },
-           navigator: {
-             enabled: true
-           }
-         },
-         series: display,
-         title: {
-           text: 'Generation at inverter'
-         },
-         useHighStocks: true
-       };
-      });
-    }
   }
+
+  getSiteInverterGeneration(SP); //gets inverter generation array of site
+  function getSiteInverterGeneration(SP) {
+    dataFactory.getSiteInverterGeneration(SP)
+    .success(function(res){
+      var groupByInverterNumber = _.groupBy(res, 'inverter_number'); //group it by inverter number
+      var display = []; //prepare to set data up to use in highcharts-ng
+      angular.forEach(groupByInverterNumber, function( row, id ) {
+        var length = display.push({
+          id: id,
+          data: []
+        });
+        angular.forEach(row, function(pit) {
+          display[length - 1].data.push([pit.timeU,pit.generation]);
+        });
+      });
+      $scope.siteInverterGeneration = display;
+
+      // Chart for inverter generation
+      $scope.chartConfig = {
+        options: {
+          chart: {
+            zoomType: 'x'
+          },
+          rangeSelector: {
+            enabled: true
+          },
+          navigator: {
+            enabled: true
+          }
+        },
+        series: display,
+        title: {
+          text: 'Generation at inverter'
+        },
+        useHighStocks: true
+      };
+    });
+  }
+
+  getSiteExportGeneration(SP);
+  function getSiteExportGeneration(SP){
+    dataFactory.getSiteExportGeneration(SP)
+    .success(function(res){
+
+      var display = []; //prepare to set data up to use in highcharts-ng
+      angular.forEach(res, function(res) {
+          highChartsData.data.push([res.timeU,res.generation]);
+      });
+
+
+      // highChartsData.data.push(res);
+      var siteExportGeneration = highChartsData;
+      $scope.siteExportGeneration = highChartsData;
+            //  Chart for export generation
+             $scope.chartExport = {
+               options: {
+                 chart: {
+                   zoomType: 'x'
+                 },
+                 rangeSelector: {
+                   enabled: true
+                 },
+                 navigator: {
+                   enabled: true
+                 }
+               },
+               series: [],
+               title: {
+                 text: 'Generation at export'
+               },
+               useHighStocks: true
+             };
+
+             $scope.chartExport.series.push(highChartsData);
+    });
+  }
+
+
 }]);
 
 //
-//       //  Chart for export generation
-//        $scope.chartExport = {
-//          options: {
-//            chart: {
-//              zoomType: 'x'
-//            },
-//            rangeSelector: {
-//              enabled: true
-//            },
-//            navigator: {
-//              enabled: true
-//            }
-//          },
-//          series: result.export,
-//          title: {
-//            text: 'Generation at export'
-//          },
-//          useHighStocks: true
-//        };
+
 //      });
 //
 //    }])
