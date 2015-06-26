@@ -19,6 +19,14 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/export/' + id);
   };
 
+  dataFactory.getEPC = function (id) {
+    return $http.get(urlBase + 'displaySite/epc/' + id);
+  };
+
+  dataFactory.getAdmin = function (id) {
+    return $http.get(urlBase + 'displaySite/admin/' + id);
+  };
+
   return dataFactory;
 }])
 

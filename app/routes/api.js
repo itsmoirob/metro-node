@@ -39,6 +39,7 @@ module.exports = function(app,connection) {
     });
   });
 
+// get export generation
   app.get('/api/displaySite/export/:id', function(req,res){
     var id = req.params.id;
     connection.query('SELECT UNIX_TIMESTAMP(cast(`date` as datetime) + cast(`time` as time))*1000 as `timeU`, `generation` from  `export_' + id +'`;', function(err,rows){
@@ -50,4 +51,27 @@ module.exports = function(app,connection) {
     });
   });
 
+  // Get the epc info.
+  app.get('/api/displaySite/epc/:id', function(req,res){
+    var id = req.params.id;
+    connection.query('SELECT top_table.id, epc.epcName from top_table left join epc on top_table.epc = epc.epcIndex where id = ' + id + ';', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+  app.get('/api/displaySite/admin/:id', function(req,res){
+    var id = req.params.id;
+    connection.query('SELECT id, dno, mpan_export from top_table where id = ' + id + ';', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+  
 };

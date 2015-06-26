@@ -74,47 +74,52 @@ angular.module('displayProject', [
   function getSiteExportGeneration(SP){
     dataFactory.getSiteExportGeneration(SP)
     .success(function(res){
-
       var display = []; //prepare to set data up to use in highcharts-ng
       angular.forEach(res, function(res) {
-          highChartsData.data.push([res.timeU,res.generation]);
+        highChartsData.data.push([res.timeU,res.generation]);
       });
 
-
-      // highChartsData.data.push(res);
       var siteExportGeneration = highChartsData;
       $scope.siteExportGeneration = highChartsData;
-            //  Chart for export generation
-             $scope.chartExport = {
-               options: {
-                 chart: {
-                   zoomType: 'x'
-                 },
-                 rangeSelector: {
-                   enabled: true
-                 },
-                 navigator: {
-                   enabled: true
-                 }
-               },
-               series: [],
-               title: {
-                 text: 'Generation at export'
-               },
-               useHighStocks: true
-             };
+      //  Chart for export generation
+      $scope.chartExport = {
+        options: {
+          chart: {
+            zoomType: 'x'
+          },
+          rangeSelector: {
+            enabled: true
+          },
+          navigator: {
+            enabled: true
+          }
+        },
+        series: [],
+        title: {
+          text: 'Generation at export'
+        },
+        useHighStocks: true
+      };
 
-             $scope.chartExport.series.push(highChartsData);
+      $scope.chartExport.series.push(highChartsData);
+    });
+  }
+
+  getEPC(SP);
+  function getEPC(SP) {
+    dataFactory.getEPC(SP)
+    .success(function(res){
+      $scope.epc = res;
+    });
+  }
+
+  getAdmin(SP);
+  function getAdmin(SP) {
+    dataFactory.getAdmin(SP)
+    .success(function(res){
+      $scope.admin = res;
     });
   }
 
 
 }]);
-
-//
-
-//      });
-//
-//    }])
-//
-// ;
