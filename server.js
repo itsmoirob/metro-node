@@ -2,6 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mysql = require('mysql');
+var csvParse = require('csv-parse');
+var fs = require('fs');
+var moment = require('moment');
 
 var config = require('./config.js');
 var mysql_config = require('./mysql_config.js');
@@ -16,6 +19,7 @@ var connection = mysql.createConnection({
 });
 
 require('./app/routes/api')(app,connection);
+require('./app/routes/apiMySQL.js')(app,connection,csvParse,fs,moment);
 
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
