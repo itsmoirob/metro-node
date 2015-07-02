@@ -5,6 +5,9 @@ var mysql = require('mysql');
 var csvParse = require('csv-parse');
 var fs = require('fs');
 var moment = require('moment');
+var async = require('async');
+var JSFtp = require("jsftp");
+
 
 var config = require('./config.js');
 var mysql_config = require('./mysql_config.js');
@@ -15,11 +18,28 @@ var connection = mysql.createConnection({
   host     : mysql_config.host,
   user     : mysql_config.user,
   password : mysql_config.password,
-  database : mysql_config.database
+  database : mysql_config.database,
+  multipleStatements: true
+});
+
+var pool  = mysql.createPool({
+  connectionLimit : 10,
+  host     : mysql_config.host,
+  user     : mysql_config.user,
+  password : mysql_config.password,
+  database : mysql_config.database,
+  multipleStatements: true
+});
+
+var Ftp = new JSFtp({
+  host: "ftp.stark.co.uk",
+  // port: 3331, // defaults to 21
+  user: "SKPS1805", // defaults to "anonymous"
+  pass: "9Sk8*sK#" // defaults to "@anonymous"
 });
 
 require('./app/routes/api')(app,connection);
-require('./app/routes/apiMySQL.js')(app,connection,csvParse,fs,moment);
+require('./app/routes/apiMySQL.js')(app,connection,csvParse,fs,moment,async,pool,Ftp);
 
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
