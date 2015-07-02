@@ -1,7 +1,14 @@
 <p>
   This is <span class="metro">Metro</span>, connecting all sites of Primrose Solar.
 </p>
-<p>
-  Pick a site from the left
-  <hr />
-</p>
+<hr />
+
+<table style="width:100%">
+  <tr ng-repeat="site in introSites">
+    <td>{{ site.name }}</td>
+    <td>{{ site.tic_mwp }}</td>
+    <td></td>
+  </tr>
+</table>
+
+{{introSites}}
