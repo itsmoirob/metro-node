@@ -1,0 +1,5 @@
+version: 1
+cron:
+ - name: "Get FTP site 1"          # required - unique across all entries in this file
+   url: "/api/testCron  "              # required - does not need to be unique
+   schedule: "*/10 * * * *"    # required - does not need to be unique
