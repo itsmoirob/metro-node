@@ -49,6 +49,19 @@ angular.module('routes', [
         }
       }
     })
+    .state('parent.displayInstallProject', { //list the main body of the 'finance' page
+      url:'/site/install/:siteResult',
+      views: {
+        'display@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteInstall.tmpl.html'
+        },
+        'other@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteList.tmpl.html'
+        }
+      }
+    })
     .state('parent.displayFinanceProject', { //list the main body of the 'finance' page
       url:'/site/finance/:siteResult',
       views: {
