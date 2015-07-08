@@ -71,6 +71,21 @@ module.exports = function(app,connection) {
       }
     });
   });
+
+  app.get('/api/displaySite/install/:id', function(req,res){
+    var id = req.params.id;
+    var queryInverter = 'select id, inverter_name, inverter_number, inverter_power, inverter_warranty from inverterInfo where id = ' + id + ' and active = 1;';
+    var queryPanel = 'select id, panel_name, panel_number, panel_watt, panel_warranty, tilt from panelInfo where id = ' + id + ' and active = 1;';
+
+    connection.query(queryPanel+queryInverter, function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
   // api for getting generation of all sites
   app.get('/api/testLoop', function(req,res){
     var baseQuery = [];
