@@ -1,9 +1,8 @@
 module.exports = function(app,connection,csvParse,fs,moment,async,pool,Ftp) {
-  var mpanList = [{"id":1,"mpan":"2100041172109_180615_Historical"},{"id":2,"mpan":"2000055901355_180615_Historical"},{"id":3,"mpan":"2000055901300_180615_Historical"},{"id":4,"mpan":"1050000588215_180615_Historical"},{"id":5,"mpan":"2200042384200_180615_Historical"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387_180615_Historical"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"}];
+  var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"}];
 
   app.get('/api/ftp/:id' ,function(req,res) {
     var id = req.params.id-1;
-
 
     Ftp.get(mpanList[id].mpan+".csv", mpanList[id].mpan+".csv", function(hadErr) {
       if (hadErr)
@@ -12,7 +11,6 @@ module.exports = function(app,connection,csvParse,fs,moment,async,pool,Ftp) {
       console.log('File copied successfully!');
       res.send("File "+mpanList[id].mpan+".csv has been downloaded");
     });
-
   });
 
 
@@ -55,4 +53,17 @@ module.exports = function(app,connection,csvParse,fs,moment,async,pool,Ftp) {
       });
     });
   });
+
+  // Get the epc info.
+  app.get('/api/testCron', function(req,res){
+    var id = req.params.id;
+    connection.query('insert into test values ("2015-07-07","00:00:00",1);', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
 };
