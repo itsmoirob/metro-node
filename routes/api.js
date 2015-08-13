@@ -49,6 +49,18 @@ module.exports = function(app,connection) {
     });
   });
 
+  // get export generation for met office test
+  app.get('/apiTestSite/displaySite/export/:id', function(req,res){
+    var id = req.params.id;
+    connection.query('SELECT `date`, `time`, `generation` from  `export_' + id +'` where date = "2015-06-01";', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
   // Get the epc info.
   app.get('/api/displaySite/epc/:id', function(req,res){
     var id = req.params.id;
@@ -86,25 +98,22 @@ module.exports = function(app,connection) {
     });
   });
 
-  // api for getting generation of all sites
-  app.get('/api/testLoop', function(req,res){
-    var baseQuery = [];
-    var num = 1;
-    var fullQuery = "";
-    for (i=1;i<6;i++){
-      baseQuery[i]=['SELECT sum(generation) from export_'+num+';'];
-      num++;
-    }
-    for(y=1;y<baseQuery.length;y++){
-      fullQuery = fullQuery+baseQuery[y];
-    }
-    connection.query(fullQuery+'SELECT id, name, tic_mwp from top_table', function(err, rows) {
+  // get export generation for met office test
+  app.get('/api/displaySite/pyro/:id', function(req,res){
+    var id = req.params.id;
+    connection.query('SELECT UNIX_TIMESTAMP(dateTime) * 1000 as `timeU`, if(pyro_1 = 0, 0, if(pyro_1>greatest(pyro_1,pyro_2)*0.6,pyro_1,"")) as `pyro_mod_1`, if(pyro_1 = 0, 0, if(pyro_2>greatest(pyro_1,pyro_2)*0.6,pyro_2,"")) as `pyro_mod_2`, (if(pyro_1 = 0, 0, if(pyro_1>greatest(pyro_1,pyro_2)*0.6,pyro_1,""))+if(pyro_2 = 0, 0, if(pyro_2>greatest(pyro_1,pyro_2)*0.6,pyro_2,""))) as `pyro_mod_sum`, (select(pyro_mod_1) <>"") + (select(pyro_mod_2) <>"") as `count`, (select(`pyro_mod_sum`)) / (select(`count`)) as `average` from  `pyro_site_' + id +'`;', function(err,rows){
       if (err){
-        console.log(err);
+        return res.json(err);
       } else {
         return res.json(rows);
       }
     });
+  });
+
+  // api for getting generation of all sites
+  app.get('/api/testLoop', function(req,res){
+
+    return res.json("World");
   });
 
 };

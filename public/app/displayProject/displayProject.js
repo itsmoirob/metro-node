@@ -13,6 +13,9 @@ angular.module('displayProject', [
   var highChartsData = {
     data : []
   };
+  var pyroChartsData = {
+    data : []
+  };
 
   getSiteSummary(SP); //gets summary array of site
   function getSiteSummary(SP) {
@@ -72,7 +75,7 @@ angular.module('displayProject', [
 
   getSiteExportGeneration(SP);
   function getSiteExportGeneration(SP){
-    dataFactory.getSiteExportGeneration(SP)
+    dataFactory.getSitePyro(SP)
     .success(function(res){
       var display = []; //prepare to set data up to use in highcharts-ng
       angular.forEach(res, function(res) {
@@ -118,6 +121,41 @@ angular.module('displayProject', [
     dataFactory.getAdmin(SP)
     .success(function(res){
       $scope.admin = res;
+    });
+  }
+
+  getSitePyro(SP);
+  function getSitePyro(SP){
+    dataFactory.getSitePyro(SP)
+    .success(function(res){
+      var display = []; //prepare to set data up to use in highcharts-ng
+      angular.forEach(res, function(res) {
+        pyroChartsData.data.push([res.timeU,res.average]);
+      });
+
+      var sitePyro = pyroChartsData;
+      $scope.sitePyro = pyroChartsData;
+      //  Chart for export generation
+      $scope.chartPyro = {
+        options: {
+          chart: {
+            zoomType: 'x'
+          },
+          rangeSelector: {
+            enabled: true
+          },
+          navigator: {
+            enabled: true
+          }
+        },
+        series: [],
+        title: {
+          text: 'Pyro'
+        },
+        useHighStocks: true
+      };
+
+      $scope.chartPyro.series.push(pyroChartsData);
     });
   }
 

@@ -10,7 +10,7 @@ angular.module('routes', [
         abstract: true
     })
     .state('parent.listSites', { //list sites at the side of the bar on the fron page
-      url:'/',
+      url:'',
       views: {
         'display@': {
           controller: 'MainCtrl',
@@ -89,6 +89,6 @@ angular.module('routes', [
       }
     })
     ;
-    $urlRouterProvider.otherwise('/'); //take to front page
+    // $urlRouterProvider.otherwise('/index'); //take to front page
     })
 ;
