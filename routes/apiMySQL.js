@@ -35,7 +35,6 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           var sqlInputData = [];
           var n = 0;
 
-          // sqlInputData[n] = [moment(data[8][7], "DD/MM/YY").format("YYYY-MM-DD"), data[8][7]];
           for (j=8;j<data.length;j++){ // use this line only for histroical data
             var day = moment(data[j][7], "DD/MM/YY").format("YYYY-MM-DD");
             for (i = 8; i < data[j].length; i++) {
@@ -48,8 +47,8 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
               n++;
             }
           }
-          // res.send("INSERT IGNORE INTO export_"+mpanList[id].id+" VALUES "+sqlInputData);
-          connection.query("INSERT IGNORE INTO export_"+mpanList[id].id+" VALUES "+sqlInputData, function(err, result){
+          // res.send("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
+          connection.query("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
             if (err) throw err;
             console.log(result.insertId);
             res.send("Done: INSERT INTO test VALUES " + sqlInputData);
@@ -103,7 +102,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
   // upload pyro data.
   app.get('/api/mySQL/pyroUpload/:id', function(req,res){
     var id = req.params.id;
-    var filePath = "./PS" + id + " Pyro Data 2015-07.csv";
+    var filePath = "./PS" + id + " Pyro.csv";
 
     fs.readFile(filePath, {
       encoding: 'utf-8'
@@ -271,16 +270,16 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
               sqlInputData.push(data[j][12]+")");
               n++;
             }
-            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_2=VALUES(pyro_3), pyro_2=VALUES(pyro_4)");
-            connection.query("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12)", function(err, result){
+            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12)");
+            connection.query("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12)", function(err, result){
               if (err) throw err;
               console.log(result.insertId);
-              res.send("Done: INSERT INTO pyro_site VALUES " + sqlInputData);
+              res.send("Done: INSERT INTO pyro_site" + id + " VALUES " + sqlInputData);
             });
 
           } else if (id > 7 && id < 11) {
 
-            for (j=2;j<data.length;j++){ // if site is 1 to 4
+            for (j=2;j<data.length;j++){ // if site is 7 to 11
               data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
               if (data[j][1] === "") {
                 data[j][1] = "NULL";
@@ -306,7 +305,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
 
           } else if (id == 11) {
 
-            for (j=2;j<data.length;j++){ // if site is 1 to 4
+            for (j=2;j<data.length;j++){ // if site is 11
               data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
               if (data[j][1] === "") {
                 data[j][1] = "NULL";
@@ -320,11 +319,17 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
               if (data[j][2] < 0.1) {
                 data[j][2] = 0;
               }
-              sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
+              if (data[j][3] === "") {
+                data[j][3] = "NULL";
+              }
+              if (data[j][3] < 0.1) {
+                data[j][3] = 0;
+              }
+              sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + ")"];
               n++;
             }
-            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2)");
-            connection.query("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2)", function(err, result){
+            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3)");
+            connection.query("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3)", function(err, result){
               if (err) throw err;
               console.log(result.insertId);
               res.send("Done: INSERT INTO pyro_site VALUES " + sqlInputData);
@@ -341,7 +346,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
   // upload pyro data.
   app.get('/api/mySQL/invUpload/', function(req,res){
     var id = req.params.id;
-    var filePath = "./PS1 Inv Data 2015-26.csv";
+    var filePath = "./PS11 Inv Data 2015.csv";
 
     fs.readFile(filePath, {
       encoding: 'utf-8'
@@ -358,26 +363,33 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
         } else {
           var sqlInputData = [];
           var n = 0;
-          for (j=1;j<data.length/7;j++){
+          for (j=1;j<data.length;j++){
             for (i=1;i<data[0].length;i++){
-              // data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              var date = data[j][0];
-              var generation = data[j][i];
-              if (generation === "") {
+              var date = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+              // var date = moment(data[j][0], "DD-mmm-YY HH:mm").format("YYYY-MM-DD HH:mm");
+              // var date = data[j][0];
+              var generation = parseFloat(data[j][i]);
+              if (isNaN(generation)) {
                 generation = "NULL";
               }
-              var trans = data[0][i].substring(1, 3);
-              var sub = data[0][i].substring(7, 9);
-              var inv = data[0][i].substring(13, 15);
+              if (generation < 0.6) {
+                generation = 0;
+              }
+              // var trans = data[0][i].substring(1, 3);
+              // var sub = data[0][i].substring(7, 9);
+              // var inv = data[0][i].substring(13, 15);
+              var trans = 1;
+              var sub = 1;
+              var inv = i;
               sqlInputData[n] = ["('" + date + "'," + trans + "," + sub + "," + inv + "," + generation + ")" ];
               n++;
             }
           }
-          // res.send("INSERT INTO inverter_site_generation_1 VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
-          connection.query("INSERT INTO inverter_site_generation_1 VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
+          // res.send("INSERT INTO inverter_generation_11 VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
+          connection.query("INSERT INTO inverter_generation_11 VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
             if (err) throw err;
             console.log(result.insertId);
-            res.send("Done: INSERT INTO inverter_site_generation_1 " + sqlInputData);
+            res.send("Done: INSERT INTO inverter_generation_11 " + sqlInputData);
           });
         }
       });
