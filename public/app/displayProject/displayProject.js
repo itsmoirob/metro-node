@@ -124,6 +124,14 @@ angular.module('displayProject', [
     });
   }
 
+  getReport(SP);
+  function getReport(SP) {
+    dataFactory.getMKReport(SP)
+    .success(function(res){
+      $scope.MKReport = res;
+    });
+  }
+
   getSitePyro(SP);
   function getSitePyro(SP){
     dataFactory.getSitePyro(SP)

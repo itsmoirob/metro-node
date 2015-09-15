@@ -31,6 +31,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/pyro/' + id);
   };
 
+  dataFactory.getMKReport = function (id) {
+    return $http.get(urlBase + 'displaySite/report/' + id);
+  };
+
   return dataFactory;
 }])
 
