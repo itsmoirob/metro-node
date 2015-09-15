@@ -10,28 +10,24 @@
 
 <table id="datatable">
   <tr>
-    <th>Column 1</th>
-    <th>Column "cool" 2</th>
-    <th>Column 3</th>
-    <th>Column 4</th>
+    <th>Date</th>
+    <th>Export kWh</th>
+    <th>Pyro mean Wh</th>
+    <th>OP Hours</th>
+    <th>ESOL</th>
+    <th>Theoretical kWh</th>
+    <th>PR%</th>
   </tr>
   <tr>
-    <td>100,111</td>
-    <td>200</td>
-    <td>300</td>
-    <td>áéíóú</td>
+    <td>{{ MKReport[0].date }}</td>
+    <td>{{ MKReport[0].export }}</td>
+    <td>{{ MKReport[0].pyroMean }}</td>
+    <td>{{ MKReport[0].opHours }}</td>
+    <td>{{ MKReport[0].esol }}</td>
+    <td>{{ MKReport[0].theoretical }}</td>
+    <td>{{ MKReport[0].PR }}</td>
   </tr>
-  <tr>
-    <td>400</td>
-    <td>500</td>
-    <td>600</td>
-    <td>àèìòù</td>
-  </tr>
-  <tr>
-    <td>Text</td>
-    <td>More text</td>
-    <td>Text with
-      new line</td>
-      <td>ç ñ ÄËÏÖÜ äëïöü</td>
-    </tr>
+
   </table>
+
+  {{ MKReport[0] }}
