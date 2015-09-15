@@ -27,6 +27,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/admin/' + id);
   };
 
+  dataFactory.getSitePyro = function (id) {
+    return $http.get(urlBase + 'displaySite/pyro/' + id);
+  };
+
   return dataFactory;
 }])
 

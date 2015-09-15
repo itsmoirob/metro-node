@@ -10,7 +10,7 @@ angular.module('routes', [
         abstract: true
     })
     .state('parent.listSites', { //list sites at the side of the bar on the fron page
-      url:'/',
+      url:'',
       views: {
         'display@': {
           controller: 'MainCtrl',
@@ -88,7 +88,20 @@ angular.module('routes', [
         }
       }
     })
+    .state('parent.displayMKReport', { //list the main body of the 'admin' page
+      url:'/site/report/:siteResult',
+      views: {
+        'display@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteMKReport.tmpl.html'
+        },
+        'other@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteList.tmpl.html'
+        }
+      }
+    })
     ;
-    $urlRouterProvider.otherwise('/'); //take to front page
+    // $urlRouterProvider.otherwise('/index'); //take to front page
     })
 ;
