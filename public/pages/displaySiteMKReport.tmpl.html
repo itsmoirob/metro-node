@@ -18,16 +18,13 @@
     <th>Theoretical kWh</th>
     <th>PR%</th>
   </tr>
-  <tr>
-    <td>{{ MKReport[0].date }}</td>
-    <td>{{ MKReport[0].export }}</td>
-    <td>{{ MKReport[0].pyroMean }}</td>
-    <td>{{ MKReport[0].opHours }}</td>
-    <td>{{ MKReport[0].esol }}</td>
-    <td>{{ MKReport[0].theoretical }}</td>
-    <td>{{ MKReport[0].PR }}</td>
+  <tr ng-repeat="report in MKReport">
+    <td>{{ report.date | date:'dd/MM/yyyy' }}</td>
+    <td>{{ report.export }}</td>
+    <td>{{ report.pyroMean }}</td>
+    <td>{{ report.opHours }}</td>
+    <td>{{ report.esol }}</td>
+    <td>{{ report.theoretical }}</td>
+    <td>{{ report.PR }}</td>
   </tr>
-
   </table>
-
-  {{ MKReport[0] }}
