@@ -6,7 +6,6 @@ html
 		meta(name="theme-color", content="#FBA11B")
 		meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
 		link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css")
-		//- link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css")
 		link(rel="stylesheet", href="/stylesheets/style.css")
 	body(ng-app="metro")
 		nav( class="primroseYellow")		
@@ -16,7 +15,7 @@ html
 						a(href='/users/login') Log In
 				if user
 					li
-						a(href="") Home
+						a(href="#") Home
 					li(class=(title == 'Register' ? 'active' : ''))
 						a(href='/users/register') Register
 					li 
@@ -52,7 +51,8 @@ html
 		script(src="//maps.googleapis.com/maps/api/js?sensor=false")
 		script(src="../javascripts/angular-google-maps.js")
 		script(src="../javascripts/lodash.min.js")
-
+		
+		script(src="../javascripts/excellentexport.min.js")
 		script(src="//code.highcharts.com/stock/highstock.src.js")
 		script(src="//code.highcharts.com/adapters/standalone-framework.js")
 		script(src="../javascripts/highcharts-ng.js")
