@@ -88,6 +88,19 @@ angular.module('routes', [
         }
       }
     })
+    .state('parent.displayMKReport', { //list the main body of the 'admin' page
+      url:'/site/report/:siteResult',
+      views: {
+        'display@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteMKReport.tmpl.html'
+        },
+        'other@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteList.tmpl.html'
+        }
+      }
+    })
     ;
     // $urlRouterProvider.otherwise('/index'); //take to front page
     })
