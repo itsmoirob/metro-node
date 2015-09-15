@@ -75,7 +75,7 @@ angular.module('displayProject', [
 
   getSiteExportGeneration(SP);
   function getSiteExportGeneration(SP){
-    dataFactory.getSitePyro(SP)
+    dataFactory.getSiteExportGeneration(SP)
     .success(function(res){
       var display = []; //prepare to set data up to use in highcharts-ng
       angular.forEach(res, function(res) {
