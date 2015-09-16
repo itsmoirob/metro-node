@@ -40,7 +40,7 @@ angular.module('routes', [
       url:'/site/generation/:siteResult',
       views: {
         'display@': {
-          controller: 'DisplayCtrl',
+          controller: 'ExportCtrl',
           templateUrl: 'pages/displaySiteGeneration.tmpl.html'
         },
         'other@': {
