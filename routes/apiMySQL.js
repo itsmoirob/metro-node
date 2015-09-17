@@ -16,9 +16,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
 
   app.get('/api/mySQL/exportUpload/:id', function(req, res) {
     var id = req.params.id-1;
-
     var filePath = "./"+mpanList[id].mpan+".csv";
-
     fs.readFile(filePath, {
       encoding: 'utf-8'
     }, function(err, csvData) {
@@ -51,53 +49,13 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           connection.query("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
             if (err) throw err;
             console.log(result.insertId);
-            res.send("Done: INSERT INTO test VALUES " + sqlInputData);
+            res.send("Done: INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData);
           });
         }
       });
     });
   });
 
-  //
-  // app.get('/api/mySQL/exportUpload/:id', function(req, res) {
-  //   var id = req.params.id-1;
-  //
-  //   var filePath = "./"+mpanList[id].mpan+".csv";
-  //
-  //   fs.readFile(filePath, {
-  //     encoding: 'utf-8'
-  //   }, function(err, csvData) {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //     csvParse(csvData, {
-  //       separator: ',',
-  //       newline: '\n'
-  //     }, function(err, data) {
-  //       if (err) {
-  //         console.log(err);
-  //       } else {
-  //         var sqlInputData = [];
-  //         var n = 0;
-  //         var hour = data[0][1];
-  //         for (j=0;j<data.length;j++){ // use this line only for histroical data
-  //           var day = moment(data[j][1], "DD/MM/YYYY").format("YYYY-MM-DD");
-  //           for (i = 2; i < data[0].length; i=i+2) {
-  //             sqlInputData[n] = ["('" + day + "','" + moment(hour, "DD/MM/YYYY").format("HH:mm:ss") + "'," + data[j][i]+")"];
-  //             hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
-  //             n++;
-  //           }
-  //         }
-  //         res.send("INSERT INTO export_"+mpanList[id].id+" VALUES "+sqlInputData);
-  //         // connection.query("INSERT INTO export_"+mpanList[id].id+" VALUES "+sqlInputData, function(err, result){
-  //         //   if (err) throw err;
-  //         //   console.log(result.insertId);
-  //         //   res.send("Done: INSERT INTO test VALUES " + sqlInputData);
-  //         // });
-  //       }
-  //     });
-  //   });
-  // });
 
   // upload pyro data.
   app.get('/api/mySQL/pyroUpload/:id', function(req,res){
