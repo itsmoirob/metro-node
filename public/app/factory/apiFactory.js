@@ -35,6 +35,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/report/' + id);
   };
 
+  dataFactory.allSiteDaily = function (id) {
+    return $http.get(urlBase + 'displaySite/allSiteDaily');
+  };
+
   return dataFactory;
 }])
 

@@ -40,7 +40,7 @@ module.exports = function(app,connection) {
   // get export generation
   app.get('/api/displaySite/export/:id', function(req,res){
     var id = req.params.id;
-    connection.query('SELECT UNIX_TIMESTAMP(cast(`date` as datetime) + cast(`time` as time))*1000 as `timeU`, `generation` from  `export_' + id +'`;', function(err,rows){
+    connection.query('SELECT UNIX_TIMESTAMP(cast(`date` as datetime) + cast(`time` as time))*1000 as `timeU`, `generation` from  `export_' + id +'` where date > NOW() - INTERVAL 4 MONTH order by date asc;', function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -186,6 +186,31 @@ module.exports = function(app,connection) {
     }
   });
 
+  app.get('/api/displaySite/allSiteDaily', function(req,res){
+    var id = req.params.id;
+    connection.query('select * from dailySumExport  where date > NOW() - INTERVAL 1 MONTH order by date desc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+  // app.get('/api/displaySite/allSiteDaily', function(req,res){
+  //
+  //   var query = 'select date, sum(generation) as generation from export_1 where date >= NOW() - INTERVAL 1 MONTH group by date order by date desc;';
+  //   var query2 = 'select date, sum(generation) as generation from export_2 where date >= NOW() - INTERVAL 1 MONTH group by date order by date desc;';
+  //
+  //
+  //   connection.query(query+query2  , function(err,rows){
+  //     if (err){
+  //       return res.json(err);
+  //     } else {
+  //       return res.json(rows);
+  //     }
+  //   });
+  // });
 
 
   // api for getting generation of all sites

@@ -9,9 +9,8 @@ function config($httpProvider) {
 
 .constant('API_URL', 'http://localhost:3000')
 
-.controller('MainCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'RandomUserFactory', 'UserFactory', function($scope,$stateParams,$http,$log,dataFactory,RandomUserFactory,UserFactory){
+.controller('MainCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function($scope,$stateParams,$http,$log,dataFactory,UserFactory){
 
-  $scope.helloThere = "Hello there";
 
   getIntroSites();
   function getIntroSites() {
@@ -21,19 +20,63 @@ function config($httpProvider) {
     });
   }
 
-  $scope.getRandomUser = getRandomUser;
+  var allSumData = {
+    data : []
+  };
+
+  getAllSiteDaily();
+  function getAllSiteDaily(){
+    dataFactory.allSiteDaily()
+    .success(function(res){
+      $scope.factory = res;
+      var display = []; //prepare to set data up to use in highcharts-ng
+      angular.forEach(res, function(res) {
+        allSumData.data.push([res]);
+      });
+
+      $scope.sumExportGeneration = allSumData;
+      //  Chart for export generation
+      $scope.chartSumSites = {
+          options: {
+              chart: {
+                  type: 'column'
+              }
+          },
+          series: [],
+          title: {
+              text: 'Hello'
+          },
+          xAxis: {
+    categories: [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+    ],
+    crosshair: true
+},
+
+          loading: false
+      };
+      // $scope.chartSumSites.series.push(allSumData);
+    });
+  }
+
+
   $scope.login = login;
   $scope.logout = logout;
 
   UserFactory.getUser().then(function success(response) {
     $scope.user = response.data;
   });
-
-  function getRandomUser() {
-    RandomUserFactory.getUser().then(function success(response) {
-      $scope.randomUser = response.data;
-    }, handleError);
-  }
 
   function login(username,password) {
     UserFactory.login(username,password).then(function success(response) {
@@ -53,16 +96,6 @@ function config($httpProvider) {
 
 }])
 
-.factory('RandomUserFactory', function RandomUserFactory($http,API_URL) {
-  'use strict';
-  return {
-    getUser: getUser
-  };
-  function getUser() {
-    return $http.get(API_URL + '/random-user');
-  }
-}
-)
 
 .factory('UserFactory', function UserFactory($http,API_URL, AuthTokenFactory, $q) {
   'use strict';
