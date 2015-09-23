@@ -20,59 +20,124 @@ function config($httpProvider) {
     });
   }
 
-  var allSumData = {
-    data : []
-  };
+  var allSumData = [];
+  var chartDate = [];
 
   getAllSiteDaily();
   function getAllSiteDaily(){
     dataFactory.allSiteDaily()
     .success(function(res){
-      $scope.factory = res;
-      var display = []; //prepare to set data up to use in highcharts-ng
-      angular.forEach(res, function(res) {
-        allSumData.data.push([res]);
+
+      var groupings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(i) { return "ps" + i; });
+      // loop over the keys
+      groupings.forEach(function (deviceName) {
+        // data is one huge array that has readings for all sensors on each day
+        // Use .map on the array to transform each element of the array.
+        // The function will transform the array element by selecting a reading for a single device
+        var dataForOneDevice = res.map(function(item) {
+          return item[deviceName];
+        });
+
+        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
+        allSumData.push({name: deviceName, data:dataForOneDevice});
       });
 
-      $scope.sumExportGeneration = allSumData;
-      //  Chart for export generation
-      $scope.chartSumSites = {
-          options: {
-              chart: {
-                  type: 'column'
-              }
-          },
-          series: [],
-          title: {
-              text: 'Hello'
-          },
-          xAxis: {
-    categories: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-    ],
-    crosshair: true
-},
 
-          loading: false
-      };
-      // $scope.chartSumSites.series.push(allSumData);
+      angular.forEach(res, function(entry) {
+        chartDate.push(moment(entry.date).format("MMM Do"));
+      });
+
     });
   }
 
+  //  Chart for export generation
+  $scope.chartSumSites = {
+    options: {
+      chart: {
+        type: 'line'
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        footerFormat: '</table>',
+        valueSuffix: ' kWH',
+        shared: true,
+        useHTML: true
+      },
+    },
+    title: {
+      text: 'Monthly Sum'
+    },
+    xAxis: {
+      categories: chartDate,
+      crosshair: true
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Generation (kWh)'
+      }
+    },
+    series: allSumData,
+    loading: false
+  };
 
-  $scope.login = login;
-  $scope.logout = logout;
+  var allSumDataMWp = [];
+
+  getAllSiteDailyMWp();
+  function getAllSiteDailyMWp(){
+    dataFactory.allSiteDailyMWp()
+    .success(function(res){
+
+      var groupings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(i) { return "ps" + i; });
+      // loop over the keys
+      groupings.forEach(function (deviceName) {
+        // data is one huge array that has readings for all sensors on each day
+        // Use .map on the array to transform each element of the array.
+        // The function will transform the array element by selecting a reading for a single device
+        var dataForOneDevice = res.map(function(item) {
+          return item[deviceName];
+        });
+
+        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
+        allSumDataMWp.push({name: deviceName, data:dataForOneDevice});
+      });
+    });
+  }
+
+  //  Chart for export generation
+  $scope.chartSumMWpSites = {
+    options: {
+      chart: {
+        type: 'line'
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        footerFormat: '</table>',
+        valueSuffix: ' kWH',
+        shared: true,
+        useHTML: true
+      },
+    },
+    title: {
+      text: 'Monthly kWh/MWp'
+    },
+    xAxis: {
+      categories: chartDate,
+      crosshair: true
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Generation (kWh/MWp)'
+      }
+    },
+    series: allSumDataMWp,
+    loading: false
+  };
 
   UserFactory.getUser().then(function success(response) {
     $scope.user = response.data;

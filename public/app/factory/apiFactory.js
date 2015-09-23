@@ -39,6 +39,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/allSiteDaily');
   };
 
+  dataFactory.allSiteDailyMWp = function (id) {
+    return $http.get(urlBase + 'displaySite/allSiteDailyMWp');
+  };
+
   return dataFactory;
 }])
 

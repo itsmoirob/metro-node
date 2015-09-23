@@ -186,9 +186,8 @@ module.exports = function(app,connection) {
     }
   });
 
-  app.get('/api/displaySite/allSiteDaily', function(req,res){
-    var id = req.params.id;
-    connection.query('select * from dailySumExport  where date > NOW() - INTERVAL 1 MONTH order by date desc;', function(err,rows){
+  app.get('/api/displaySite/allSiteDaily/', function(req,res){
+    connection.query('select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11 from dailySumExport where date > NOW() - INTERVAL 30 DAY order by date asc', function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -197,20 +196,15 @@ module.exports = function(app,connection) {
     });
   });
 
-  // app.get('/api/displaySite/allSiteDaily', function(req,res){
-  //
-  //   var query = 'select date, sum(generation) as generation from export_1 where date >= NOW() - INTERVAL 1 MONTH group by date order by date desc;';
-  //   var query2 = 'select date, sum(generation) as generation from export_2 where date >= NOW() - INTERVAL 1 MONTH group by date order by date desc;';
-  //
-  //
-  //   connection.query(query+query2  , function(err,rows){
-  //     if (err){
-  //       return res.json(err);
-  //     } else {
-  //       return res.json(rows);
-  //     }
-  //   });
-  // });
+  app.get('/api/displaySite/allSiteDailyMWp/', function(req,res){
+    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11` from dailySumExport where date > NOW() - INTERVAL 30 DAY order by date asc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
 
 
   // api for getting generation of all sites
