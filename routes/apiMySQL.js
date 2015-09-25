@@ -79,7 +79,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           var n = 0;
           if (id < 5) {
             for (j=1;j<data.length;j++){ // if site is 1 to 4
-              // data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
               data[j][1] = parseFloat(data[j][1]);
               data[j][2] = parseFloat(data[j][2]);
               if (isNaN(data[j][1])) {

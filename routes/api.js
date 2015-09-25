@@ -4,7 +4,7 @@ module.exports = function(app,connection) {
   // api for getting top level summary data of all sites
   app.get('/api/pickUp', function(req,res){
     connection.query('SELECT id, name, tic_mwp from top_table', function(err, rows) {
-    // connection.query('SELECT id, mpan_export from top_table', function(err, rows) {
+      // connection.query('SELECT id, mpan_export from top_table', function(err, rows) {
       if (err){
         return res.json(err);
       } else {
@@ -40,13 +40,52 @@ module.exports = function(app,connection) {
   // get export generation
   app.get('/api/displaySite/export/:id', function(req,res){
     var id = req.params.id;
-    connection.query('SELECT UNIX_TIMESTAMP(cast(`date` as datetime) + cast(`time` as time))*1000 as `timeU`, `generation` from  `export_' + id +'` where date > NOW() - INTERVAL 4 MONTH order by date asc;', function(err,rows){
+    connection.query('SELECT UNIX_TIMESTAMP(cast(`date` as datetime) + cast(`time` as time))*1000 as `timeU`, `generation` from  `export_' + id +'` where date > NOW() - INTERVAL 2 MONTH order by date asc;', function(err,rows){
       if (err){
         return res.json(err);
       } else {
         return res.json(rows);
       }
     });
+  });
+
+  // get export generation
+  app.get('/api/displaySite/pyroMean/:id', function(req,res){
+    var id = req.params.id;
+    if (id==5) {
+      connection.query('SELECT ROUND(UNIX_TIMESTAMP(dateTime)/(30 * 60)) AS timekey, UNIX_TIMESTAMP(datetime)*1000 as `timeU`, round((ifnull(avg(pyro_1),0) + ifnull(avg(pyro_2),0) + ifnull(avg(pyro_3),0) + ifnull(avg(pyro_4),0))/4,2) as `avgPyro` FROM pyro_site_' + id +' where date(dateTime) > NOW() - INTERVAL 2 MONTH GROUP BY timekey;', function(err,rows){
+        if (err){
+          return res.json(err);
+        } else {
+          return res.json(rows);
+        }
+      });
+    } else if (id==7) {
+      connection.query('SELECT ROUND(UNIX_TIMESTAMP(dateTime)/(30 * 60)) AS timekey, UNIX_TIMESTAMP(datetime)*1000 as `timeU`, round((ifnull(avg(pyro_1),"") + ifnull(avg(pyro_2),"") + ifnull(avg(pyro_3),"") + ifnull(avg(pyro_4),"") + ifnull(avg(pyro_5),"") + ifnull(avg(pyro_6),"") + ifnull(avg(pyro_7),"")  + ifnull(avg(pyro_8),"") + ifnull(avg(pyro_9),"") + ifnull(avg(pyro_10),"") + ifnull(avg(pyro_11),"") + ifnull(avg(pyro_12),""))/12,2)  `avgPyro` FROM pyro_site_' + id +' where date(dateTime) > NOW() - INTERVAL 2 MONTH GROUP BY timekey;', function(err,rows){
+        if (err){
+          return res.json(err);
+        } else {
+          return res.json(rows);
+        }
+      });
+    } else if (id==11) {
+      connection.query('SELECT ROUND(UNIX_TIMESTAMP(dateTime)/(30 * 60)) AS timekey, UNIX_TIMESTAMP(datetime)*1000 as `timeU`, round((ifnull(avg(pyro_1),0) + ifnull(avg(pyro_2),0) + ifnull(avg(pyro_3),0))/3,2) as `avgPyro` FROM pyro_site_' + id +' where date(dateTime) > NOW() - INTERVAL 2 MONTH GROUP BY timekey;', function(err,rows){
+        if (err){
+          return res.json(err);
+        } else {
+          return res.json(rows);
+        }
+      });
+    } else {
+
+    connection.query('SELECT ROUND(UNIX_TIMESTAMP(dateTime)/(30 * 60)) AS timekey, UNIX_TIMESTAMP(datetime)*1000 as `timeU`, round((ifnull(avg(pyro_1),0) + ifnull(avg(pyro_2),0))/2,2) as `avgPyro` FROM pyro_site_' + id +' where date(dateTime) > NOW() - INTERVAL 2 MONTH GROUP BY timekey;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+    }
   });
 
   // get export generation for met office test
@@ -196,8 +235,20 @@ module.exports = function(app,connection) {
     });
   });
 
+
   app.get('/api/displaySite/allSiteDailyMWp/', function(req,res){
     connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11` from dailySumExport where date > NOW() - INTERVAL 30 DAY order by date asc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+  app.get('/api/mySQL/sumExport/:id', function(req,res){
+    var id = req.params.id;
+    connection.query('insert into dailySumExport(date,PS' + id +') select date, sum(generation) from export_' + id +' where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS' + id +'=VALUES(PS' + id +');', function(err,rows){
       if (err){
         return res.json(err);
       } else {

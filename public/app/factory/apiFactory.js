@@ -43,6 +43,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/allSiteDailyMWp');
   };
 
+  dataFactory.getChartPyro = function (id) {
+    return $http.get(urlBase + 'displaySite/pyroMean/' + id);
+  };
+
   return dataFactory;
 }])
 
