@@ -7,6 +7,10 @@ angular.module('displayProject', [
   'apiFactory'
 ])
 
+.config(function($httpProvider){
+  delete $httpProvider.defaults.headers.common['X-Requested-With'];
+})
+
 .controller('DisplayCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
 
   var SP = $stateParams.siteResult;
@@ -16,6 +20,12 @@ angular.module('displayProject', [
     dataFactory.getSiteSummary(SP)
     .success(function(res){
       $scope.currentDisplaySite = res;
+      $http({
+        method: 'GET',
+        url: 'http://api.openweathermap.org/data/2.5/forecast/daily?&units=metric&lat='+res[0].latitude+'&lon='+res[0].longitude+'&cnt=3'
+      }).then(function(response) {
+        $scope.forecast = response;
+      });
       $scope.map = { center: { latitude: res[0].latitude, longitude: res[0].longitude }, zoom: 16 }; //sets up gmaps
       $scope.marker = { //sets up pin for gmaps
         id: $stateParams.siteResult,
@@ -27,6 +37,8 @@ angular.module('displayProject', [
       };
     });
   }
+
+
 
   getEPC(SP);
   function getEPC(SP) {
