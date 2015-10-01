@@ -79,7 +79,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           var n = 0;
           if (id < 5) {
             for (j=1;j<data.length;j++){ // if site is 1 to 4
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+              // data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
               data[j][1] = parseFloat(data[j][1]);
               data[j][2] = parseFloat(data[j][2]);
               if (isNaN(data[j][1])) {
@@ -327,9 +327,9 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
   });
 
   // upload pyro data.
-  app.get('/api/mySQL/invUpload/', function(req,res){
+  app.get('/api/mySQL/invUpload/:id', function(req,res){
     var id = req.params.id;
-    var filePath = "./PS1 Inv.csv";
+    var filePath = "./PS" + id + " Inv.csv";
 
     fs.readFile(filePath, {
       encoding: 'utf-8'
@@ -345,48 +345,66 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           console.log(err);
         } else {
           var sqlInputData = [];
-          var onDuplicateKey = [];
-          var n = 0;
-          // for (j=1;j<=data[0].length-1;j++){
-          //   if(j==1){
-          //     sqlInputData.push("CREATE TABLE `dev`.`alt_inv_gen_1` (`dateTime` DATETIME NOT NULL `" + data[0][j].substring(0,15) + "` DECIMAL(4,2) NULL,");
-          //   } else if (j==data[0].length-1) {
-          //       sqlInputData.push("`" + data[0][j].substring(0,15) + "`, PRIMARY KEY (`dateTime`));");
-          //   } else {
-          //     sqlInputData.push("`" + data[0][j].substring(0,15) + "` DECIMAL(4,2) NULL");
-          //   }
-          //
-          // }
+          // var n = 1;
+          if(id >= 8 && id <= 10)
+          {
+            for (j=2;j<data.length;j++){
+              for (i=1;i<2;i++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                data[j][i] = parseFloat(data[j][i]);
+                if (isNaN(data[j][i])) {
+                  data[j][i] = "NULL";
+                }
+                if (data[j][i] < 0.6) {
+                  data[j][i] = 0;
+                }
+                sqlInputData.push("('" + data[j][0] + "'");
+                for (k=1;k<=data[j].length-1;k++){
+                  if(k==data[j].length-1){
+                    sqlInputData.push(k + "," + data[j][k] + ")");
+                  } else {
+                    sqlInputData.push(k + "," + data[j][k] + "),('" + data[j][0] + "'");
+                  }
+                }
+                // n++;
+              }
+            }
+            // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+              if (err) throw err;
+              console.log(result.insertId);
+              res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+            });
+          } else {
 
           for (j=1;j<data.length;j++){
             for (i=1;i<2;i++){
               data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              var generation = parseFloat(data[j][i]);
-              if (isNaN(generation)) {
-                generation = "NULL";
+              data[j][i] = parseFloat(data[j][i]);
+              if (isNaN(data[j][i])) {
+                data[j][i] = "NULL";
               }
-              if (generation < 0.6) {
-                generation = 0;
+              if (data[j][i] < 0.6) {
+                data[j][i] = 0;
               }
               sqlInputData.push("('" + data[j][0] + "'");
               for (k=1;k<=data[j].length-1;k++){
                 if(k==data[j].length-1){
-                  sqlInputData.push(data[j][k] + ")");
-                  // onDuplicateKey.push("`" + data[0][k].substring(0,15) + "` = VALUES(`" + data[0][k].substring(0,15) + "`)" );
+                  sqlInputData.push("17," + data[j][k] + ")");
                 } else {
-                  sqlInputData.push(data[j][k]);
-                  // onDuplicateKey.push("`" + data[0][k].substring(0,15) + "` = VALUES(`" + data[0][k].substring(0,15) + "`)" );
+                  sqlInputData.push("17," + data[j][k]);
                 }
               }
               n++;
             }
           }
-          res.send("INSERT INTO alt_inv_gen_1 VALUES " + sqlInputData);
-          // connection.query("INSERT INTO alt_inv_gen_1 VALUES " + sqlInputData, function(err, result){
+          res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+          // connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
           //   if (err) throw err;
           //   console.log(result.insertId);
-          //   res.send("Done: INSERT INTO alt_inv_gen_1 " + sqlInputData);
+          //   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
           // });
+          }
         }
       });
     });
