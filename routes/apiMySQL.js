@@ -346,9 +346,57 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
         } else {
           var sqlInputData = [];
           // var n = 1;
-          if(id >= 8 && id <= 10)
-          {
+          if(id >= 8 && id <= 10) {
             for (j=2;j<data.length;j++){
+              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+              sqlInputData.push("('" + data[j][0] + "'");
+              for (i=1;i<=data[j].length-1;i++){
+                data[j][i] = parseFloat(data[j][i]);
+                if (isNaN(data[j][i])) {
+                  data[j][i] = "NULL";
+                }
+                if (data[j][i] < 0.6) {
+                  data[j][i] = 0;
+                }
+                if(i==data[j].length-1){
+                  sqlInputData.push(i + "," + data[j][i] + ")");
+                } else {
+                  sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
+                }
+              }
+            }
+            // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+              if (err) throw err;
+              console.log(result);
+              res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+            });
+          } else if (id <= 4) {
+            for (j=1;j<data.length;j++){
+              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+              sqlInputData.push("('" + data[j][0] + "'");
+              for (i=1;i<=data[j].length-1;i++){
+                data[j][i] = parseFloat(data[j][i]);
+                if (isNaN(data[j][i])) {
+                  data[j][i] = "NULL";
+                }
+                if(i==data[j].length-1){
+                  sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + ")");
+                } else {
+                  sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + "),('" + data[j][0] + "'");
+                }
+              }
+            }
+            // res.send("INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            connection.query("INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+              if (err) throw err;
+              console.log(result.insertId);
+              res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + sqlInputData);
+            });
+
+          } else {
+
+            for (j=1;j<data.length;j++){
               for (i=1;i<2;i++){
                 data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
                 data[j][i] = parseFloat(data[j][i]);
@@ -361,49 +409,20 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
                 sqlInputData.push("('" + data[j][0] + "'");
                 for (k=1;k<=data[j].length-1;k++){
                   if(k==data[j].length-1){
-                    sqlInputData.push(k + "," + data[j][k] + ")");
+                    sqlInputData.push("17," + data[j][k] + ")");
                   } else {
-                    sqlInputData.push(k + "," + data[j][k] + "),('" + data[j][0] + "'");
+                    sqlInputData.push("17," + data[j][k]);
                   }
                 }
-                // n++;
+                n++;
               }
             }
-            // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
-            connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-            });
-          } else {
-
-          for (j=1;j<data.length;j++){
-            for (i=1;i<2;i++){
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              data[j][i] = parseFloat(data[j][i]);
-              if (isNaN(data[j][i])) {
-                data[j][i] = "NULL";
-              }
-              if (data[j][i] < 0.6) {
-                data[j][i] = 0;
-              }
-              sqlInputData.push("('" + data[j][0] + "'");
-              for (k=1;k<=data[j].length-1;k++){
-                if(k==data[j].length-1){
-                  sqlInputData.push("17," + data[j][k] + ")");
-                } else {
-                  sqlInputData.push("17," + data[j][k]);
-                }
-              }
-              n++;
-            }
-          }
-          res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
-          // connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
-          //   if (err) throw err;
-          //   console.log(result.insertId);
-          //   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-          // });
+            res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            // connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+            //   if (err) throw err;
+            //   console.log(result.insertId);
+            //   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+            // });
           }
         }
       });
