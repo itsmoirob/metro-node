@@ -22,7 +22,7 @@ angular.module('displayProject', [
       $scope.currentDisplaySite = res;
       $http({
         method: 'GET',
-        url: 'http://api.openweathermap.org/data/2.5/forecast/daily?&units=metric&lat='+res[0].latitude+'&lon='+res[0].longitude+'&cnt=3'
+        url: 'http://api.openweathermap.org/data/2.5/forecast/daily?&units=metric&lat='+res[0].latitude+'&lon='+res[0].longitude+'&cnt=3&APPID=ede052db245fa42874e3cc8513991c6e'
       }).then(function(response) {
         $scope.forecast = response;
       });
