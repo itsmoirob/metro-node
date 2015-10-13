@@ -4,6 +4,7 @@ angular.module('metro', [
   'listSites',
   'routes',
   'displayProject',
+  'displayExport',
   'apiFactory'
 ])
 ;

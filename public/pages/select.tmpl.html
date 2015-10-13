@@ -1,8 +1,16 @@
 <p>
   This is <span class="metro">Metro</span>, connecting all sites of Primrose Solar.
 </p>
+A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> project board on what I am working on and suggesting features/reports
 <hr />
 
+<div class="col s6">
+  <highchart id="chart1" config="chartSumSites" class="span10"></highchart>
+</div>
+<div class="col s6">
+  <highchart id="chart1" config="chartSumMWpSites" class="span10"></highchart>
+</div>
+{{chartDate}}
 <table style="width:100%">
   <tr ng-repeat="site in introSites">
     <td>{{ site.name }}</td>
@@ -10,5 +18,3 @@
     <td></td>
   </tr>
 </table>
-
-{{introSites}}

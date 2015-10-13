@@ -16,9 +16,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
 
   app.get('/api/mySQL/exportUpload/:id', function(req, res) {
     var id = req.params.id-1;
-
     var filePath = "./"+mpanList[id].mpan+".csv";
-
     fs.readFile(filePath, {
       encoding: 'utf-8'
     }, function(err, csvData) {
@@ -51,53 +49,13 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           connection.query("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
             if (err) throw err;
             console.log(result.insertId);
-            res.send("Done: INSERT INTO test VALUES " + sqlInputData);
+            res.send("Done: INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData);
           });
         }
       });
     });
   });
 
-  //
-  // app.get('/api/mySQL/exportUpload/:id', function(req, res) {
-  //   var id = req.params.id-1;
-  //
-  //   var filePath = "./"+mpanList[id].mpan+".csv";
-  //
-  //   fs.readFile(filePath, {
-  //     encoding: 'utf-8'
-  //   }, function(err, csvData) {
-  //     if (err) {
-  //       console.log(err);
-  //     }
-  //     csvParse(csvData, {
-  //       separator: ',',
-  //       newline: '\n'
-  //     }, function(err, data) {
-  //       if (err) {
-  //         console.log(err);
-  //       } else {
-  //         var sqlInputData = [];
-  //         var n = 0;
-  //         var hour = data[0][1];
-  //         for (j=0;j<data.length;j++){ // use this line only for histroical data
-  //           var day = moment(data[j][1], "DD/MM/YYYY").format("YYYY-MM-DD");
-  //           for (i = 2; i < data[0].length; i=i+2) {
-  //             sqlInputData[n] = ["('" + day + "','" + moment(hour, "DD/MM/YYYY").format("HH:mm:ss") + "'," + data[j][i]+")"];
-  //             hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
-  //             n++;
-  //           }
-  //         }
-  //         res.send("INSERT INTO export_"+mpanList[id].id+" VALUES "+sqlInputData);
-  //         // connection.query("INSERT INTO export_"+mpanList[id].id+" VALUES "+sqlInputData, function(err, result){
-  //         //   if (err) throw err;
-  //         //   console.log(result.insertId);
-  //         //   res.send("Done: INSERT INTO test VALUES " + sqlInputData);
-  //         // });
-  //       }
-  //     });
-  //   });
-  // });
 
   // upload pyro data.
   app.get('/api/mySQL/pyroUpload/:id', function(req,res){
@@ -121,14 +79,16 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           var n = 0;
           if (id < 5) {
             for (j=1;j<data.length;j++){ // if site is 1 to 4
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
-              if (data[j][1] === "") {
+              // data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+              data[j][1] = parseFloat(data[j][1]);
+              data[j][2] = parseFloat(data[j][2]);
+              if (isNaN(data[j][1])) {
                 data[j][1] = "NULL";
               }
               if (data[j][1] < 0) {
                 data[j][1] = 0;
               }
-              if (data[j][2] === "") {
+              if (isNaN(data[j][2])) {
                 data[j][2] = "NULL";
               }
               if (data[j][2] < 0) {
@@ -146,25 +106,29 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           } else if (id == 5) {
             for (j=1;j<data.length;j++){
               data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              if (data[j][1] === "") {
+              data[j][1] = parseFloat(data[j][1]);
+              data[j][2] = parseFloat(data[j][2]);
+              data[j][3] = parseFloat(data[j][3]);
+              data[j][4] = parseFloat(data[j][4]);
+              if (isNaN(data[j][1])) {
                 data[j][1] = "NULL";
               }
               if (data[j][1] < 0) {
                 data[j][1] = 0;
               }
-              if (data[j][2] === "") {
+              if (isNaN(data[j][2])) {
                 data[j][2] = "NULL";
               }
               if (data[j][2] < 0) {
                 data[j][2] = 0;
               }
-              if (data[j][3] === "") {
+              if (isNaN(data[j][3])) {
                 data[j][3] = "NULL";
               }
               if (data[j][3] < 0) {
                 data[j][3] = 0;
               }
-              if (data[j][4] === "") {
+              if (isNaN(data[j][4])) {
                 data[j][4] = "NULL";
               }
               if (data[j][4] < 0) {
@@ -183,73 +147,87 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
 
             for (j=1;j<data.length;j++){
               data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              if (data[j][1] === "") {
+
+              data[j][1] = parseFloat(data[j][1]);
+              data[j][2] = parseFloat(data[j][2]);
+              data[j][3] = parseFloat(data[j][3]);
+              data[j][4] = parseFloat(data[j][4]);
+              data[j][5] = parseFloat(data[j][5]);
+              data[j][6] = parseFloat(data[j][6]);
+              data[j][7] = parseFloat(data[j][7]);
+              data[j][8] = parseFloat(data[j][8]);
+              data[j][9] = parseFloat(data[j][9]);
+              data[j][10] = parseFloat(data[j][10]);
+              data[j][11] = parseFloat(data[j][11]);
+              data[j][12] = parseFloat(data[j][12]);
+
+              if (isNaN(data[j][1])) {
                 data[j][1] = "NULL";
               }
               if (data[j][1] < 0.1) {
                 data[j][1] = 0;
               }
-              if (data[j][2] === "") {
+              if (isNaN(data[j][2])) {
                 data[j][2] = "NULL";
               }
               if (data[j][2] < 0.1) {
                 data[j][2] = 0;
               }
-              if (data[j][3] === "") {
+              if (isNaN(data[j][3])) {
                 data[j][3] = "NULL";
               }
               if (data[j][3] < 0.1) {
                 data[j][3] = 0;
               }
-              if (data[j][4] === "") {
+              if (isNaN(data[j][4])) {
                 data[j][4] = "NULL";
               }
               if (data[j][4] < 0.1) {
                 data[j][4] = 0;
               }
-              if (data[j][5] === "") {
+              if (isNaN(data[j][5])) {
                 data[j][5] = "NULL";
-              if (data[j][5] < 0.1) {
               }
+              if (data[j][5] < 0.1) {
                 data[j][5] = 0;
               }
-              if (data[j][6] === "") {
+              if (isNaN(data[j][6])) {
                 data[j][6] = "NULL";
               }
               if (data[j][6] < 0.1) {
                 data[j][6] = 0;
               }
-              if (data[j][7] === "") {
+              if (isNaN(data[j][7])) {
                 data[j][7] = "NULL";
               }
               if (data[j][7] < 0.1) {
                 data[j][7] = 0;
               }
-              if (data[j][8] === "") {
+              if (isNaN(data[j][8])) {
                 data[j][8] = "NULL";
               }
               if (data[j][8] < 0.1) {
                 data[j][8] = 0;
               }
-              if (data[j][9] === "") {
+              if (isNaN(data[j][9])) {
                 data[j][9] = "NULL";
-              if (data[j][9] < 0.1) {
               }
+              if (data[j][9] < 0.1) {
                 data[j][9] = 0;
               }
-              if (data[j][10] === "") {
+              if (isNaN(data[j][10])) {
                 data[j][10] = "NULL";
               }
               if (data[j][10] < 0.1) {
                 data[j][10] = 0;
               }
-              if (data[j][11] === "") {
+              if (isNaN(data[j][11])) {
                 data[j][11] = "NULL";
               }
               if (data[j][11] < 0.1) {
                 data[j][11] = 0;
               }
-              if (data[j][12] === "") {
+              if (isNaN(data[j][12])) {
                 data[j][12] = "NULL";
               }
               if (data[j][12] < 0.1) {
@@ -281,13 +259,15 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
 
             for (j=2;j<data.length;j++){ // if site is 7 to 11
               data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
-              if (data[j][1] === "") {
+              data[j][1] = parseFloat(data[j][1]);
+              data[j][2] = parseFloat(data[j][2]);
+              if (isNaN(data[j][1])) {
                 data[j][1] = "NULL";
               }
               if (data[j][1] < 0.1) {
                 data[j][1] = 0;
               }
-              if (data[j][2] === "") {
+              if (isNaN(data[j][2])) {
                 data[j][2] = "NULL";
               }
               if (data[j][2] < 0.1) {
@@ -307,19 +287,22 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
 
             for (j=2;j<data.length;j++){ // if site is 11
               data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
-              if (data[j][1] === "") {
+              data[j][1] = parseFloat(data[j][1]);
+              data[j][2] = parseFloat(data[j][2]);
+              data[j][3] = parseFloat(data[j][3]);
+              if (isNaN(data[j][1])) {
                 data[j][1] = "NULL";
               }
               if (data[j][1] < 0.1) {
                 data[j][1] = 0;
               }
-              if (data[j][2] === "") {
+              if (isNaN(data[j][2])) {
                 data[j][2] = "NULL";
               }
               if (data[j][2] < 0.1) {
                 data[j][2] = 0;
               }
-              if (data[j][3] === "") {
+              if (isNaN(data[j][3])) {
                 data[j][3] = "NULL";
               }
               if (data[j][3] < 0.1) {
@@ -344,9 +327,9 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
   });
 
   // upload pyro data.
-  app.get('/api/mySQL/invUpload/', function(req,res){
+  app.get('/api/mySQL/invUpload/:id', function(req,res){
     var id = req.params.id;
-    var filePath = "./PS11 Inv Data 2015.csv";
+    var filePath = "./PS" + id + " Inv.csv";
 
     fs.readFile(filePath, {
       encoding: 'utf-8'
@@ -362,35 +345,85 @@ module.exports = function(app,connection,csvParse,fs,moment,pool,Ftp) {
           console.log(err);
         } else {
           var sqlInputData = [];
-          var n = 0;
-          for (j=1;j<data.length;j++){
-            for (i=1;i<data[0].length;i++){
-              var date = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              // var date = moment(data[j][0], "DD-mmm-YY HH:mm").format("YYYY-MM-DD HH:mm");
-              // var date = data[j][0];
-              var generation = parseFloat(data[j][i]);
-              if (isNaN(generation)) {
-                generation = "NULL";
+          // var n = 1;
+          if(id >= 8 && id <= 10) {
+            for (j=2;j<data.length;j++){
+              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+              sqlInputData.push("('" + data[j][0] + "'");
+              for (i=1;i<=data[j].length-1;i++){
+                data[j][i] = parseFloat(data[j][i]);
+                if (isNaN(data[j][i])) {
+                  data[j][i] = "NULL";
+                }
+                if (data[j][i] < 0.6) {
+                  data[j][i] = 0;
+                }
+                if(i==data[j].length-1){
+                  sqlInputData.push(i + "," + data[j][i] + ")");
+                } else {
+                  sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
+                }
               }
-              if (generation < 0.6) {
-                generation = 0;
-              }
-              // var trans = data[0][i].substring(1, 3);
-              // var sub = data[0][i].substring(7, 9);
-              // var inv = data[0][i].substring(13, 15);
-              var trans = 1;
-              var sub = 1;
-              var inv = i;
-              sqlInputData[n] = ["('" + date + "'," + trans + "," + sub + "," + inv + "," + generation + ")" ];
-              n++;
             }
+            // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+              if (err) throw err;
+              console.log(result);
+              res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+            });
+          } else if (id <= 4) {
+            for (j=1;j<data.length;j++){
+              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+              sqlInputData.push("('" + data[j][0] + "'");
+              for (i=1;i<=data[j].length-1;i++){
+                data[j][i] = parseFloat(data[j][i]);
+                if (isNaN(data[j][i])) {
+                  data[j][i] = "NULL";
+                }
+                if(i==data[j].length-1){
+                  sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + ")");
+                } else {
+                  sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + "),('" + data[j][0] + "'");
+                }
+              }
+            }
+            // res.send("INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            connection.query("INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+              if (err) throw err;
+              console.log(result.insertId);
+              res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + sqlInputData);
+            });
+
+          } else {
+
+            for (j=1;j<data.length;j++){
+              for (i=1;i<2;i++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                data[j][i] = parseFloat(data[j][i]);
+                if (isNaN(data[j][i])) {
+                  data[j][i] = "NULL";
+                }
+                if (data[j][i] < 0.6) {
+                  data[j][i] = 0;
+                }
+                sqlInputData.push("('" + data[j][0] + "'");
+                for (k=1;k<=data[j].length-1;k++){
+                  if(k==data[j].length-1){
+                    sqlInputData.push("17," + data[j][k] + ")");
+                  } else {
+                    sqlInputData.push("17," + data[j][k]);
+                  }
+                }
+                n++;
+              }
+            }
+            res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+            // connection.query("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function(err, result){
+            //   if (err) throw err;
+            //   console.log(result.insertId);
+            //   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+            // });
           }
-          // res.send("INSERT INTO inverter_generation_11 VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
-          connection.query("INSERT INTO inverter_generation_11 VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
-            if (err) throw err;
-            console.log(result.insertId);
-            res.send("Done: INSERT INTO inverter_generation_11 " + sqlInputData);
-          });
         }
       });
     });

@@ -9,9 +9,8 @@ function config($httpProvider) {
 
 .constant('API_URL', 'http://localhost:3000')
 
-.controller('MainCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'RandomUserFactory', 'UserFactory', function($scope,$stateParams,$http,$log,dataFactory,RandomUserFactory,UserFactory){
+.controller('MainCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function($scope,$stateParams,$http,$log,dataFactory,UserFactory){
 
-  $scope.helloThere = "Hello there";
 
   getIntroSites();
   function getIntroSites() {
@@ -21,19 +20,128 @@ function config($httpProvider) {
     });
   }
 
-  $scope.getRandomUser = getRandomUser;
-  $scope.login = login;
-  $scope.logout = logout;
+  var allSumData = [];
+  var chartDate = [];
+
+  getAllSiteDaily();
+  function getAllSiteDaily(){
+    dataFactory.allSiteDaily()
+    .success(function(res){
+
+      var groupings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(i) { return "ps" + i; });
+      // loop over the keys
+      groupings.forEach(function (deviceName) {
+        // data is one huge array that has readings for all sensors on each day
+        // Use .map on the array to transform each element of the array.
+        // The function will transform the array element by selecting a reading for a single device
+        var dataForOneDevice = res.map(function(item) {
+          return item[deviceName];
+        });
+
+        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
+        allSumData.push({name: deviceName, data:dataForOneDevice});
+      });
+
+
+      angular.forEach(res, function(entry) {
+        chartDate.push(moment(entry.date).format("MMM Do"));
+      });
+
+    });
+  }
+
+  //  Chart for export generation
+  $scope.chartSumSites = {
+    options: {
+      chart: {
+        type: 'line'
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        footerFormat: '</table>',
+        valueSuffix: ' kWH',
+        shared: true,
+        useHTML: true
+      },
+    },
+    title: {
+      text: 'Monthly Sum'
+    },
+    xAxis: {
+      categories: chartDate,
+      crosshair: true
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Generation (kWh)'
+      }
+    },
+    series: allSumData,
+    loading: false
+  };
+
+  var allSumDataMWp = [];
+
+  getAllSiteDailyMWp();
+  function getAllSiteDailyMWp(){
+    dataFactory.allSiteDailyMWp()
+    .success(function(res){
+
+      var groupings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(i) { return "ps" + i; });
+      // loop over the keys
+      groupings.forEach(function (deviceName) {
+        // data is one huge array that has readings for all sensors on each day
+        // Use .map on the array to transform each element of the array.
+        // The function will transform the array element by selecting a reading for a single device
+        var dataForOneDevice = res.map(function(item) {
+          return item[deviceName];
+        });
+
+        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
+        allSumDataMWp.push({name: deviceName, data:dataForOneDevice});
+      });
+    });
+  }
+
+  //  Chart for export generation
+  $scope.chartSumMWpSites = {
+    options: {
+      chart: {
+        type: 'line'
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        footerFormat: '</table>',
+        valueSuffix: ' kWH',
+        shared: true,
+        useHTML: true
+      },
+    },
+    title: {
+      text: 'Monthly kWh/MWp'
+    },
+    xAxis: {
+      categories: chartDate,
+      crosshair: true
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Generation (kWh/MWp)'
+      }
+    },
+    series: allSumDataMWp,
+    loading: false
+  };
 
   UserFactory.getUser().then(function success(response) {
     $scope.user = response.data;
   });
-
-  function getRandomUser() {
-    RandomUserFactory.getUser().then(function success(response) {
-      $scope.randomUser = response.data;
-    }, handleError);
-  }
 
   function login(username,password) {
     UserFactory.login(username,password).then(function success(response) {
@@ -53,16 +161,6 @@ function config($httpProvider) {
 
 }])
 
-.factory('RandomUserFactory', function RandomUserFactory($http,API_URL) {
-  'use strict';
-  return {
-    getUser: getUser
-  };
-  function getUser() {
-    return $http.get(API_URL + '/random-user');
-  }
-}
-)
 
 .factory('UserFactory', function UserFactory($http,API_URL, AuthTokenFactory, $q) {
   'use strict';
