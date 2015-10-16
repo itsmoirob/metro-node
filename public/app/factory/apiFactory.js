@@ -47,6 +47,18 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/pyroMean/' + id);
   };
 
+  dataFactory.getReportRaw = function (id) {
+    return $http.get(urlBase + 'displaySite/reportRaw/' + id);
+  };
+
+  dataFactory.getReportOver = function (id) {
+    return $http.get(urlBase + 'displaySite/reportOver/' + id);
+  };
+
+  dataFactory.getReportSD = function (id) {
+    return $http.get(urlBase + 'displaySite/reportSD/' + id);
+  };
+
   return dataFactory;
 }])
 

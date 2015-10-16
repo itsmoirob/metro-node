@@ -101,6 +101,45 @@ angular.module('routes', [
         }
       }
     })
+    .state('parent.displayRawReport', { //list the main body of the 'admin' page
+      url:'/site/reportRaw/:siteResult',
+      views: {
+        'display@': {
+          controller: 'ReportTestCtrl',
+          templateUrl: 'pages/displaySiteRawReport.tmpl.html'
+        },
+        'other@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteList.tmpl.html'
+        }
+      }
+    })
+    .state('parent.displayOverReport', { //list the main body of the 'admin' page
+      url:'/site/reportOver/:siteResult',
+      views: {
+        'display@': {
+          controller: 'ReportTestCtrl',
+          templateUrl: 'pages/displaySiteOverReport.tmpl.html'
+        },
+        'other@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteList.tmpl.html'
+        }
+      }
+    })
+    .state('parent.displaySDReport', { //list the main body of the 'admin' page
+      url:'/site/reportSD/:siteResult',
+      views: {
+        'display@': {
+          controller: 'ReportTestCtrl',
+          templateUrl: 'pages/displaySiteSDReport.tmpl.html'
+        },
+        'other@': {
+          controller: 'DisplayCtrl',
+          templateUrl: 'pages/displaySiteList.tmpl.html'
+        }
+      }
+    })
     ;
     // $urlRouterProvider.otherwise('/index'); //take to front page
     })

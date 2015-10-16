@@ -78,13 +78,13 @@ module.exports = function(app,connection) {
       });
     } else {
 
-    connection.query('SELECT ROUND(UNIX_TIMESTAMP(dateTime)/(30 * 60)) AS timekey, UNIX_TIMESTAMP(datetime)*1000 as `timeU`, round((ifnull(avg(pyro_1),0) + ifnull(avg(pyro_2),0))/2,2) as `avgPyro` FROM pyro_site_' + id +' where date(dateTime) > NOW() - INTERVAL 2 MONTH GROUP BY timekey;', function(err,rows){
-      if (err){
-        return res.json(err);
-      } else {
-        return res.json(rows);
-      }
-    });
+      connection.query('SELECT ROUND(UNIX_TIMESTAMP(dateTime)/(30 * 60)) AS timekey, UNIX_TIMESTAMP(datetime)*1000 as `timeU`, round((ifnull(avg(pyro_1),0) + ifnull(avg(pyro_2),0))/2,2) as `avgPyro` FROM pyro_site_' + id +' where date(dateTime) > NOW() - INTERVAL 2 MONTH GROUP BY timekey;', function(err,rows){
+        if (err){
+          return res.json(err);
+        } else {
+          return res.json(rows);
+        }
+      });
     }
   });
 
@@ -187,6 +187,60 @@ module.exports = function(app,connection) {
     }
   });
 
+  // get data for report using RAW pyro test
+  app.get('/api/displaySite/reportRaw/:id', function(req,res){
+    var id = req.params.id;
+    var minutes;
+    if (id <=4)  {
+      minutes = 60000;
+    } else {
+      minutes = 12000;
+    }
+    connection.query('select date(dateTime) as `date`, sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' as `esol`, sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996 as `theoretical`, sum(generation) as `generation`, sum(generation)/(sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996) as `PR` from `pyro_site_' + id +'` p left join export_' + id +' e on p.datetime = e.date group by year(dateTime), month(dateTime) order by date desc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+  // get data for report using over 50 pyro test
+  app.get('/api/displaySite/reportOver/:id', function(req,res){
+    var id = req.params.id;
+    var minutes;
+    if (id <=4)  {
+      minutes = 60000;
+    } else {
+      minutes = 12000;
+    }
+    connection.query('select date(dateTime) as `date`, sum((if(pyro_1>50,pyro_1,"") + if(pyro_2>50,pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' as `esol`, sum((if(pyro_1>50,pyro_1,"") + if(pyro_2>50,pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996 as `theoretical`, sum(generation) as `generation`, sum(generation)/(sum((if(pyro_1>50,pyro_1,"") + if(pyro_2>50,pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996) as `PR` from `pyro_site_' + id +'` p left join export_' + id +' e on p.datetime = e.date group by year(dateTime), month(dateTime) order by date desc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+  // get data for report using over SD pyro test
+  app.get('/api/displaySite/reportSD/:id', function(req,res){
+    var id = req.params.id;
+    var minutes;
+    if (id <=4)  {
+      minutes = 60000;
+    } else {
+      minutes = 12000;
+    }
+    connection.query('select date(dateTime) as `date`, sum(generation) as `generation`, sum((if(pyro_1 > greatest(ifnull(pyro_1, ""),ifnull(pyro_2, ""))*0.6 ,pyro_1,"") + if(pyro_2 > greatest(ifnull(pyro_1, ""),ifnull(pyro_2, ""))*0.6,pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' as `esol`, sum((if(pyro_1 > greatest(ifnull(pyro_1, ""),ifnull(pyro_2, ""))*0.6 ,pyro_1,"") + if(pyro_2 > greatest(ifnull(pyro_1, ""),ifnull(pyro_2, ""))*0.6,pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996 as `theoretical`, sum(generation)/(sum((if(pyro_1 > greatest(ifnull(pyro_1, ""),ifnull(pyro_2, ""))*0.6 ,pyro_1,"") + if(pyro_2 > greatest(ifnull(pyro_1, ""),ifnull(pyro_2, ""))*0.6,pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996) as `PR` from `pyro_site_' + id +'` p left join export_' + id +' e on p.datetime = e.date group by year(dateTime), month(dateTime) order by date desc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
   // get export generation for met office test
   app.get('/api/mySQL/pyroMeanInsert/:id', function(req,res){
     var id = req.params.id;
@@ -255,13 +309,6 @@ module.exports = function(app,connection) {
         return res.json(rows);
       }
     });
-  });
-
-
-  // api for getting generation of all sites
-  app.get('/api/testLoop', function(req,res){
-
-    return res.json("World");
   });
 
 };

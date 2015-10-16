@@ -5,6 +5,7 @@ angular.module('metro', [
   'routes',
   'displayProject',
   'displayExport',
-  'apiFactory'
+  'apiFactory',
+  'displayProjectTest'
 ])
 ;
