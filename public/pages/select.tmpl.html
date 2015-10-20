@@ -10,11 +10,26 @@ A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> proje
 <div class="col s6">
   <highchart id="chart1" config="chartSumMWpSites" class="span10"></highchart>
 </div>
-{{chartDate}}
-<table style="width:100%">
-  <tr ng-repeat="site in introSites">
-    <td>{{ site.name }}</td>
-    <td>{{ site.tic_mwp }}</td>
-    <td></td>
+
+<h4>Open incidents</h4>
+
+<table class="incidentTable" style="width:100%">
+  <tr>
+    <th>site</th>
+    <th>date logged</th>
+    <th>start</th>
+    <th>end</th>
+    <th>details</th>
+    <th>comment</th>
+    <th>incident number</th>
+  </tr>
+  <tr ng-repeat="incident in incidentReport">
+    <td>PS{{ incident.site }}</td>
+    <td>{{ incident.date_logged | date:'dd/MM/yy' }}</td>
+    <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
+    <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
+    <td>{{ incident.details }}</td>
+    <td>{{ incident.comment }}</td>
+    <td>{{ incident.incident_report_number }}</td>
   </tr>
 </table>
