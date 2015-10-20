@@ -16,6 +16,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
     });
   });
 
+
   app.get('/api/mySQL/exportCSVtest', function(req, res) {
 
     // Ftp.get('Primrose Solar Limited_131015.csv', 'PrimroseLimited.csv', function(hadErr) {
@@ -119,12 +120,12 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 n++;
               }
             }
-            res.send("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
-            // connection.query("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
-            //   if (err) throw err;
-            //   console.log(result.insertId);
-            //   res.send("Done: INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData);
-            // });
+            // res.send("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
+            connection.query("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)", function(err, result){
+              if (err) throw err;
+              console.log(result.insertId);
+              res.send("Done: INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData);
+            });
           }
         });
       });
