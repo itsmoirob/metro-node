@@ -11,7 +11,6 @@ function config($httpProvider) {
 
 .controller('MainCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function($scope,$stateParams,$http,$log,dataFactory,UserFactory){
 
-
   getIntroSites();
   function getIntroSites() {
     dataFactory.getPickUp()
@@ -20,9 +19,16 @@ function config($httpProvider) {
     });
   }
 
+  getIncidentReport();
+  function getIncidentReport() {
+    dataFactory.getIncidentReport()
+    .success(function(res){
+      $scope.incidentReport = res;
+    });
+  }
+
   var allSumData = [];
   var chartDate = [];
-
   getAllSiteDaily();
   function getAllSiteDaily(){
     dataFactory.allSiteDaily()
