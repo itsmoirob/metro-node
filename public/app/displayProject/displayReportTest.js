@@ -5,9 +5,6 @@ angular.module('displayProjectTest', [
   'apiFactory'
 ])
 
-.config(function($httpProvider){
-  delete $httpProvider.defaults.headers.common['X-Requested-With'];
-})
 
 .controller('ReportTestCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
 

@@ -7,10 +7,6 @@ angular.module('displayProject', [
   'apiFactory'
 ])
 
-.config(function($httpProvider){
-  delete $httpProvider.defaults.headers.common['X-Requested-With'];
-})
-
 .controller('DisplayCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
 
   var SP = $stateParams.siteResult;
