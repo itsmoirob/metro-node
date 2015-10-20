@@ -59,6 +59,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/reportSD/' + id);
   };
 
+  dataFactory.getIncidentReport = function () {
+    return $http.get(urlBase + 'reports/incidents');
+  };
+
   return dataFactory;
 }])
 

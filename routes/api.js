@@ -196,7 +196,7 @@ module.exports = function(app,connection) {
     } else {
       minutes = 12000;
     }
-    connection.query('select date(dateTime) as `date`, sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' as `esol`, sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996 as `theoretical`, sum(generation) as `generation`, sum(generation)/(sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996) as `PR` from `pyro_site_' + id +'` p left join export_' + id +' e on p.datetime = e.date group by year(dateTime), month(dateTime) order by date desc;', function(err,rows){
+    connection.query('select date(dateTime) as `date`,sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END))) as `pyro`, sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' as `esol`, sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996 as `theoretical`, sum(generation) as `generation`, sum(generation)/(sum((ifnull(pyro_1,"") + ifnull(pyro_2,"")) / ((CASE WHEN pyro_1 is null THEN 0 ELSE 1 END) + (CASE WHEN pyro_2 is null THEN 0 ELSE 1 END)))/' + minutes +' * (select tic_mwp * 1000 from top_table where id = ' + id +') * 0.996) as `PR` from `pyro_site_' + id +'` p left join export_' + id +' e on p.datetime = e.date group by year(dateTime), month(dateTime) order by date desc;', function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -277,6 +277,16 @@ module.exports = function(app,connection) {
         }
       });
     }
+  });
+
+  app.get('/api/reports/incidents' , function(req,res) {
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, comment, incident_report_number from incident_log where status = 1;', function(err,rows){
+      if(err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
   });
 
   app.get('/api/displaySite/allSiteDaily/', function(req,res){
