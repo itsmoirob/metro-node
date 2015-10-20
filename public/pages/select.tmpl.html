@@ -16,7 +16,6 @@ A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> proje
 <table class="incidentTable" style="width:100%">
   <tr>
     <th>site</th>
-    <th>date logged</th>
     <th>start</th>
     <th>end</th>
     <th>details</th>
@@ -25,7 +24,6 @@ A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> proje
   </tr>
   <tr ng-repeat="incident in incidentReport">
     <td>PS{{ incident.site }}</td>
-    <td>{{ incident.date_logged | date:'dd/MM/yy' }}</td>
     <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
     <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
     <td>{{ incident.details }}</td>
