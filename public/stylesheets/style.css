@@ -45,6 +45,10 @@ ul.success li{
   	border-color: #d6e9c6;
 }
 
+.footer {
+  height:100px;
+}
+
 
 .primroseYellow {
   background-color: rgb(251, 161, 27);
@@ -69,4 +73,8 @@ ul.success li{
 #wrapper {
   margin: 0 auto;
   /*font-size: 1.6em;*/
+}
+
+.btn-custom:hover{
+   background-color: rgb(251, 161, 27);
 }
