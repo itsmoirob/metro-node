@@ -1,0 +1,18 @@
+<table class="incidentTable" style="width:100%" >
+  <tr>
+    <th>Site</th>
+    <th>Availabilty</th>
+    <th>Over 0</th>
+    <th>PR</th>
+    <th>Export</th>
+  </tr>
+  <tr ng-repeat="site in allReports">
+    <td>{{site.site}}</td>
+    <td>{{site.avail}}</td>
+    <td>{{site.Over0}}</td>
+    <td>{{site.PR}}</td>
+    <td>{{site.export}}</td>
+  </tr>
+</table>
+
+{{allReports}}
