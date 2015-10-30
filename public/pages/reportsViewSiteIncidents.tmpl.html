@@ -1,0 +1,18 @@
+<h3>You are viewing {{ currentDisplaySite[0].name }}</h3>
+
+<table class="incidentTable" style="width:100%">
+  <tr>
+    <th>start</th>
+    <th>end</th>
+    <th>details</th>
+    <th>comment</th>
+    <th>incident number</th>
+  </tr>
+  <tr ng-repeat="incident in incidentReportSite">
+    <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
+    <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
+    <td>{{ incident.details }}</td>
+    <td>{{ incident.comment }}</td>
+    <td>{{ incident.incident_report_number }}</td>
+  </tr>
+</table>
