@@ -27,6 +27,7 @@ angular.module('displayExport', [
       });
     });
   }
+  
   getChartMeanPyro(SP);
   function getChartMeanPyro(SP){
     dataFactory.getChartPyro(SP)

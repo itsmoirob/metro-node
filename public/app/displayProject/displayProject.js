@@ -34,8 +34,6 @@ angular.module('displayProject', [
     });
   }
 
-
-
   getEPC(SP);
   function getEPC(SP) {
     dataFactory.getEPC(SP)

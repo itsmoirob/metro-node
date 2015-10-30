@@ -9,7 +9,7 @@ angular.module('displayProjectTest', [
 .controller('ReportTestCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
 
   var SP = $stateParams.siteResult;
-
+  
   getReportRaw(SP);
   function getReportRaw(SP) {
     dataFactory.getReportRaw(SP)
@@ -31,6 +31,5 @@ angular.module('displayProjectTest', [
       $scope.reportSD = res;
     });
   }
-
 
 }]);
