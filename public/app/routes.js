@@ -5,194 +5,214 @@ angular.module('routes', [
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
-    .state('parent', {
-        url:'',
-        abstract: true
-    })
-    .state('parent.listSites', { //list sites at the side of the bar on the fron page
-      url:'',
-      views: {
-        'display@': {
-          controller: 'MainCtrl',
-          templateUrl: 'pages/select.tmpl.html'
-        },
-        'other@': {
-          controller: 'MainCtrl',
-          templateUrl: 'pages/selectList.tmpl.html'
+  .state('parent', {
+    url:'',
+    abstract: true
+  })
+  .state('parent.listSites', { //list sites at the side of the bar on the fron page
+    url:'',
+    views: {
+      'display@': {
+        controller: 'MainCtrl',
+        templateUrl: 'pages/select.tmpl.html'
+      },
+      'other@': {
+        controller: 'MainCtrl',
+        templateUrl: 'pages/selectList.tmpl.html'
 
-        }
       }
-    })
-    .state('parent.displaySummaryProject', { //list the main body of the 'summary' page
-      url:'/site/summary/:siteResult',
-      views: {
-        'display@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySite.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayGenerationProject', { //list the main body of the 'generation' page
-      url:'/site/generation/:siteResult',
-      views: {
-        'display@': {
-          controller: 'ExportCtrl',
-          templateUrl: 'pages/displaySiteGeneration.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayInstallProject', { //list the main body of the 'finance' page
-      url:'/site/install/:siteResult',
-      views: {
-        'display@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteInstall.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayFinanceProject', { //list the main body of the 'finance' page
-      url:'/site/finance/:siteResult',
-      views: {
-        'display@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteFinance.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayAdminProject', { //list the main body of the 'admin' page
-      url:'/site/admin/:siteResult',
-      views: {
-        'display@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteAdmin.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayMKReport', { //list the main body of the 'admin' page
-      url:'/site/report/:siteResult',
-      views: {
-        'display@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteMKReport.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayRawReport', { //list the main body of the 'admin' page
-      url:'/site/reportRaw/:siteResult',
-      views: {
-        'display@': {
-          controller: 'ReportTestCtrl',
-          templateUrl: 'pages/displaySiteRawReport.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displayOverReport', { //list the main body of the 'admin' page
-      url:'/site/reportOver/:siteResult',
-      views: {
-        'display@': {
-          controller: 'ReportTestCtrl',
-          templateUrl: 'pages/displaySiteOverReport.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.displaySDReport', { //list the main body of the 'admin' page
-      url:'/site/reportSD/:siteResult',
-      views: {
-        'display@': {
-          controller: 'ReportTestCtrl',
-          templateUrl: 'pages/displaySiteSDReport.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.reportsIncidentsAll', { //list the main body of the 'admin' page
-      url:'/incidentsAll',
-      views: {
-        'display@': {
-          controller: 'ReportIncidentsCtrl',
-          templateUrl: 'pages/reportsViewAllIncidents.tmpl.html'
-        },
-        'other@': {
-          // controller: 'DisplayCtrl',
-          // templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.reportsIncidentNew', { //list the main body of the 'admin' page
-      url:'/incidentNew',
-      views: {
-        'display@': {
-          controller: 'ReportIncidentsCtrl',
-          templateUrl: 'pages/reportsNewIncident.tmpl.html'
-        },
-        'other@': {
-          // controller: 'DisplayCtrl',
-          // templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.reportsIncidentSite', { //list the main body of the 'admin' page
-      url:'/incidents/:siteResult',
-      views: {
-        'display@': {
-          controller: 'ReportIncidentsCtrl',
-          templateUrl: 'pages/reportsViewSiteIncidents.tmpl.html'
-        },
-        'other@': {
-          controller: 'DisplayCtrl',
-          templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    .state('parent.reportsAll', { //list the main body of the 'admin' page
-      url:'/reportsAll',
-      views: {
-        'display@': {
-          controller: 'ReportIncidentsCtrl',
-          templateUrl: 'pages/reportsAll.tmpl.html'
-        },
-        'other@': {
-          // controller: 'DisplayCtrl',
-          // templateUrl: 'pages/displaySiteList.tmpl.html'
-        }
-      }
-    })
-    ;
-    // $urlRouterProvider.otherwise('/index'); //take to front page
-    })
+    }
+  })
+  .state('parent.displaySummaryProject', { //list the main body of the 'summary' page
+  url:'/site/summary/:siteResult',
+  views: {
+    'display@': {
+      controller: 'DisplayCtrl',
+      templateUrl: 'pages/displaySite.tmpl.html'
+    },
+    'other@': {
+      controller: 'DisplayCtrl',
+      templateUrl: 'pages/displaySiteList.tmpl.html'
+    }
+  }
+})
+.state('parent.displayGenerationProject', { //list the main body of the 'generation' page
+url:'/site/generation/:siteResult',
+views: {
+  'display@': {
+    controller: 'ExportCtrl',
+    templateUrl: 'pages/displaySiteGeneration.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displayInstallProject', { //list the main body of the 'finance' page
+url:'/site/install/:siteResult',
+views: {
+  'display@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteInstall.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displayFinanceProject', { //list the main body of the 'finance' page
+url:'/site/finance/:siteResult',
+views: {
+  'display@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteFinance.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displayAdminProject', { //list the main body of the 'admin' page
+url:'/site/admin/:siteResult',
+views: {
+  'display@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteAdmin.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displayMKReport', { //list the main body of the 'admin' page
+url:'/site/report/:siteResult',
+views: {
+  'display@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteMKReport.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displayRawReport', { //list the main body of the 'admin' page
+url:'/site/reportRaw/:siteResult',
+views: {
+  'display@': {
+    controller: 'ReportTestCtrl',
+    templateUrl: 'pages/displaySiteRawReport.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displayOverReport', { //list the main body of the 'admin' page
+url:'/site/reportOver/:siteResult',
+views: {
+  'display@': {
+    controller: 'ReportTestCtrl',
+    templateUrl: 'pages/displaySiteOverReport.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.displaySDReport', { //list the main body of the 'admin' page
+url:'/site/reportSD/:siteResult',
+views: {
+  'display@': {
+    controller: 'ReportTestCtrl',
+    templateUrl: 'pages/displaySiteSDReport.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.reportsIncidentsAll', { //list the main body of the 'admin' page
+url:'/incidentsAll',
+views: {
+  'display@': {
+    controller: 'ReportIncidentsCtrl',
+    templateUrl: 'pages/reportsViewAllIncidents.tmpl.html'
+  },
+  'other@': {
+    // controller: 'DisplayCtrl',
+    // templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.reportsIncidentNew', { //list the main body of the 'admin' page
+url:'/incidentNew',
+views: {
+  'display@': {
+    controller: 'ReportIncidentsCtrl',
+    templateUrl: 'pages/reportsNewIncident.tmpl.html'
+  },
+  'other@': {
+    // controller: 'DisplayCtrl',
+    // templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.reportsIncidentSite', { //list the main body of the 'admin' page
+url:'/incidents/:siteResult',
+views: {
+  'display@': {
+    controller: 'ReportIncidentsCtrl',
+    templateUrl: 'pages/reportsViewSiteIncidents.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.reportsAll', { //list the main body of the 'admin' page
+url:'/reportsAll',
+views: {
+  'display@': {
+    controller: 'ReportIncidentsCtrl',
+    templateUrl: 'pages/reportsAll.tmpl.html'
+  },
+  'other@': {
+    // controller: 'DisplayCtrl',
+    // templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
+.state('parent.reportsSelect', { //list the main body of the 'admin' page
+url:'/reportsSelect/:year/:month/:day/:numberOfDays',
+views: {
+  'display@': {
+    controller: 'ReportIncidentsCtrl',
+    templateUrl: 'pages/reportsSelect.tmpl.html'
+  },
+  'other@': {
+    // controller: 'DisplayCtrl',
+    // templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+},
+params: {
+  day: null,
+  month: null,
+  year: null,
+  numberOfDays: null
+}
+
+})
+;
+// $urlRouterProvider.otherwise('/index'); //take to front page
+})
 ;

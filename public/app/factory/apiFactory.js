@@ -75,6 +75,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/allReport/');
   };
 
+  dataFactory.getSelectReports = function (year, month, day, numberOfDays) {
+    return $http.get(urlBase + 'displaySite/reportSelect/' + year + '/' + month + '/' + day + '/' + numberOfDays + '/');
+  };
+
   return dataFactory;
 }])
 
