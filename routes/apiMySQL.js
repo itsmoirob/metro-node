@@ -19,41 +19,13 @@
 
   app.get('/api/mySQL/exportCSVtest/:id', function(req, res) {
 
-    // var str = "g"; // Will store the contents of the file
-    // Ftp.get('Primrose Solar Limited.csv', function(err, socket) {
-    //   if (err) return;
-    //   socket.on("data", function(d) { str += d.toString() +"1"; });
-    //   socket.on("close", function(hadErr) {
-    //     if (hadErr)
-    //     console.error('There was an error retrieving the file.');
-    //   });
-    //   socket.resume();
-    //   res.send("str contains " + str);
-    //   Ftp.raw.quit(function(err, data) {
-    //     if (err) return console.error(err);
-    //     console.log("Bye!");
-    //   });
-    // });
-
-    // Ftp.get('Primrose Solar Limited.csv', 'PrimroseLimited.csv', function(hadErr) {
-    //   if (hadErr)
-    //     console.error('There was an error retrieving the file.');
-    //   else
-    //     console.log('File copied successfully!');
-    // });
-    //
-    //
-    // Ftp.ls(".", function(err, res) {
-    //   res.forEach(function(file) {
-    //     console.log(file.name);
-    //   });
-    // });
     var id = req.params.id;
     id = id - 1;
 
-    var filePath = "Primrose Solar Limited.csv";
-    // var filePath = "ftp://SKPS1805:9Sk8*sK%23@ftp.stark.co.uk/Primrose%20Solar%20Limited_131015.csv";
-    fs.readFile(filePath, {
+    var filePathHH = "Primrose Solar Limited.csv";
+    var filePathNonHH = "Primrose Solar Limited NonHH.csv";
+
+    fs.readFile(filePathHH, {
       encoding: 'utf-8'
     }, function(err, csvData) {
       if (err) {
@@ -94,9 +66,6 @@
               }
             }
 
-            // res.send("Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;");
-
-
             connection.query("Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;", function(err, result){
               if (err) throw err;
               console.log(result);
@@ -110,9 +79,13 @@
 
 
   app.get('/api/mySQL/exportUpload/:id', function(req, res) {
-    var id = req.params.id-1;
-    var filePath = "./"+mpanList[id].mpan+".csv";
-    fs.readFile(filePath, {
+    var id = req.params.id;
+    id = id - 1;
+
+    var filePathHH = "Primrose Solar Limited.csv";
+    var filePathNonHH = "Primrose Solar Limited NonHH.csv";
+
+    fs.readFile(filePathNonHH, {
       encoding: 'utf-8'
     }, function(err, csvData) {
       if (err) {
@@ -125,30 +98,43 @@
         if (err) {
           console.log(err);
         } else {
-          var sqlInputData = [];
-          var n = 0;
 
-          for (j=8;j<data.length;j++){ // use this line only for histroical data
-            var day = moment(data[j][7], "DD/MM/YY").format("YYYY-MM-DD");
-            for (i = 8; i < data[j].length; i++) {
-              var hour = data[7][i];
-              if (data[j][i] === "-"){
-                data[j][i] = "NULL";
+          var readingsForExport = mpanList.map(function (mpan) {
+            var readingsForOneExport = data.filter(function (item) {
+              return item[0] === mpan.mpan;
+            });
+            return { id:mpan.id,
+              data:readingsForOneExport};
+            });
+
+
+            var sqlInputData = [];
+            var n = 0;
+
+            for (j=0;j<readingsForExport[id].data.length;j++){ // use this line only for histroical data
+              var day = moment(readingsForExport[id].data[j][2], "DD/MM/YYYY").format("YYYY-MM-DD");
+              var hour = moment("00:00", "HH:mm").format("HH:mm");
+              for (i = 3; i < readingsForExport[id].data[j].length; i++) {
+
+                if (readingsForExport[id].data[j][i] === "-"){
+                  readingsForExport[id].data[j][i] = "NULL";
+                }
+
+                sqlInputData[n] = ["(NULL, '" + day + "','" + hour + "'," + readingsForExport[id].data[j][i]+")"];
+                hour = moment(hour,"HH:mm").add(30,'minutes').format("HH:mm");
+                n++;
               }
-              sqlInputData[n] = ["(NULL, '" + day + "','" + hour + "'," + data[j][i]+")"];
-              // hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
-              n++;
             }
+
+            connection.query("Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;", function(err, result){
+              if (err) throw err;
+              console.log(result);
+              res.send("COMPLETE: Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;" + result.message);
+            });
+
           }
-          // res.send("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
-          connection.query("Start transaction; INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation);insert into dailySumExport(date,PS" + mpanList[id].id + ") select date, sum(generation) from export_" + mpanList[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + mpanList[id].id + "=VALUES(PS" + mpanList[id].id + "); commit;", function(err, result){
-            if (err) throw err;
-            console.log(result.insertId);
-            res.send("Start transaction; INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation);insert into dailySumExport(date,PS" + mpanList[id].id + ") select date, sum(generation) from export_" + mpanList[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + mpanList[id].id + "=VALUES(PS" + mpanList[id].id + "); commit;");
-          });
-        }
+        });
       });
-    });
   });
 
 
