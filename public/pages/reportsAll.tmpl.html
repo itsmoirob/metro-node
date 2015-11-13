@@ -30,12 +30,12 @@
 </div>
 <div class="row">
   <p>
-    <a class="waves-effect waves-light" ui-sref="parent.reportsSelect({day:datePicked.day, month:datePicked.month.value, year:datePicked.year, numberOfDays:datePicked.numberOfDays})">Display report for date {{datePicked.day}} {{datePicked.month.name}} {{datePicked.year}}, and {{datePicked.numberOfDays}} day/s</a>
+    <a ng-hide="datePicked.year == null || datePicked.day == null || datePicked.month.name == null || datePicked.numberOfDays == null" class="waves-effect waves-light" class="waves-effect waves-light" ui-sref="parent.reportsSelect({day:datePicked.day, month:datePicked.month.value, year:datePicked.year, numberOfDays:datePicked.numberOfDays})">Display report for date {{datePicked.day}} {{datePicked.month.name}} {{datePicked.year}}, and {{datePicked.numberOfDays}} day/s</a>
 
   </p>
 </div>
 <div class="row">
-  Report for last 7 days from today
+  Report for last 14 days from today
   <table class="incidentTable" style="width:100%" >
     <tr>
       <th>Site</th>
@@ -53,5 +53,3 @@
     </tr>
   </table>
 </div>
-
-{{}}
