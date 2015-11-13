@@ -102,4 +102,22 @@ angular.module('displayReportsIncidents', [
   {name:"November", value:"11"},
   {name:"December", value:"12"}];
 
+  $scope.form = {
+    startDate: null,
+    startTime: null,
+    endDate: null,
+    endTime: null,
+    planned: false,
+    lossOfGeneration: false,
+    closed: false
+  };
+
+  $scope.saveData = function() {
+    $http.post('/users/newIncidentLog', $scope.form)
+    .then(function(data) {
+      $location.path('/');
+    }).error(function(err) {
+      $scope.errorMessage = err;
+    });
+  };
 }]);

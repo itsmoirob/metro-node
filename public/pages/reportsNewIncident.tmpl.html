@@ -1,38 +1,82 @@
-<div class="row">
-  <form class="col s12" action="index.html" method="post">
-    <div class="input-field">
-      <input id="site" type="text" class="validate">
-      <label for="site">Site</label>
-    </div>
-    <div class="input-field">
-      <input id="start_time" type="date" class="datepicker">
-      <label for="start_time" class="active">Start time</label>
-    </div>
-    <div class="input-field">
-      <input id="end_time" type="date" class="datepicker">
-      <label for="end_time" class="active">End time</label>
-    </div>
-    <div class="input-field">
-      <input id="reported_by_person" type="text" class="validate">
-      <label for="reported_by_person">Reported by person</label>
-    </div>
-    <div class="input-field">
-      <input id="reported_by_company" type="text" class="validate">
-      <label for="reported_by_company">Reported by company</label>
-    </div>
+<h3>New incident form</h3>
 
-    <label>Category</label>
-    <select class="browser-default">
-      <option value="" disabled selected>Choose your option</option>
-      <option value="1">Option 1</option>
-      <option value="2">Option 2</option>
-      <option value="3">Option 3</option>
-    </select>
-    <p>
-      <input type="checkbox" id="test5" />
-      <label for="test5">Red</label>
-    </p>
+<div class="row">
+  <div class="card-panel col m6">
+    <form name="incidentForm" role="form" action="/users/newIncidentLog" method="post">
+      id: <input type="text" name="id">
+      category: <input type="text" name="category">
+      <input type="submit" value="Submit">
+
+
+      <!-- <div class="input-field">
+        <input id="site" type="text" class="validate">
+        <label for="site">Site</label>
+      </div>
+      <div class="row">
+        <div class="col s6 m6">
+          <label for="selectStartDate">Select start date: </label>
+          <input type="date" id="selectStartDate" name="input" ng-model="form.startDate">
+        </div>
+        <div class="col s6 m6">
+          <label for="selectStartTime">Select start time: </label>
+          <input type="time" id="selectStartTime" name="input" ng-model="form.startTime">
+        </div>
+        <div class="col s6 m6">
+          <label for="selectEndDate">Select end date: </label>
+          <input type="date" id="selectStartDate" name="input" ng-model="form.endDate">
+        </div>
+        <div class="col s6 m6">
+          <label for="selectEndTime">Select end time: </label>
+          <input type="time" id="selectEndTime" name="input" ng-model="form.endTime">
+        </div>
+      </div>
+      <div class="input-field">
+        <input id="reported_by_person" type="text" class="validate">
+        <label for="reported_by_person">Reported by person</label>
+      </div>
+      <div class="input-field">
+        <input id="reported_by_company" type="text" class="validate">
+        <label for="reported_by_company">Reported by company</label>
+      </div>
+      <div class="switch">
+        <label>
+          No
+          <input type="checkbox" ng-model="form.planned" id="planned">
+          <span class="lever"></span>
+          Yes
+        </label>
+      </div>
+      <div class="switch">
+        <label>
+          No
+          <input type="checkbox" ng-model="form.lossOfGeneration" id="lossOfGeneration">
+          <span class="lever"></span>
+          Yes
+        </label>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <textarea id="details" class="materialize-textarea" length="1500"></textarea>
+          <label for="details">Incident details</label>
+        </div>
+      </div>
+
+      <div class="switch">
+        Closed?
+        <label>
+          No
+          <input type="checkbox" ng-model="form.closed" id="closed">
+          <span class="lever"></span>
+          Yes
+        </label>
+      </div>
+
+      <hr>
+
+      <button type="submit" ng-click="saveData()" class="btn btn-success">Save</button>
+    </div> -->
   </form>
 </div>
+</div>
 
-planned, loss_of_generation, details, status, comment, incident_report_number
+{{form}}
