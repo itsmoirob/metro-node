@@ -16,11 +16,11 @@
   </tr>
   <tr ng-repeat="report in MKReport">
     <td>{{ report.date | date:'dd/MM/yyyy' }}</td>
-    <td>{{ report.export | number }}</td>
-    <td>{{ report.pyroMean | number }}</td>
+    <td>{{ report.theoretical | number }}</td>
+    <td>{{ report.avgPyro | number }}</td>
     <td>{{ report.opHours | number }}</td>
     <td>{{ report.esol | number }}</td>
     <td>{{ report.theoretical | number }}</td>
-    <td>{{ report.PR * 100 }}%</td>
+    <td>{{ report.pr * 100 | number }}%</td>
   </tr>
   </table>
