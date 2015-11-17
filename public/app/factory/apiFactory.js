@@ -79,6 +79,14 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/reportSelect/' + year + '/' + month + '/' + day + '/' + numberOfDays + '/');
   };
 
+  dataFactory.getIncidentSiteName = function () {
+    return $http.get(urlBase + 'incidents/incidentSiteName/');
+  };
+
+  dataFactory.getIncidentCategory = function () {
+    return $http.get(urlBase + 'incidents/incidentCategory/');
+  };
+
   return dataFactory;
 }])
 

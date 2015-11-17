@@ -3,80 +3,69 @@
 <div class="row">
   <div class="card-panel col m6">
     <form name="incidentForm" role="form" action="/users/newIncidentLog" method="post">
-      id: <input type="text" name="id">
-      category: <input type="text" name="category">
-      <input type="submit" value="Submit">
-
-
-      <!-- <div class="input-field">
-        <input id="site" type="text" class="validate">
-        <label for="site">Site</label>
-      </div>
+      <label>Loss of generation</label>
+      <select class="browser-default" name="site" required>
+        <option value="" disabled selected>Choose your option</option>
+        <option ng-repeat="name in incidentSiteName" value={{name.id}}>{{name.name}}</option>
+      </select>
       <div class="row">
         <div class="col s6 m6">
           <label for="selectStartDate">Select start date: </label>
-          <input type="date" id="selectStartDate" name="input" ng-model="form.startDate">
+          <input type="date" name="selectStartDate" name="input" required>
         </div>
         <div class="col s6 m6">
           <label for="selectStartTime">Select start time: </label>
-          <input type="time" id="selectStartTime" name="input" ng-model="form.startTime">
+          <input type="time" name="selectStartTime" name="input" required>
         </div>
         <div class="col s6 m6">
           <label for="selectEndDate">Select end date: </label>
-          <input type="date" id="selectStartDate" name="input" ng-model="form.endDate">
+          <input type="date" name="selectEndDate" name="input">
         </div>
         <div class="col s6 m6">
           <label for="selectEndTime">Select end time: </label>
-          <input type="time" id="selectEndTime" name="input" ng-model="form.endTime">
+          <input type="time" name="selectEndTime" name="input">
         </div>
       </div>
       <div class="input-field">
-        <input id="reported_by_person" type="text" class="validate">
-        <label for="reported_by_person">Reported by person</label>
+        <input name="reportedByPerson" type="text" class="validate" required>
+        <label for="reportedByPerson">Reported by person</label>
       </div>
-      <div class="input-field">
-        <input id="reported_by_company" type="text" class="validate">
-        <label for="reported_by_company">Reported by company</label>
+      <label>Which company reported?</label>
+      <select class="browser-default" name="reportedByCompany" required>
+        <option value="" disabled selected>Choose your option</option>
+        <option value="1">Primrose</option>
+        <option value="2">EPC</option>
+        <option value="3">Other</option>
+      </select>
+      <label>Planned</label>
+      <select class="browser-default" name="planned" required>
+        <option value="" disabled selected>Choose your option</option>
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
+      <label>Loss of generation</label>
+      <select class="browser-default" name="lossOfGeneration" required>
+        <option value="" disabled selected>Choose your option</option>
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
+      <label>Category</label>
+      <select class="browser-default" name="category" required>
+        <option value="" disabled selected>Choose your option</option>
+        <option ng-repeat="category in incidentCategory" value={{category.id}}>{{category.value}}</option>
+      </select>
+      <div class="input-field col s12">
+        <textarea name="details" class="materialize-textarea" required></textarea>
+        <label for="details">Incident details</label>
       </div>
-      <div class="switch">
-        <label>
-          No
-          <input type="checkbox" ng-model="form.planned" id="planned">
-          <span class="lever"></span>
-          Yes
-        </label>
-      </div>
-      <div class="switch">
-        <label>
-          No
-          <input type="checkbox" ng-model="form.lossOfGeneration" id="lossOfGeneration">
-          <span class="lever"></span>
-          Yes
-        </label>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <textarea id="details" class="materialize-textarea" length="1500"></textarea>
-          <label for="details">Incident details</label>
-        </div>
-      </div>
-
-      <div class="switch">
-        Closed?
-        <label>
-          No
-          <input type="checkbox" ng-model="form.closed" id="closed">
-          <span class="lever"></span>
-          Yes
-        </label>
-      </div>
-
+      <label>Closed</label>
+      <select class="browser-default" name="isClosed" required>
+        <option value="" disabled selected>Choose your option</option>
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
       <hr>
-
-      <button type="submit" ng-click="saveData()" class="btn btn-success">Save</button>
-    </div> -->
-  </form>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
 </div>
-</div>
-
-{{form}}

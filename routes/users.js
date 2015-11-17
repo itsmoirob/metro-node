@@ -32,33 +32,7 @@ router.get('/login', function(req, res, next) {
   });
 });
 
-router.post('/newIncidentLog', function(req, res, next) {
-  console.log("POST: ");
-// connection.connect();
 
-name = req.body.id;
-category = req.body.category;
-console.log('insert into testTable values (' + "'" + name +"'" +',' + "'"+ category +"'" +');');
-connection.query('insert into testTable values (' + "'" + name +"'" +',' + "'"+ category +"'" +');', function (error, rows, fields) {
-  console.log(error);
-       res.writeHead(200, {'Content-Type': 'text/plain'});
-
-    res.end( 'record inerted...');
-        });
-// connection.end();
-  // var query = "INSERT INTO ??(??,??) VALUES (?,?)";
-  // var table = ["user_login","user_email","user_password",req.body.name1,req.body.email];
-  // query = mysql.format(query,table);
-  // connection.query(query,function(err,rows){
-  //   if(err) {
-  //     res.json({"Error" : true, "Message" : err});
-  //   } else {
-  //     res.json({"Error" : false, "Message" : "User Added !"});
-  //   }
-  // });
-  // // res.send(query);
-
-});
 
 router.post('/register',function(req, res, next){
   // Get Form Values
@@ -170,6 +144,47 @@ router.get('/logout', function(req, res){
   req.logout();
   req.flash('success','You have logged out');
   res.redirect('/users/login');
+});
+
+router.post('/newIncidentLog', function(req, res, next) {
+  console.log("POST: ");
+  // connection.connect();
+
+  name = req.user.name;
+  site = req.body.site;
+  selectStartDate = req.body.selectStartDate;
+  selectStartTime = req.body.selectStartTime;
+  selectEndTime = "00:00" || req.body.selectEndTime;
+  if(req.body.selectEndDate) {
+    endDateTime = "'" + req.body.selectEndDate + " " + selectEndTime + "'";
+  } else {
+    endDateTime = "NULL";
+  }
+  reportedByPerson = req.body.reportedByPerson;
+  reportedByCompany = req.body.reportedByCompany;
+  planned = req.body.planned;
+  lossOfGeneration = req.body.lossOfGeneration;
+  category = req.body.category;
+  details = req.body.details;
+  isClosed = req.body.isClosed;
+
+  connection.query("start transaction; insert into incident_log values (NULL," +
+  site + ", now(), '" +
+  selectStartDate + " " + selectStartTime + "', " +
+  endDateTime + ", '" +
+  reportedByPerson + "', " +
+  reportedByCompany + ", " +
+  category + "," +
+  planned + ", " +
+  lossOfGeneration + ", '" +
+  details + "', " +
+  isClosed
+  + ",NULL, '" + name +"'); Update incident_log set incident_report_number = concat('IRF_', date(now()), '_', lpad(id,3,'0')) order by id desc limit 1; commit;", function (error, rows, fields) {
+    console.log(error);
+    // res.writeHead(200, {'Content-Type': 'text/plain'});
+    req.flash('success','Record has been inserted');
+    res.redirect('/#/incidentsAll');
+  });
 });
 
 
