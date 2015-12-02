@@ -63,6 +63,11 @@ ul.success li{
   color: white;
 }
 
+.formSubmit {
+  margin-bottom: 50px;
+  margin-top: 50px;
+}
+
 .incidentTable td {
   border: solid thin;
 }
