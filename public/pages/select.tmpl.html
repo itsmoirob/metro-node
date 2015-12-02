@@ -1,33 +1,51 @@
-<p>
-  This is <span class="metro">Metro</span>, connecting all sites of Primrose Solar.
-</p>
-A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> project board on what I am working on and suggesting features/reports
-<hr />
-
-<div class="col s6">
-  <highchart id="chart1" config="chartSumSites" class="span10"></highchart>
+<div class="row">
+  <p>
+    This is <span class="metro">Metro</span>, connecting all sites of Primrose Solar.
+  </p>
+  A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> project board on what I am working on and suggesting features/reports
+  <hr />
+  <div>
+    <highchart id="chart1" config="chartSumSites" class="span10"></highchart>
+  </div>
+  <div>
+    <highchart id="chart1" config="chartSumMWpSites" class="span10"></highchart>
+  </div>
+  <!-- <p>
+    Select a different date. Graphs will display 31 days up to the date selected.
+  </p>
+  <div class="col s6 m4">
+    <label for="chartStartDate">Select end date: </label>
+    <input type="date" name="chartStartDate" name="input" required>
+  </div>
+  <div class="col s6 m4">
+    <button class="btn waves-effect waves-light">Submit</button>
+  </div> -->
 </div>
-<div class="col s6">
-  <highchart id="chart1" config="chartSumMWpSites" class="span10"></highchart>
+<div class="row">
+  <hr>
+  <div ng-if="incidentReport[0].id" class="col s12 m12">
+    <h4>Open incidents</h4>
+    <table class="incidentTable" style="width:100%">
+      <tr>
+        <th>Site</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Details</th>
+        <th>Comment</th>
+        <th>Incident number</th>
+      </tr>
+      <tr ng-repeat="incident in incidentReport">
+        <td>PS{{ incident.site }}</td>
+        <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
+        <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
+        <td>{{ incident.details }}</td>
+        <td>{{ incident.comment }}</td>
+        <td>{{ incident.incident_report_number }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div ng-if="!incidentReport[0].id" class="col s12 m12">
+    <h5>There are curently no open incidents.</h5>
+  </div>
 </div>
-
-<h4>Open incidents</h4>
-
-<table class="incidentTable" style="width:100%">
-  <tr>
-    <th>site</th>
-    <th>start</th>
-    <th>end</th>
-    <th>details</th>
-    <th>comment</th>
-    <th>incident number</th>
-  </tr>
-  <tr ng-repeat="incident in incidentReport">
-    <td>PS{{ incident.site }}</td>
-    <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
-    <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
-    <td>{{ incident.details }}</td>
-    <td>{{ incident.comment }}</td>
-    <td>{{ incident.incident_report_number }}</td>
-  </tr>
-</table>
