@@ -152,17 +152,7 @@ module.exports = function(app,connection) {
   // get export generation for met office test
   app.get('/api/displaySite/report/:id', function(req,res){
     var id = req.params.id;
-    if (id == 5) {
-      avgPyro = "(avg(nullif(pyro_1,0)) + avg(nullif(pyro_2,0)) + avg(nullif(pyro_3,0)) + avg(nullif(pyro_4,0)))/4 as avg_pyro";
-    } else if (id == 7) {
-      avgPyro = "(avg(nullif(pyro_1,0)) + avg(nullif(pyro_2,0)) + avg(nullif(pyro_3,0)) + avg(nullif(pyro_4,0)) + avg(nullif(pyro_5,0)) + avg(nullif(pyro_6,0)) + avg(nullif(pyro_7,0)) + avg(nullif(pyro_8,0)) + avg(nullif(pyro_9,0)) + avg(nullif(pyro_10,0)) + avg(nullif(pyro_11,0)) + avg(nullif(pyro_12,0)))/12 as avgPyro";
-    } else if (id == 11) {
-      avgPyro = "(avg(nullif(pyro_1,0)) + avg(nullif(pyro_2,0)) + avg(nullif(pyro_3,0)))/3 as avgPyro";
-    } else {
-      avgPyro = "(avg(nullif(pyro_1,0)) + avg(nullif(pyro_2,0)))/2 as avgPyro";
-    }
-    // res.send("select e.date, sum(generation), " + avgPyro + ", round((time_to_sec((select time from export_" + id + "  as main where generation > 0 and (date = date(dateTime)) group by date desc limit 1)) - time_to_sec((select time from export_" + id + "  as main where generation > 0 and (date = date(dateTime)) group by date asc limit 1)))/60/60,2) as time, ps" + id + "  as esol, ps" + id + "  * (select tic_mwp from top_table where id = " + id + " ) * 1000 as theoretical, sum(generation)/(ps" + id + "  * (select tic_mwp from top_table where id = " + id + " ) * 1000) as pr from export_" + id + "  e left join pyro_site_" + id + " p on concat(e.date,' ',time) = p.dateTime left join dailyEsol i on e.date = i.date group by e.date order by e.date desc;");
-    connection.query("select e.date, sum(generation), " + avgPyro + ", round((time_to_sec((select time from export_" + id + "  as main where generation > 0 and (date = date(dateTime)) group by date desc limit 1)) - time_to_sec((select time from export_" + id + "  as main where generation > 0 and (date = date(dateTime)) group by date asc limit 1)))/60/60,2) as opHours, ps" + id + "  as esol, ps" + id + "  * (select tic_mwp from top_table where id = " + id + " ) * 1000 as theoretical, sum(generation)/(ps" + id + "  * (select tic_mwp from top_table where id = " + id + " ) * 1000) as pr from export_" + id + "  e left join pyro_site_" + id + " p on concat(e.date,' ',time) = p.dateTime left join dailyEsol i on e.date = i.date group by e.date order by e.date desc;", function(err,rows){
+    connection.query("select e.date, sum(generation) as generation, ps" + id + " * 1000 / (sum(case when generation > 0 then 0.5 else 0 end)) as avgPyro, sum(case when generation > 0 then 0.5 else 0 end) as opHours, ps" + id + " as esol, ps" + id + " * (select tic_mwp from top_table where id = " + id + " ) * 1000 as theoretical, sum(generation)/(ps" + id + " * (select tic_mwp from top_table where id = " + id + " ) * 1000) as pr from export_" + id + "  e join dailyEsol i on e.date = i.date group by e.date order by e.date desc;", function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -173,7 +163,7 @@ module.exports = function(app,connection) {
   });
 
   app.get('/api/reports/incidents' , function(req,res) {
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log left join incident_comment on id = log_id where status = 1 and end_time > now();', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log  join incident_comment on id = log_id where status = 1 and end_time > now();', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -183,7 +173,7 @@ module.exports = function(app,connection) {
   });
 
   app.get('/api/reports/incidentsAll' , function(req,res) {
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log left join incident_comment on id = log_id group by id;', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log  join incident_comment on id = log_id group by id;', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -194,7 +184,7 @@ module.exports = function(app,connection) {
 
   app.get('/api/reports/incidentsSite/:id' , function(req,res) {
     var id = req.params.id;
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, comment, incident_report_number from incident_log where site = ' + id + ';', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log  join incident_comment on id = log_id where site = ' + id + ';', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -203,8 +193,10 @@ module.exports = function(app,connection) {
     });
   });
 
+  // Get data main display chart
   app.get('/api/displaySite/allSiteDaily/', function(req,res){
-    connection.query('select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11 from dailySumExport where date > NOW() - INTERVAL 30 DAY order by date asc', function(err,rows){
+    var selectedDate = "NOW()"
+    connection.query("select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11 from dailySumExport where (date between (" + selectedDate + " - INTERVAL 31 DAY) and " + selectedDate + ") order by date asc;", function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -213,9 +205,9 @@ module.exports = function(app,connection) {
     });
   });
 
-
+  // Get data main display chart
   app.get('/api/displaySite/allSiteDailyMWp/', function(req,res){
-    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11` from dailySumExport where date > NOW() - INTERVAL 30 DAY order by date asc;', function(err,rows){
+    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11` from dailySumExport where (date between (NOW() - INTERVAL 31 DAY) and NOW()) order by date asc;', function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -237,7 +229,7 @@ module.exports = function(app,connection) {
 
   app.get('/api/displaySite/allReport/', function(req,res){
     var id = req.params.id;
-    connection.query('select sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) / sum(t.PS1_T01 + t.PS1_T02 + t.PS1_T03 + t.PS1_T04 + t.PS1_T05) as `PS01_avail`, sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) / sum(t.PS2_T01 + t.PS2_T02 + t.PS2_T03 + t.PS2_T04 + t.PS2_T05 + t.PS2_T06 + t.PS2_T07) as `PS02_avail`, sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) / sum(t.PS3_T01 + t.PS3_T02 + t.PS3_T03 + t.PS3_T04) as `PS03_avail`, sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) / sum(t.PS4_T01 + t.PS4_T02 + t.PS4_T03 + t.PS4_T04 + t.PS4_T05 + t.PS4_T06 + t.PS4_T07 + t.PS4_T08) as `PS04_avail`, sum(a.PS5) / sum(t.PS5) as `PS05_avail`, sum(a.PS7) / sum(t.PS7) as `PS07_avail`, sum(a.PS8) / sum(t.PS8) as `PS08_avail`, sum(a.PS9) / sum(t.PS9) as `PS09_avail`, sum(a.PS10) / sum(t.PS10) as `PS10_avail`, sum(a.PS11) / sum(t.PS11) as `PS11_avail`, sum(o.PS1_T01 + o.PS1_T02 + o.PS1_T03 + o.PS1_T04  + o.PS1_T05) / sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) as `PS01_Over0`, sum(o.PS2_T01 + o.PS2_T02 + o.PS2_T03 + o.PS2_T04 + o.PS2_T05 + o.PS2_T06 + o.PS2_T07) / sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) as `PS02_Over0`, sum(o.PS3_T01 + o.PS3_T02 + o.PS3_T03 + o.PS3_T04) / sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) as `PS03_Over0`, sum(o.PS4_T01 + o.PS4_T02 + o.PS4_T03 + o.PS4_T04 + o.PS4_T05 + o.PS4_T06 + o.PS4_T07 + o.PS4_T08) / sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) as `PS04_Over0`, sum(o.PS5) / sum(a.PS5) as `PS05_Over0`, sum(o.PS7) / sum(a.PS7) as `PS07_Over0`, sum(o.PS8) / sum(a.PS8) as `PS08_Over0`, sum(o.PS9) / sum(a.PS9) as `PS09_Over0`, sum(o.PS10) / sum(a.PS10) as `PS10_Over0`, sum(o.PS11) / sum(a.PS11) as `PS11_Over0`, sum(e.PS1) / sum(c.PS1 * (select tic_mwp from top_table where id = 1) * 1000) as `PS01_PR`, sum(e.PS2) / sum(c.PS2 * (select tic_mwp from top_table where id = 2) * 1000) as `PS02_PR`, sum(e.PS3) / sum(c.PS3 * (select tic_mwp from top_table where id = 3) * 1000) as `PS03_PR`, sum(e.PS4) / sum(c.PS4 * (select tic_mwp from top_table where id = 4) * 1000) as `PS04_PR`,sum(e.PS5) / sum(c.PS5 * (select tic_mwp from top_table where id = 5) * 1000) as `PS05_PR`,sum(e.PS7) / sum(c.PS7 * (select tic_mwp from top_table where id = 7) * 1000) as `PS07_PR`, sum(e.PS8) / sum(c.PS8 * (select tic_mwp from top_table where id = 8) * 1000) as `PS08_PR`, sum(e.PS9) / sum(c.PS9 * (select tic_mwp from top_table where id = 9) * 1000) as `PS09_PR`, sum(e.PS10) / sum(c.PS10 * (select tic_mwp from top_table where id = 10) * 1000) as `PS10_PR`, sum(e.PS11) / sum(c.PS11 * (select tic_mwp from top_table where id = 11) * 1000) as `PS11_PR`, sum(e.PS1) as `PS01_export`, sum(e.PS2) as `PS02_export`, sum(e.PS3) as `PS03_export`, sum(e.PS4) as `PS04_export`, sum(e.PS5) as `PS05_export`, sum(e.PS7) as `PS07_export`, sum(e.PS8) as `PS08_export`, sum(e.PS9) as `PS09_export`, sum(e.PS10) as `PS10_export`, sum(e.PS11) as `PS11_export` from dailySumExport e left join dailySumInverterOver0 o on e.date = o.date left join dailySumInverterAvailabilty a on e.date = a.date left join dailySumInverterTimeDiff t on e.date = t.date left join dailyEsol c on e.date = c.date where e.date <= (now() - interval 1 day) and e.date >= (now() - interval 8 day);', function(err,rows){
+    connection.query('select sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) / sum(t.PS1_T01 + t.PS1_T02 + t.PS1_T03 + t.PS1_T04 + t.PS1_T05) as `PS01_avail`, sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) / sum(t.PS2_T01 + t.PS2_T02 + t.PS2_T03 + t.PS2_T04 + t.PS2_T05 + t.PS2_T06 + t.PS2_T07) as `PS02_avail`, sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) / sum(t.PS3_T01 + t.PS3_T02 + t.PS3_T03 + t.PS3_T04) as `PS03_avail`, sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) / sum(t.PS4_T01 + t.PS4_T02 + t.PS4_T03 + t.PS4_T04 + t.PS4_T05 + t.PS4_T06 + t.PS4_T07 + t.PS4_T08) as `PS04_avail`, sum(a.PS5) / sum(t.PS5) as `PS05_avail`, sum(a.PS7) / sum(t.PS7) as `PS07_avail`, sum(a.PS8) / sum(t.PS8) as `PS08_avail`, sum(a.PS9) / sum(t.PS9) as `PS09_avail`, sum(a.PS10) / sum(t.PS10) as `PS10_avail`, sum(a.PS11) / sum(t.PS11) as `PS11_avail`, sum(o.PS1_T01 + o.PS1_T02 + o.PS1_T03 + o.PS1_T04  + o.PS1_T05) / sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) as `PS01_Over0`, sum(o.PS2_T01 + o.PS2_T02 + o.PS2_T03 + o.PS2_T04 + o.PS2_T05 + o.PS2_T06 + o.PS2_T07) / sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) as `PS02_Over0`, sum(o.PS3_T01 + o.PS3_T02 + o.PS3_T03 + o.PS3_T04) / sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) as `PS03_Over0`, sum(o.PS4_T01 + o.PS4_T02 + o.PS4_T03 + o.PS4_T04 + o.PS4_T05 + o.PS4_T06 + o.PS4_T07 + o.PS4_T08) / sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) as `PS04_Over0`, sum(o.PS5) / sum(a.PS5) as `PS05_Over0`, sum(o.PS7) / sum(a.PS7) as `PS07_Over0`, sum(o.PS8) / sum(a.PS8) as `PS08_Over0`, sum(o.PS9) / sum(a.PS9) as `PS09_Over0`, sum(o.PS10) / sum(a.PS10) as `PS10_Over0`, sum(o.PS11) / sum(a.PS11) as `PS11_Over0`, sum(e.PS1) / sum(c.PS1 * (select tic_mwp from top_table where id = 1) * 1000) as `PS01_PR`, sum(e.PS2) / sum(c.PS2 * (select tic_mwp from top_table where id = 2) * 1000) as `PS02_PR`, sum(e.PS3) / sum(c.PS3 * (select tic_mwp from top_table where id = 3) * 1000) as `PS03_PR`, sum(e.PS4) / sum(c.PS4 * (select tic_mwp from top_table where id = 4) * 1000) as `PS04_PR`,sum(e.PS5) / sum(c.PS5 * (select tic_mwp from top_table where id = 5) * 1000) as `PS05_PR`,sum(e.PS7) / sum(c.PS7 * (select tic_mwp from top_table where id = 7) * 1000) as `PS07_PR`, sum(e.PS8) / sum(c.PS8 * (select tic_mwp from top_table where id = 8) * 1000) as `PS08_PR`, sum(e.PS9) / sum(c.PS9 * (select tic_mwp from top_table where id = 9) * 1000) as `PS09_PR`, sum(e.PS10) / sum(c.PS10 * (select tic_mwp from top_table where id = 10) * 1000) as `PS10_PR`, sum(e.PS11) / sum(c.PS11 * (select tic_mwp from top_table where id = 11) * 1000) as `PS11_PR`, sum(e.PS1) as `PS01_export`, sum(e.PS2) as `PS02_export`, sum(e.PS3) as `PS03_export`, sum(e.PS4) as `PS04_export`, sum(e.PS5) as `PS05_export`, sum(e.PS7) as `PS07_export`, sum(e.PS8) as `PS08_export`, sum(e.PS9) as `PS09_export`, sum(e.PS10) as `PS10_export`, sum(e.PS11) as `PS11_export` from dailySumExport e join dailySumInverterOver0 o on e.date = o.date join dailySumInverterAvailabilty a on e.date = a.date join dailySumInverterTimeDiff t on e.date = t.date join dailyEsol c on e.date = c.date where e.date <= (now() - interval 1 day) and e.date >= (now() - interval 15 day);', function(err,rows){
       if (err){
         return res.json(err);
       } else {

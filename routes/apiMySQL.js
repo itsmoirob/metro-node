@@ -1,4 +1,4 @@
- module.exports = function(app,connection,csvParse,fs,moment,pool) {
+module.exports = function(app,connection,csvParse,fs,moment,pool) {
   var request = require('request');
 
 
@@ -76,412 +76,454 @@
 
             connection.query("Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;", function(err, result){
               if (err) throw err;
-            //   console.log(result);
-            res.send("COMPLETE: Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;" + result.message);
+              //   console.log(result);
+              res.send("COMPLETE: Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;" + result.message);
             });
 
           }
         });
       });
-  });
-
-
-  // upload pyro data.
-  app.get('/api/mySQL/pyroUpload/:id', function(req,res){
-    var id = req.params.id;
-    var filePath = "./PS" + id + " Pyro.csv";
-
-    fs.readFile(filePath, {
-      encoding: 'utf-8'
-    }, function(err, csvData) {
-      if (err) {
-        console.log(err);
-      }
-      csvParse(csvData, {
-        separator: ',',
-        newline: '\n'
-      }, function(err, data) {
-        if (err) {
-          console.log(err);
-        } else {
-          var sqlInputData = [];
-          var n = 0;
-          if (id < 5) {
-            for (j=1;j<data.length;j++){ // if site is 1 to 4
-              // data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
-              data[j][1] = parseFloat(data[j][1]);
-              data[j][2] = parseFloat(data[j][2]);
-              if (isNaN(data[j][1])) {
-                data[j][1] = "NULL";
-              }
-              if (data[j][1] < 0) {
-                data[j][1] = 0;
-              }
-              if (isNaN(data[j][2])) {
-                data[j][2] = "NULL";
-              }
-              if (data[j][2] < 0) {
-                data[j][2] = 0;
-              }
-              sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
-              n++;
-            }
-            // res.send("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime), (ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null)),'')) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null) is null THEN 0 ELSE 1 END)) as `esol` from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;");
-            connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime), (ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null)),'')) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null) is null THEN 0 ELSE 1 END)) as `esol` from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
-            });
-
-          } else if (id == 5) {
-            for (j=1;j<data.length;j++){
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              data[j][1] = parseFloat(data[j][1]);
-              data[j][2] = parseFloat(data[j][2]);
-              data[j][3] = parseFloat(data[j][3]);
-              data[j][4] = parseFloat(data[j][4]);
-              if (isNaN(data[j][1])) {
-                data[j][1] = "NULL";
-              }
-              if (data[j][1] < 0) {
-                data[j][1] = 0;
-              }
-              if (isNaN(data[j][2])) {
-                data[j][2] = "NULL";
-              }
-              if (data[j][2] < 0) {
-                data[j][2] = 0;
-              }
-              if (isNaN(data[j][3])) {
-                data[j][3] = "NULL";
-              }
-              if (data[j][3] < 0) {
-                data[j][3] = 0;
-              }
-              if (isNaN(data[j][4])) {
-                data[j][4] = "NULL";
-              }
-              if (data[j][4] < 0) {
-                data[j][4] = 0;
-              }
-              sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + "," + data[j][4] + ")"];
-              n++;
-            }
-            // res.send("Start transaction;INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS5) select date(dateTime), (ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null)),'') + ifnull((if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null)),'') + ifnull((if((count(pyro_4)/count(dateTime))>.74,sum(pyro_4/60000),null)),'')) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_4)/count(dateTime))>.74,sum(pyro_4/60000),null) is null THEN 0 ELSE 1 END)) as `esol` from pyro_site_5 where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS5 = VALUES(PS5);Commit;");
-            connection.query("Start transaction;INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS5) select date(dateTime), (ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null)),'') + ifnull((if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null)),'') + ifnull((if((count(pyro_4)/count(dateTime))>.74,sum(pyro_4/60000),null)),'')) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_4)/count(dateTime))>.74,sum(pyro_4/60000),null) is null THEN 0 ELSE 1 END)) as `esol` from pyro_site_5 where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS5 = VALUES(PS5);Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
-            });
-          } else if (id == 7) {
-
-            for (j=1;j<data.length;j++){
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-
-              data[j][1] = parseFloat(data[j][1]);
-              data[j][2] = parseFloat(data[j][2]);
-              data[j][3] = parseFloat(data[j][3]);
-              data[j][4] = parseFloat(data[j][4]);
-              data[j][5] = parseFloat(data[j][5]);
-              data[j][6] = parseFloat(data[j][6]);
-              data[j][7] = parseFloat(data[j][7]);
-              data[j][8] = parseFloat(data[j][8]);
-              data[j][9] = parseFloat(data[j][9]);
-              data[j][10] = parseFloat(data[j][10]);
-              data[j][11] = parseFloat(data[j][11]);
-              data[j][12] = parseFloat(data[j][12]);
-
-              if (isNaN(data[j][1])) {
-                data[j][1] = "NULL";
-              }
-              if (data[j][1] < 0.1) {
-                data[j][1] = 0;
-              }
-              if (isNaN(data[j][2])) {
-                data[j][2] = "NULL";
-              }
-              if (data[j][2] < 0.1) {
-                data[j][2] = 0;
-              }
-              if (isNaN(data[j][3])) {
-                data[j][3] = "NULL";
-              }
-              if (data[j][3] < 0.1) {
-                data[j][3] = 0;
-              }
-              if (isNaN(data[j][4])) {
-                data[j][4] = "NULL";
-              }
-              if (data[j][4] < 0.1) {
-                data[j][4] = 0;
-              }
-              if (isNaN(data[j][5])) {
-                data[j][5] = "NULL";
-              }
-              if (data[j][5] < 0.1) {
-                data[j][5] = 0;
-              }
-              if (isNaN(data[j][6])) {
-                data[j][6] = "NULL";
-              }
-              if (data[j][6] < 0.1) {
-                data[j][6] = 0;
-              }
-              if (isNaN(data[j][7])) {
-                data[j][7] = "NULL";
-              }
-              if (data[j][7] < 0.1) {
-                data[j][7] = 0;
-              }
-              if (isNaN(data[j][8])) {
-                data[j][8] = "NULL";
-              }
-              if (data[j][8] < 0.1) {
-                data[j][8] = 0;
-              }
-              if (isNaN(data[j][9])) {
-                data[j][9] = "NULL";
-              }
-              if (data[j][9] < 0.1) {
-                data[j][9] = 0;
-              }
-              if (isNaN(data[j][10])) {
-                data[j][10] = "NULL";
-              }
-              if (data[j][10] < 0.1) {
-                data[j][10] = 0;
-              }
-              if (isNaN(data[j][11])) {
-                data[j][11] = "NULL";
-              }
-              if (data[j][11] < 0.1) {
-                data[j][11] = 0;
-              }
-              if (isNaN(data[j][12])) {
-                data[j][12] = "NULL";
-              }
-              if (data[j][12] < 0.1) {
-                data[j][12] = 0;
-              }
-              sqlInputData.push("('" + data[j][0] + "'");
-              sqlInputData.push(data[j][1]);
-              sqlInputData.push(data[j][2]);
-              sqlInputData.push(data[j][3]);
-              sqlInputData.push(data[j][4]);
-              sqlInputData.push(data[j][5]);
-              sqlInputData.push(data[j][6]);
-              sqlInputData.push(data[j][7]);
-              sqlInputData.push(data[j][8]);
-              sqlInputData.push(data[j][9]);
-              sqlInputData.push(data[j][10]);
-              sqlInputData.push(data[j][11]);
-              sqlInputData.push(data[j][12]+")");
-              n++;
-            }
-            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12)");
-            connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12); insert into dailyEsol (date, PS7) select date(dateTime),(ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null)),'') + ifnull((if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null)),'') + ifnull((if((count(pyro_4)/count(dateTime))>.74,sum(pyro_4/60000),null)),'') + ifnull((if((count(pyro_5)/count(dateTime))>.74,sum(pyro_5/60000),null)),'') + ifnull((if((count(pyro_6)/count(dateTime))>.74,sum(pyro_6/60000),null)),'') + ifnull((if((count(pyro_7)/count(dateTime))>.74,sum(pyro_7/60000),null)),'') + ifnull((if((count(pyro_8)/count(dateTime))>.74,sum(pyro_8/60000),null)),'') + ifnull((if((count(pyro_9)/count(dateTime))>.74,sum(pyro_9/60000),null)),'') + ifnull((if((count(pyro_10)/count(dateTime))>.74,sum(pyro_10/60000),null)),'') + ifnull((if((count(pyro_11)/count(dateTime))>.74,sum(pyro_11/60000),null)),'') + ifnull((if((count(pyro_12)/count(dateTime))>.74,sum(pyro_12/60000),null)),'') ) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_4)/count(dateTime))>.74,sum(pyro_4/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_5)/count(dateTime))>.74,sum(pyro_5/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_6)/count(dateTime))>.74,sum(pyro_6/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_7)/count(dateTime))>.74,sum(pyro_7/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_8)/count(dateTime))>.74,sum(pyro_8/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_9)/count(dateTime))>.74,sum(pyro_9/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_10)/count(dateTime))>.74,sum(pyro_10/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_11)/count(dateTime))>.74,sum(pyro_11/60000),null) is null THEN 0 ELSE 1 END) +  (CASE WHEN if((count(pyro_12)/count(dateTime))>.74,sum(pyro_12/60000),null) is null THEN 0 ELSE 1 END) ) as `esol` from pyro_site_7 where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS7 = VALUES(PS7); Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO pyro_site" + id + " VALUES " + sqlInputData);
-            });
-
-          } else if (id > 7 && id < 11) {
-
-            for (j=2;j<data.length;j++){ // if site is 7 to 11
-              data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
-              data[j][1] = parseFloat(data[j][1]);
-              data[j][2] = parseFloat(data[j][2]);
-              if (isNaN(data[j][1])) {
-                data[j][1] = "NULL";
-              }
-              if (data[j][1] < 0.1) {
-                data[j][1] = 0;
-              }
-              if (isNaN(data[j][2])) {
-                data[j][2] = "NULL";
-              }
-              if (data[j][2] < 0.1) {
-                data[j][2] = 0;
-              }
-              sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
-              n++;
-            }
-            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2)");
-            connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime), (ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/12000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/12000),null)),'')) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/12000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/12000),null) is null THEN 0 ELSE 1 END)) as `esol` from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO pyro_site VALUES " + sqlInputData);
-            });
-
-          } else if (id == 11) {
-
-            for (j=2;j<data.length;j++){ // if site is 11
-              data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
-              data[j][1] = parseFloat(data[j][1]);
-              data[j][2] = parseFloat(data[j][2]);
-              data[j][3] = parseFloat(data[j][3]);
-              if (isNaN(data[j][1])) {
-                data[j][1] = "NULL";
-              }
-              if (data[j][1] < 0.1) {
-                data[j][1] = 0;
-              }
-              if (isNaN(data[j][2])) {
-                data[j][2] = "NULL";
-              }
-              if (data[j][2] < 0.1) {
-                data[j][2] = 0;
-              }
-              if (isNaN(data[j][3])) {
-                data[j][3] = "NULL";
-              }
-              if (data[j][3] < 0.1) {
-                data[j][3] = 0;
-              }
-              sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + ")"];
-              n++;
-            }
-            // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3)");
-            connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3); insert into dailyEsol (date, PS11) select date(dateTime), (ifnull((if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null)),'') + ifnull((if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null)),'') + ifnull((if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null)),'')) / ((CASE WHEN if((count(pyro_1)/count(dateTime))>.74,sum(pyro_1/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_2)/count(dateTime))>.74,sum(pyro_2/60000),null) is null THEN 0 ELSE 1 END) + (CASE WHEN if((count(pyro_3)/count(dateTime))>.74,sum(pyro_3/60000),null) is null THEN 0 ELSE 1 END)) as `esol` from pyro_site_11 where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS11 = VALUES(PS11); Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
-            });
-
-          } else {
-            res.send("Hello last else "+id);
-          }
-        }
-      });
     });
-  });
 
-  // upload pyro data.
-  app.get('/api/mySQL/invUpload/:id', function(req,res){
-    var id = req.params.id;
-    var filePath = "./PS" + id + " Inv.csv";
 
-    fs.readFile(filePath, {
-      encoding: 'utf-8'
-    }, function(err, csvData) {
-      if (err) {
-        console.log(err);
-      }
-      csvParse(csvData, {
-        separator: ',',
-        newline: '\n'
-      }, function(err, data) {
+    // upload pyro data.
+    app.get('/api/mySQL/pyroUpload/:id', function(req,res){
+      var id = req.params.id;
+      var filePath = "./PS" + id + " Pyro.csv";
+
+      fs.readFile(filePath, {
+        encoding: 'utf-8'
+      }, function(err, csvData) {
         if (err) {
           console.log(err);
-        } else {
-          var sqlInputData = [];
-          // var n = 1;
-
-          if(id >= 8 && id <= 10) {
-            for (j=2;j<data.length;j++){
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              sqlInputData.push("('" + data[j][0] + "'");
-              for (i=1;i<=data[j].length-1;i++){
-                data[j][i] = parseFloat(data[j][i]);
-                if (isNaN(data[j][i])) {
-                  data[j][i] = "NULL";
-                }
-                if(i==data[j].length-1){
-                  sqlInputData.push(i + "," + data[j][i] + ")");
-                } else {
-                  sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
-                }
-              }
-            }
-            // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
-            connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result);
-              res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-            });
-
-          } else if (id <= 4) {
-            for (j=1;j<data.length;j++){
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              sqlInputData.push("('" + data[j][0] + "'");
-              for (i=1;i<=data[j].length-1;i++){
-                data[j][i] = parseFloat(data[j][i]);
-                if (isNaN(data[j][i])) {
-                  data[j][i] = "NULL";
-                }
-                if(i==data[j].length-1){
-                  sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + ")");
-                } else {
-                  sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + "),('" + data[j][0] + "'");
-                }
-              }
-            }
-            // res.send("INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
-
-            connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " where generation is null; Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + sqlInputData);
-            });
-
-          } else if (id == 5) {
-            for (j=1;j<data.length;j++){
-              data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-              sqlInputData.push("('" + data[j][0] + "'");
-              for (i=1;i<=data[j].length-1;i++){
-                data[j][i] = parseFloat(data[j][i]);
-                if (isNaN(data[j][i])) {
-                  data[j][i] = "NULL";
-                }
-                if(i==data[j].length-1){
-                  sqlInputData.push(i + "," + data[j][i] + ")");
-                } else {
-                  sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
-                }
-              }
-            }
-
-            // res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
-            connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
-              if (err) throw err;
-              console.log(result.insertId);
-              res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-            });
-            
+        }
+        csvParse(csvData, {
+          separator: ',',
+          newline: '\n'
+        }, function(err, data) {
+          if (err) {
+            console.log(err);
           } else {
-
-            for (j=1;j<data.length;j++){
-              for (i=1;i<2;i++){
-                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-                data[j][i] = parseFloat(data[j][i]);
-                if (isNaN(data[j][i])) {
-                  data[j][i] = "NULL";
+            var sqlInputData = [];
+            var n = 0;
+            if (id < 5) {
+              for (j=1;j<data.length;j++){ // if site is 1 to 4
+                // data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+                data[j][1] = parseFloat(data[j][1]);
+                data[j][2] = parseFloat(data[j][2]);
+                if (isNaN(data[j][1])) {
+                  data[j][1] = "NULL";
                 }
-                if (data[j][i] < 0.6) {
-                  data[j][i] = 0;
+                if (data[j][1] < 0) {
+                  data[j][1] = 0;
+                }
+                if (isNaN(data[j][2])) {
+                  data[j][2] = "NULL";
+                }
+                if (data[j][2] < 0) {
+                  data[j][2] = 0;
+                }
+                sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
+                n++;
+              }
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime),(ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
+              });
+
+            } else if (id == 5) {
+              for (j=1;j<data.length;j++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                data[j][1] = parseFloat(data[j][1]);
+                data[j][2] = parseFloat(data[j][2]);
+                data[j][3] = parseFloat(data[j][3]);
+                data[j][4] = parseFloat(data[j][4]);
+                if (isNaN(data[j][1])) {
+                  data[j][1] = "NULL";
+                }
+                if (data[j][1] < 0) {
+                  data[j][1] = 0;
+                }
+                if (isNaN(data[j][2])) {
+                  data[j][2] = "NULL";
+                }
+                if (data[j][2] < 0) {
+                  data[j][2] = 0;
+                }
+                if (isNaN(data[j][3])) {
+                  data[j][3] = "NULL";
+                }
+                if (data[j][3] < 0) {
+                  data[j][3] = 0;
+                }
+                if (isNaN(data[j][4])) {
+                  data[j][4] = "NULL";
+                }
+                if (data[j][4] < 0) {
+                  data[j][4] = 0;
+                }
+                sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + "," + data[j][4] + ")"];
+                n++;
+              }
+              connection.query("Start transaction;INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS5) select date(dateTime), (ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0) + ifnull(avg(nullif(pyro_3,0)),0) + ifnull(avg(nullif(pyro_4,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_3,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_4,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
+              });
+            } else if (id == 7) {
+
+              for (j=1;j<data.length;j++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+
+                data[j][1] = parseFloat(data[j][1]);
+                data[j][2] = parseFloat(data[j][2]);
+                data[j][3] = parseFloat(data[j][3]);
+                data[j][4] = parseFloat(data[j][4]);
+                data[j][5] = parseFloat(data[j][5]);
+                data[j][6] = parseFloat(data[j][6]);
+                data[j][7] = parseFloat(data[j][7]);
+                data[j][8] = parseFloat(data[j][8]);
+                data[j][9] = parseFloat(data[j][9]);
+                data[j][10] = parseFloat(data[j][10]);
+                data[j][11] = parseFloat(data[j][11]);
+                data[j][12] = parseFloat(data[j][12]);
+
+                if (isNaN(data[j][1])) {
+                  data[j][1] = "NULL";
+                }
+                if (data[j][1] < 0.1) {
+                  data[j][1] = 0;
+                }
+                if (isNaN(data[j][2])) {
+                  data[j][2] = "NULL";
+                }
+                if (data[j][2] < 0.1) {
+                  data[j][2] = 0;
+                }
+                if (isNaN(data[j][3])) {
+                  data[j][3] = "NULL";
+                }
+                if (data[j][3] < 0.1) {
+                  data[j][3] = 0;
+                }
+                if (isNaN(data[j][4])) {
+                  data[j][4] = "NULL";
+                }
+                if (data[j][4] < 0.1) {
+                  data[j][4] = 0;
+                }
+                if (isNaN(data[j][5])) {
+                  data[j][5] = "NULL";
+                }
+                if (data[j][5] < 0.1) {
+                  data[j][5] = 0;
+                }
+                if (isNaN(data[j][6])) {
+                  data[j][6] = "NULL";
+                }
+                if (data[j][6] < 0.1) {
+                  data[j][6] = 0;
+                }
+                if (isNaN(data[j][7])) {
+                  data[j][7] = "NULL";
+                }
+                if (data[j][7] < 0.1) {
+                  data[j][7] = 0;
+                }
+                if (isNaN(data[j][8])) {
+                  data[j][8] = "NULL";
+                }
+                if (data[j][8] < 0.1) {
+                  data[j][8] = 0;
+                }
+                if (isNaN(data[j][9])) {
+                  data[j][9] = "NULL";
+                }
+                if (data[j][9] < 0.1) {
+                  data[j][9] = 0;
+                }
+                if (isNaN(data[j][10])) {
+                  data[j][10] = "NULL";
+                }
+                if (data[j][10] < 0.1) {
+                  data[j][10] = 0;
+                }
+                if (isNaN(data[j][11])) {
+                  data[j][11] = "NULL";
+                }
+                if (data[j][11] < 0.1) {
+                  data[j][11] = 0;
+                }
+                if (isNaN(data[j][12])) {
+                  data[j][12] = "NULL";
+                }
+                if (data[j][12] < 0.1) {
+                  data[j][12] = 0;
                 }
                 sqlInputData.push("('" + data[j][0] + "'");
-                for (k=1;k<=data[j].length-1;k++){
-                  if(k==data[j].length-1){
-                    sqlInputData.push("17," + data[j][k] + ")");
-                  } else {
-                    sqlInputData.push("17," + data[j][k]);
-                  }
-                }
-                // n++;
+                sqlInputData.push(data[j][1]);
+                sqlInputData.push(data[j][2]);
+                sqlInputData.push(data[j][3]);
+                sqlInputData.push(data[j][4]);
+                sqlInputData.push(data[j][5]);
+                sqlInputData.push(data[j][6]);
+                sqlInputData.push(data[j][7]);
+                sqlInputData.push(data[j][8]);
+                sqlInputData.push(data[j][9]);
+                sqlInputData.push(data[j][10]);
+                sqlInputData.push(data[j][11]);
+                sqlInputData.push(data[j][12]+")");
+                n++;
               }
+
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12); insert into dailyEsol (date, PS" + id + ") select date(dateTime), (ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0) + ifnull(avg(nullif(pyro_3,0)),0) + ifnull(avg(nullif(pyro_4,0)),0) + ifnull(avg(nullif(pyro_5,0)),0) + ifnull(avg(nullif(pyro_6,0)),0) + ifnull(avg(nullif(pyro_7,0)),0) + ifnull(avg(nullif(pyro_8,0)),0) + ifnull(avg(nullif(pyro_9,0)),0) + ifnull(avg(nullif(pyro_10,0)),0) + ifnull(avg(nullif(pyro_11,0)),0) + ifnull(avg(nullif(pyro_12,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_3,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_4,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_5,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_6,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_7,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_8,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_9,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_10,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_11,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_12,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO pyro_site" + id + " VALUES " + sqlInputData);
+              });
+
+            } else if (id > 7 && id < 11) {
+
+              for (j=2;j<data.length;j++){ // if site is 7 to 11
+                data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+                data[j][1] = parseFloat(data[j][1]);
+                data[j][2] = parseFloat(data[j][2]);
+                if (isNaN(data[j][1])) {
+                  data[j][1] = "NULL";
+                }
+                if (data[j][1] < 0.1) {
+                  data[j][1] = 0;
+                }
+                if (isNaN(data[j][2])) {
+                  data[j][2] = "NULL";
+                }
+                if (data[j][2] < 0.1) {
+                  data[j][2] = 0;
+                }
+                sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
+                n++;
+              }
+              // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2)");
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2);  insert into dailyEsol (date, PS" + id + ") select date(dateTime),(ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO pyro_site VALUES " + sqlInputData);
+              });
+
+            } else if (id == 11) {
+
+              for (j=2;j<data.length;j++){ // if site is 11
+                data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+                data[j][1] = parseFloat(data[j][1]);
+                data[j][2] = parseFloat(data[j][2]);
+                data[j][3] = parseFloat(data[j][3]);
+                if (isNaN(data[j][1])) {
+                  data[j][1] = "NULL";
+                }
+                if (data[j][1] < 0.1) {
+                  data[j][1] = 0;
+                }
+                if (isNaN(data[j][2])) {
+                  data[j][2] = "NULL";
+                }
+                if (data[j][2] < 0.1) {
+                  data[j][2] = 0;
+                }
+                if (isNaN(data[j][3])) {
+                  data[j][3] = "NULL";
+                }
+                if (data[j][3] < 0.1) {
+                  data[j][3] = 0;
+                }
+                sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + ")"];
+                n++;
+              }
+              // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3)");
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3); insert into dailyEsol (date, PS11) select date(dateTime), (ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0) + ifnull(avg(nullif(pyro_3,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_3,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
+              });
+
+            } else {
+              res.send("Hello last else "+id);
             }
-            res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
-            // connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
-            //   if (err) throw err;
-            //   console.log(result.insertId);
-            //   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-            // });
           }
-        }
+        });
       });
     });
-  });
+
+    // upload pyro data.
+    app.get('/api/mySQL/invUpload/:id', function(req,res){
+      var id = req.params.id;
+      var filePath = "./PS" + id + " Inv.csv";
+
+      fs.readFile(filePath, {
+        encoding: 'utf-8'
+      }, function(err, csvData) {
+        if (err) {
+          console.log(err);
+        }
+        csvParse(csvData, {
+          separator: ',',
+          newline: '\n'
+        }, function(err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            var sqlInputData = [];
+            // var n = 1;
+
+            if(id >= 8 && id <= 10) {
+              for (j=2;j<data.length;j++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                sqlInputData.push("('" + data[j][0] + "'");
+                for (i=1;i<=data[j].length-1;i++){
+                  data[j][i] = parseFloat(data[j][i]);
+                  if (isNaN(data[j][i])) {
+                    data[j][i] = "NULL";
+                  }
+                  if(i==data[j].length-1){
+                    sqlInputData.push(i + "," + data[j][i] + ")");
+                  } else {
+                    sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
+                  }
+                }
+              }
+              // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+              connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result);
+                res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+              });
+
+            } else if (id <= 4) {
 
 
-};
+              // for (j=1;j<data.length;j++){
+              //   data[j][3] = moment(data[j][3], "DD/MM/YYYY").format("YYYY-MM-DD");
+              //
+              //   sqlInputData.push("('" + data[j][3] + " " + data[j][4] + "'");
+              //
+              //   data[j][5] = parseFloat(data[j][5])/1000;
+              //   if (isNaN(data[j][5])) {
+              //     data[j][5] = "NULL";
+              //   }
+              //
+              //   sqlInputData.push(data[j][1] + "," + data[j][2] + "," + data[j][5] + ")");
+              // }
+              // // res.send("INSERT INTO inverter_generation_" + id + "_" + data[1][0] + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+              // connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_T0" + data[1][0] + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_T0" + data[1][0] + " where generation is null; Commit;", function(err, result){
+              //   if (err) throw err;
+              //   console.log(result.insertId);
+              //   res.send("Done: INSERT INTO inverter_generation_" + id + "_T0" + data[1][0] + sqlInputData);
+              // });
+
+
+
+              for (j=1;j<data.length;j++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                sqlInputData.push("('" + data[j][0] + "'");
+                for (i=1;i<=data[j].length-1;i++){
+                  data[j][i] = parseFloat(data[j][i]);
+                  if (isNaN(data[j][i])) {
+                    data[j][i] = "NULL";
+                  }
+                  if(i==data[j].length-1){
+                    sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + ")");
+                  } else {
+                    sqlInputData.push(data[0][i].substring(7,9) + "," + data[0][i].substring(13,15) + "," + data[j][i] + "),('" + data[j][0] + "'");
+                  }
+                }
+              }
+
+              connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0,3) + " where generation is null; Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0,3) + sqlInputData);
+              });
+
+            } else if (id == 5) {
+              for (j=1;j<data.length;j++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                sqlInputData.push("('" + data[j][0] + "'");
+                for (i=1;i<=data[j].length-1;i++){
+                  data[j][i] = parseFloat(data[j][i]);
+                  if (isNaN(data[j][i])) {
+                    data[j][i] = "NULL";
+                  }
+                  if(i==data[j].length-1){
+                    sqlInputData.push(i + "," + data[j][i] + ")");
+                  } else {
+                    sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
+                  }
+                }
+              }
+
+              // res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
+              connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+              });
+
+            } else if(id = 11) {
+              for (j=1;j<data.length;j++){
+                data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                sqlInputData.push("('" + data[j][0] + "'");
+                for (i=1;i<=data[j].length-1;i++){
+                  data[j][i] = parseFloat(data[j][i]);
+                  if (isNaN(data[j][i])) {
+                    data[j][i] = "NULL";
+                  }
+                  if(i==data[j].length-1){
+                    sqlInputData.push(data[0][i]  + "," + data[j][i] + ")");
+                  } else {
+                    sqlInputData.push(data[0][i]  + "," + data[j][i] + "),('" + data[j][0] + "'");
+                  }
+                }
+              }
+              // res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
+              connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
+                if (err) throw err;
+                console.log(result);
+                res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+              });
+
+            } else {
+
+              for (j=1;j<data.length;j++){
+                for (i=1;i<2;i++){
+                  data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+                  data[j][i] = parseFloat(data[j][i]);
+                  if (isNaN(data[j][i])) {
+                    data[j][i] = "NULL";
+                  }
+                  if (data[j][i] < 0.6) {
+                    data[j][i] = 0;
+                  }
+                  sqlInputData.push("('" + data[j][0] + "'");
+                  for (k=1;k<=data[j].length-1;k++){
+                    if(k==data[j].length-1){
+                      sqlInputData.push("17," + data[j][k] + ")");
+                    } else {
+                      sqlInputData.push("17," + data[j][k]);
+                    }
+                  }
+                }
+              }
+              res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
+              // connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
+              //   if (err) throw err;
+              //   console.log(result.insertId);
+              //   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+              // });
+            }
+          }
+        });
+      });
+    });
+
+
+  };
