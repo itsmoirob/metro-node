@@ -46,9 +46,9 @@
     </tr>
     <tr ng-repeat="site in allReports">
       <td>{{site.site}}</td>
-      <td>{{site.avail * 100 }}%</td>
-      <td>{{site.Over0 * 100 }}%</td>
-      <td>{{site.PR * 100 }}%</td>
+      <td>{{site.avail * 100 | number }}%</td>
+      <td>{{site.Over0 * 100 | number }}%</td>
+      <td>{{site.PR * 100 | number }}%</td>
       <td>{{site.export | number}}</td>
     </tr>
   </table>

@@ -3,7 +3,7 @@
 <div class="row">
   <div class="card-panel col m6">
     <form name="incidentForm" role="form" action="/users/newIncidentLog" method="post">
-      <label>Loss of generation</label>
+      <label>Site name</label>
       <select class="browser-default" name="site" required>
         <option value="" disabled selected>Choose your option</option>
         <option ng-repeat="name in incidentSiteName" value={{name.id}}>{{name.name}}</option>
@@ -65,7 +65,7 @@
         <option value="1">Yes</option>
       </select>
       <hr>
-      <input type="submit" value="Submit">
+      <button class="btn waves-effect waves-light formSubmit" type="submit" name="action">Submit</button>
     </form>
   </div>
 </div>

@@ -29,11 +29,11 @@ function config($httpProvider) {
 
   var allSumData = [];
   var chartDate = [];
+
   getAllSiteDaily();
   function getAllSiteDaily(){
     dataFactory.allSiteDaily()
     .success(function(res){
-
       var groupings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(i) { return "ps" + i; });
       // loop over the keys
       groupings.forEach(function (deviceName) {
@@ -43,16 +43,12 @@ function config($httpProvider) {
         var dataForOneDevice = res.map(function(item) {
           return item[deviceName];
         });
-
         // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
         allSumData.push({name: deviceName, data:dataForOneDevice});
       });
-
-
       angular.forEach(res, function(entry) {
         chartDate.push(moment(entry.date).format("MMM Do"));
       });
-
     });
   }
 
@@ -95,7 +91,6 @@ function config($httpProvider) {
   function getAllSiteDailyMWp(){
     dataFactory.allSiteDailyMWp()
     .success(function(res){
-
       var groupings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(i) { return "ps" + i; });
       // loop over the keys
       groupings.forEach(function (deviceName) {
@@ -105,7 +100,6 @@ function config($httpProvider) {
         var dataForOneDevice = res.map(function(item) {
           return item[deviceName];
         });
-
         // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
         allSumDataMWp.push({name: deviceName, data:dataForOneDevice});
       });
