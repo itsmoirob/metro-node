@@ -89,9 +89,11 @@ module.exports = function(app,connection) {
   });
 
   // get export generation for met office test
-  app.get('/apiTestSite/displaySite/export/:id', function(req,res){
+  app.get('/apiTestSite/displaySite/export/site_:id', function(req,res){
+    var date = req.params.date;
+    var days = req.params.days;
     var id = req.params.id;
-    connection.query('SELECT `date`, `time`, `generation` from  `export_' + id +'` where date = "2015-06-01";', function(err,rows){
+    connection.query('SELECT `date`, `time`, `generation` from  `export_' + id +'`  where (date between (now() - interval 7 day) and now());', function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -163,7 +165,7 @@ module.exports = function(app,connection) {
   });
 
   app.get('/api/reports/incidents' , function(req,res) {
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log  join incident_comment on id = log_id where status = 1 and end_time > now();', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, comment,incident_report_number from incident_log inner join incident_comment on id = log_id where status = 1 and end_time > now();', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -173,7 +175,7 @@ module.exports = function(app,connection) {
   });
 
   app.get('/api/reports/incidentsAll' , function(req,res) {
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log  join incident_comment on id = log_id group by id;', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, comment,incident_report_number from incident_log inner join incident_comment on id = log_id;', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -184,7 +186,7 @@ module.exports = function(app,connection) {
 
   app.get('/api/reports/incidentsSite/:id' , function(req,res) {
     var id = req.params.id;
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, reported_by_company, category, planned, loss_of_generation, details, status, group_concat(comment) as comment, incident_report_number from incident_log  join incident_comment on id = log_id where site = ' + id + ';', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, comment,incident_report_number from incident_log inner join incident_comment on id = log_id where site = ' + id + ';', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -193,10 +195,33 @@ module.exports = function(app,connection) {
     });
   });
 
+  app.get('/api/reports/incidentLog/:id' , function(req,res) {
+    var id = req.params.id;
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status,incident_report_number from incident_log where id = ' + id + ';', function(err,rows){
+      if(err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+  app.get('/api/reports/incidentLogComments/:id' , function(req,res) {
+    var id = req.params.id;
+    connection.query('select * from incident_comment where log_id = ' + id + ';', function(err,rows){
+      if(err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
+
   // Get data main display chart
   app.get('/api/displaySite/allSiteDaily/', function(req,res){
     var selectedDate = "NOW()"
-    connection.query("select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11 from dailySumExport where (date between (" + selectedDate + " - INTERVAL 31 DAY) and " + selectedDate + ") order by date asc;", function(err,rows){
+    connection.query("select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11, ps12 from dailySumExport where (date between (" + selectedDate + " - INTERVAL 31 DAY) and " + selectedDate + ") order by date asc;", function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -207,7 +232,7 @@ module.exports = function(app,connection) {
 
   // Get data main display chart
   app.get('/api/displaySite/allSiteDailyMWp/', function(req,res){
-    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11` from dailySumExport where (date between (NOW() - INTERVAL 31 DAY) and NOW()) order by date asc;', function(err,rows){
+    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11`, ps12/4.999 as `ps12` from dailySumExport where (date between (NOW() - INTERVAL 31 DAY) and NOW()) order by date asc;', function(err,rows){
       if (err){
         return res.json(err);
       } else {

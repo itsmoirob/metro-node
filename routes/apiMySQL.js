@@ -2,7 +2,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
   var request = require('request');
 
 
-  var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"}];
+  var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"},{"id":12, "mpan":"2000056366930"}];
 
   app.get('/api/ftp/:id' ,function(req,res) {
     var id = req.params.id-1;
@@ -192,73 +192,73 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 if (isNaN(data[j][1])) {
                   data[j][1] = "NULL";
                 }
-                if (data[j][1] < 0.1) {
+                if (data[j][1] < 0.01) {
                   data[j][1] = 0;
                 }
                 if (isNaN(data[j][2])) {
                   data[j][2] = "NULL";
                 }
-                if (data[j][2] < 0.1) {
+                if (data[j][2] < 0.01) {
                   data[j][2] = 0;
                 }
                 if (isNaN(data[j][3])) {
                   data[j][3] = "NULL";
                 }
-                if (data[j][3] < 0.1) {
+                if (data[j][3] < 0.01) {
                   data[j][3] = 0;
                 }
                 if (isNaN(data[j][4])) {
                   data[j][4] = "NULL";
                 }
-                if (data[j][4] < 0.1) {
+                if (data[j][4] < 0.01) {
                   data[j][4] = 0;
                 }
                 if (isNaN(data[j][5])) {
                   data[j][5] = "NULL";
                 }
-                if (data[j][5] < 0.1) {
+                if (data[j][5] < 0.01) {
                   data[j][5] = 0;
                 }
                 if (isNaN(data[j][6])) {
                   data[j][6] = "NULL";
                 }
-                if (data[j][6] < 0.1) {
+                if (data[j][6] < 0.01) {
                   data[j][6] = 0;
                 }
                 if (isNaN(data[j][7])) {
                   data[j][7] = "NULL";
                 }
-                if (data[j][7] < 0.1) {
+                if (data[j][7] < 0.01) {
                   data[j][7] = 0;
                 }
                 if (isNaN(data[j][8])) {
                   data[j][8] = "NULL";
                 }
-                if (data[j][8] < 0.1) {
+                if (data[j][8] < 0.01) {
                   data[j][8] = 0;
                 }
                 if (isNaN(data[j][9])) {
                   data[j][9] = "NULL";
                 }
-                if (data[j][9] < 0.1) {
+                if (data[j][9] < 0.01) {
                   data[j][9] = 0;
                 }
                 if (isNaN(data[j][10])) {
                   data[j][10] = "NULL";
                 }
-                if (data[j][10] < 0.1) {
+                if (data[j][10] < 0.01) {
                   data[j][10] = 0;
                 }
                 if (isNaN(data[j][11])) {
                   data[j][11] = "NULL";
                 }
-                if (data[j][11] < 0.1) {
+                if (data[j][11] < 0.01) {
                   data[j][11] = 0;
                 }
                 if (isNaN(data[j][12])) {
                   data[j][12] = "NULL";
                 }
-                if (data[j][12] < 0.1) {
+                if (data[j][12] < 0.01) {
                   data[j][12] = 0;
                 }
                 sqlInputData.push("('" + data[j][0] + "'");
@@ -292,13 +292,13 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 if (isNaN(data[j][1])) {
                   data[j][1] = "NULL";
                 }
-                if (data[j][1] < 0.1) {
+                if (data[j][1] < 0) {
                   data[j][1] = 0;
                 }
                 if (isNaN(data[j][2])) {
                   data[j][2] = "NULL";
                 }
-                if (data[j][2] < 0.1) {
+                if (data[j][2] < 0) {
                   data[j][2] = 0;
                 }
                 sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
@@ -321,19 +321,19 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 if (isNaN(data[j][1])) {
                   data[j][1] = "NULL";
                 }
-                if (data[j][1] < 0.1) {
+                if (data[j][1] < 0.01) {
                   data[j][1] = 0;
                 }
                 if (isNaN(data[j][2])) {
                   data[j][2] = "NULL";
                 }
-                if (data[j][2] < 0.1) {
+                if (data[j][2] < 0.01) {
                   data[j][2] = 0;
                 }
                 if (isNaN(data[j][3])) {
                   data[j][3] = "NULL";
                 }
-                if (data[j][3] < 0.1) {
+                if (data[j][3] < 0.01) {
                   data[j][3] = 0;
                 }
                 sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + ")"];
