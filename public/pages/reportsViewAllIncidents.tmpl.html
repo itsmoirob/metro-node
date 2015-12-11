@@ -1,22 +1,35 @@
-<div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
-  <a ui-sref=parent.reportsIncidentNew class="btn-large btn-flat btn-custom">Add new incident</a>
-</div>
+<div class="row">
+  <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+    <a ui-sref=parent.reportsIncidentNew class="btn-large btn-flat btn-custom">Add new incident</a>
+  </div>
 
-<table class="incidentTable" style="width:100%">
-  <tr>
-    <th>site</th>
-    <th>start</th>
-    <th>end</th>
-    <th>details</th>
-    <th>comment</th>
-    <th>incident number</th>
-  </tr>
-  <tr ng-repeat="incident in incidentReportAll">
-    <td><a ui-sref=parent.reportsIncidentSite({siteResult:incident.site})>PS{{ incident.site }}</a></td>
-    <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
-    <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
-    <td>{{ incident.details }}</td>
-    <td>{{ incident.comment }}</td>
-    <td>{{ incident.incident_report_number }}</td>
-  </tr>
-</table>
+  <label>Show all or open</label>
+  <select class="browser-default" ng-model="search.status" required>
+    <option value="">All</option>
+    <option value="Open">Open only</option>
+  </select>
+  <table class="incidentTable" style="width:100%">
+    <tr>
+      <th>site</th>
+      <th>start</th>
+      <th>end</th>
+      <th>details</th>
+      <th>category</th>
+      <th>loss of generation</th>
+      <th>comment</th>
+      <th>incident number</th>
+      <th>status</th>
+    </tr>
+    <tr ng-repeat="incident in incidentReportAll | filter:search">
+      <td><a ui-sref=parent.reportsIncidentSite({siteResult:incident.site})>PS{{ incident.site }}</a></td>
+      <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
+      <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
+      <td>{{ incident.details }}</td>
+      <td>{{ incident.category }}</td>
+      <td>{{ incident.loss_of_generation }}</td>
+      <td>{{ incident.comment }}</td>
+      <td><a ui-sref=parent.reportIncident({incidentId:incident.id})>{{ incident.incident_report_number }}</a></td>
+      <td>{{ incident.status }}</td>
+    </tr>
+  </table>
+</div>
