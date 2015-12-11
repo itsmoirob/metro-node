@@ -1,4 +1,11 @@
 <div class="row">
+  <div class="col s6 m4">
+    <label for="selectStartDate">Select start date: </label>
+    <input type="date" ng-model="selectStartDate" name="input" required>
+  </div>
+  <p>
+    hey: {{ selectStartDate | date : 'yyyy-MM-dd' }}
+  </p>
   <div class="input-field col s4 m4">
     <input id="day-of-month" type="number" class="validate" ng-model="datePicked.day">
     <label for="day-of-month">Day of month</label>
@@ -39,8 +46,8 @@
   <table class="incidentTable" style="width:100%" >
     <tr>
       <th>Site</th>
-      <th>Availabilty</th>
-      <th>Over 0</th>
+      <th>Comms availabilty</th>
+      <th>Technical availabilty</th>
       <th>PR</th>
       <th>Export</th>
     </tr>
