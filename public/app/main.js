@@ -7,6 +7,7 @@ angular.module('metro', [
   'displayExport',
   'apiFactory',
   'displayProjectTest',
-  'displayReportsIncidents'
+  'displayReportsIncidents',
+  'displaySingleReportsIncident'
 ])
 ;
