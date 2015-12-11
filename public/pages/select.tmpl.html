@@ -31,6 +31,8 @@
         <th>Start</th>
         <th>End</th>
         <th>Details</th>
+        <th>Category</th>
+        <th>Loss of generation</th>
         <th>Comment</th>
         <th>Incident number</th>
       </tr>
@@ -39,6 +41,8 @@
         <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
         <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
         <td>{{ incident.details }}</td>
+        <td>{{ incident.category }}</td>
+        <td>{{ incident.loss_of_generation }}</td>
         <td>{{ incident.comment }}</td>
         <td>{{ incident.incident_report_number }}</td>
       </tr>
