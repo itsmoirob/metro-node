@@ -1,18 +1,29 @@
 <h3>You are viewing {{ currentDisplaySite[0].name }}</h3>
+<label>Show all or open</label>
+<select class="browser-default" ng-model="search.status" required>
+  <option value="">All</option>
+  <option value="Open">Open only</option>
+</select>
 
 <table class="incidentTable" style="width:100%">
   <tr>
     <th>start</th>
     <th>end</th>
     <th>details</th>
+    <th>category</th>
+    <th>loss of generation</th>
     <th>comment</th>
     <th>incident number</th>
+    <th>status</th>
   </tr>
-  <tr ng-repeat="incident in incidentReportSite">
+  <tr ng-repeat="incident in incidentReportSite | filter:search">
     <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
     <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
     <td>{{ incident.details }}</td>
+    <td>{{ incident.category }}</td>
+    <td>{{ incident.loss_of_generation }}</td>
     <td>{{ incident.comment }}</td>
     <td>{{ incident.incident_report_number }}</td>
+    <td>{{ incident.status }}</td>
   </tr>
 </table>
