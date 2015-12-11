@@ -187,5 +187,32 @@ router.post('/newIncidentLog', function(req, res, next) {
   });
 });
 
+router.post('/newComment', function(req, res, next) {
+
+  comment = req.body.comment;
+  log_id = req.body.log_id;
+  name = req.user.name;
+
+  console.log('POST: ' + log_id + ' ' + comment + " " + name);
+
+  res.send('insert into incident_comment values (null, ' + log_id + ', \'' + comment+ '\', now(), \'' + name + '\');');
+//   connection.query('insert into incident_comment values (null, ' + log_id + ', ' + comment+ ', now(), ' + name + ');', function (error, rows, fields) {
+//     console.log(error);
+//     // res.writeHead(200, {'Content-Type': 'text/plain'});
+//     req.flash('success','Record has been inserted');
+//     res.redirect('/#/incidentsAll');
+//   });
+
+});
+
+router.post('/closeLog', function(req, res, next) {
+  status = req.body.status;
+  
+  console.log('POST: this is closed' );
+
+  res.send('POST: this is closed');
+
+});
+
 
 module.exports = router;
