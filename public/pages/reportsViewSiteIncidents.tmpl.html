@@ -12,7 +12,6 @@
     <th>details</th>
     <th>category</th>
     <th>loss of generation</th>
-    <th>comment</th>
     <th>incident number</th>
     <th>status</th>
   </tr>
@@ -22,8 +21,7 @@
     <td>{{ incident.details }}</td>
     <td>{{ incident.category }}</td>
     <td>{{ incident.loss_of_generation }}</td>
-    <td>{{ incident.comment }}</td>
-    <td>{{ incident.incident_report_number }}</td>
+    <td><a ui-sref=parent.reportIncident({incidentId:incident.id})>{{ incident.incident_report_number }}</a></td>
     <td>{{ incident.status }}</td>
   </tr>
 </table>

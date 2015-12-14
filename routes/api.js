@@ -4,7 +4,6 @@ module.exports = function(app,connection) {
   // api for getting top level summary data of all sites
   app.get('/api/pickUp', function(req,res){
     connection.query('SELECT id, name, tic_mwp from top_table', function(err, rows) {
-      // connection.query('SELECT id, mpan_export from top_table', function(err, rows) {
       if (err){
         return res.json(err);
       } else {
@@ -165,7 +164,7 @@ module.exports = function(app,connection) {
   });
 
   app.get('/api/reports/incidents' , function(req,res) {
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, comment,incident_report_number from incident_log inner join incident_comment on id = log_id where status = 1 and end_time > now();', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, incident_report_number from incident_log where status = 1 and end_time > now();', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -175,7 +174,7 @@ module.exports = function(app,connection) {
   });
 
   app.get('/api/reports/incidentsAll' , function(req,res) {
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, comment,incident_report_number from incident_log inner join incident_comment on id = log_id;', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status,incident_report_number from incident_log;', function(err,rows){
       if(err){
         return res.json(err);
       } else {
@@ -186,7 +185,7 @@ module.exports = function(app,connection) {
 
   app.get('/api/reports/incidentsSite/:id' , function(req,res) {
     var id = req.params.id;
-    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, comment,incident_report_number from incident_log inner join incident_comment on id = log_id where site = ' + id + ';', function(err,rows){
+    connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ';', function(err,rows){
       if(err){
         return res.json(err);
       } else {
