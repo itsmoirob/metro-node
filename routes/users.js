@@ -179,7 +179,7 @@ router.post('/newIncidentLog', function(req, res, next) {
   lossOfGeneration + ", '" +
   details + "', " +
   isClosed
-  + ",NULL, '" + name +"'); Update incident_log set incident_report_number = concat('IRF_', date(now()), '_', lpad(id,3,'0')) order by id desc limit 1; commit;", function (error, rows, fields) {
+  + ",NULL, '" + name +"'); Update incident_log set incident_report_number = concat('IRF_', date(now()), '_', lpad(id-11,3,'0')) order by id desc limit 1; commit;", function (error, rows, fields) {
     console.log(error);
     // res.writeHead(200, {'Content-Type': 'text/plain'});
     req.flash('success','Record has been inserted');
@@ -195,23 +195,18 @@ router.post('/newComment', function(req, res, next) {
 
   console.log('POST: ' + log_id + ' ' + comment + " " + name);
 
-  res.send('insert into incident_comment values (null, ' + log_id + ', \'' + comment+ '\', now(), \'' + name + '\');');
-//   connection.query('insert into incident_comment values (null, ' + log_id + ', ' + comment+ ', now(), ' + name + ');', function (error, rows, fields) {
-//     console.log(error);
-//     // res.writeHead(200, {'Content-Type': 'text/plain'});
-//     req.flash('success','Record has been inserted');
-//     res.redirect('/#/incidentsAll');
-//   });
-
+  connection.query('insert into incident_comment values (null, ' + log_id + ', \'' + comment+ '\', now(), \'' + name + '\');', function (error, rows, fields) {
+    console.log(error);
+    // res.writeHead(200, {'Content-Type': 'text/plain'});
+    req.flash('success','Comment has been inserted');
+    res.redirect('/#/report/incident/' + log_id);
+  });
 });
 
 router.post('/closeLog', function(req, res, next) {
   status = req.body.status;
-  
   console.log('POST: this is closed' );
-
   res.send('POST: this is closed');
-
 });
 
 
