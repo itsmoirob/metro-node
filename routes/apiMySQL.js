@@ -4,19 +4,19 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
 
   var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"},{"id":12, "mpan":"2000056366930"}];
 
-  app.get('/api/ftp/:id' ,function(req,res) {
-    var id = req.params.id-1;
+  // app.get('/api/ftp/:id' ,function(req,res) {
+  //   var id = req.params.id-1;
+  //
+  //   Ftp.get(mpanList[id].mpan+".csv", mpanList[id].mpan+".csv", function(hadErr) {
+  //     if (hadErr)
+  //     console.error('There was an error retrieving the file.'+hadErr);
+  //     else
+  //     console.log('File copied successfully!');
+  //     res.send("File "+mpanList[id].mpan+".csv has been downloaded");
+  //   });
+  // });
 
-    Ftp.get(mpanList[id].mpan+".csv", mpanList[id].mpan+".csv", function(hadErr) {
-      if (hadErr)
-      console.error('There was an error retrieving the file.'+hadErr);
-      else
-      console.log('File copied successfully!');
-      res.send("File "+mpanList[id].mpan+".csv has been downloaded");
-    });
-  });
-
-
+// upload export to database tables export_# and dailySumExport
   app.get('/api/mySQL/exportUpload/:id', function(req, res) {
 
     var id = req.params.id;
@@ -305,7 +305,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 n++;
               }
               // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2)");
-              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2);  insert into dailyEsol (date, PS" + id + ") select date(dateTime),(ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime),(ifnull(sum(nullif(pyro_1,0)),0) + ifnull(sum(nullif(pyro_2,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end)) / 12000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
                 if (err) throw err;
                 console.log(result.insertId);
                 res.send("Done: INSERT INTO pyro_site VALUES " + sqlInputData);
