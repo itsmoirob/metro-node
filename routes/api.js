@@ -240,6 +240,17 @@ module.exports = function(app,connection) {
     });
   });
 
+  // Get data daily pyro chart
+  app.get('/api/displaySite/allSiteDailyEsol/', function(req,res){
+    connection.query('select date, PS1, PS2, PS3, PS4, PS5, PS7, PS8, PS9, PS10, PS11 from dailyEsol where (date between (NOW() - INTERVAL 31 DAY) and NOW()) order by date asc;', function(err,rows){
+      if (err){
+        return res.json(err);
+      } else {
+        return res.json(rows);
+      }
+    });
+  });
+
   app.get('/api/mySQL/sumExport/:id', function(req,res){
     var id = req.params.id;
     connection.query('insert into dailySumExport(date,PS' + id +') select date, sum(generation) from export_' + id +' where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS' + id +'=VALUES(PS' + id +');', function(err,rows){
@@ -262,12 +273,18 @@ module.exports = function(app,connection) {
     });
   });
 
-  app.get('/api/displaySite/reportSelect/:year/:month/:day/:numberOfDays', function(req,res){
-    var year = req.params.year;
-    var month = req.params.month;
-    var day = req.params.day;
-    var numberOfDays = req.params.numberOfDays;
-    connection.query('select sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) / sum(t.PS1_T01 + t.PS1_T02 + t.PS1_T03 + t.PS1_T04 + t.PS1_T05) as `PS01_avail`, sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) / sum(t.PS2_T01 + t.PS2_T02 + t.PS2_T03 + t.PS2_T04 + t.PS2_T05 + t.PS2_T06 + t.PS2_T07) as `PS02_avail`, sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) / sum(t.PS3_T01 + t.PS3_T02 + t.PS3_T03 + t.PS3_T04) as `PS03_avail`, sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) / sum(t.PS4_T01 + t.PS4_T02 + t.PS4_T03 + t.PS4_T04 + t.PS4_T05 + t.PS4_T06 + t.PS4_T07 + t.PS4_T08) as `PS04_avail`, sum(a.PS5) / sum(t.PS5) as `PS05_avail`, sum(a.PS7) / sum(t.PS7) as `PS07_avail`, sum(a.PS8) / sum(t.PS8) as `PS08_avail`, sum(a.PS9) / sum(t.PS9) as `PS09_avail`, sum(a.PS10) / sum(t.PS10) as `PS10_avail`, sum(a.PS11) / sum(t.PS11) as `PS11_avail`, sum(o.PS1_T01 + o.PS1_T02 + o.PS1_T03 + o.PS1_T04  + o.PS1_T05) / sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) as `PS01_Over0`, sum(o.PS2_T01 + o.PS2_T02 + o.PS2_T03 + o.PS2_T04 + o.PS2_T05 + o.PS2_T06 + o.PS2_T07) / sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) as `PS02_Over0`, sum(o.PS3_T01 + o.PS3_T02 + o.PS3_T03 + o.PS3_T04) / sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) as `PS03_Over0`, sum(o.PS4_T01 + o.PS4_T02 + o.PS4_T03 + o.PS4_T04 + o.PS4_T05 + o.PS4_T06 + o.PS4_T07 + o.PS4_T08) / sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) as `PS04_Over0`, sum(o.PS5) / sum(a.PS5) as `PS05_Over0`, sum(o.PS7) / sum(a.PS7) as `PS07_Over0`, sum(o.PS8) / sum(a.PS8) as `PS08_Over0`, sum(o.PS9) / sum(a.PS9) as `PS09_Over0`, sum(o.PS10) / sum(a.PS10) as `PS10_Over0`, sum(o.PS11) / sum(a.PS11) as `PS11_Over0`, sum(e.PS1) / sum(c.PS1 * (select tic_mwp from top_table where id = 1) * 1000) as `PS01_PR`, sum(e.PS2) / sum(c.PS2 * (select tic_mwp from top_table where id = 2) * 1000) as `PS02_PR`, sum(e.PS3) / sum(c.PS3 * (select tic_mwp from top_table where id = 3) * 1000) as `PS03_PR`, sum(e.PS4) / sum(c.PS4 * (select tic_mwp from top_table where id = 4) * 1000) as `PS04_PR`,sum(e.PS5) / sum(c.PS5 * (select tic_mwp from top_table where id = 5) * 1000) as `PS05_PR`,sum(e.PS7) / sum(c.PS7 * (select tic_mwp from top_table where id = 7) * 1000) as `PS07_PR`, sum(e.PS8) / sum(c.PS8 * (select tic_mwp from top_table where id = 8) * 1000) as `PS08_PR`, sum(e.PS9) / sum(c.PS9 * (select tic_mwp from top_table where id = 9) * 1000) as `PS09_PR`, sum(e.PS10) / sum(c.PS10 * (select tic_mwp from top_table where id = 10) * 1000) as `PS10_PR`, sum(e.PS11) / sum(c.PS11 * (select tic_mwp from top_table where id = 11) * 1000) as `PS11_PR`, sum(e.PS1) as `PS01_export`, sum(e.PS2) as `PS02_export`, sum(e.PS3) as `PS03_export`, sum(e.PS4) as `PS04_export`, sum(e.PS5) as `PS05_export`, sum(e.PS7) as `PS07_export`, sum(e.PS8) as `PS08_export`, sum(e.PS9) as `PS09_export`, sum(e.PS10) as `PS10_export`, sum(e.PS11) as `PS11_export` from dailySumExport e left join dailySumInverterOver0 o on e.date = o.date left join dailySumInverterAvailabilty a on e.date = a.date left join dailySumInverterTimeDiff t on e.date = t.date left join dailyEsol c on e.date = c.date where e.date < "' + year + '-' + month + '-' + day + '" and e.date >= ("' + year + '-' + month + '-' + day + '" - interval ' + numberOfDays + ' day);', function(err,rows){
+  app.get('/api/displaySite/reportSelect/:startDate/:endDate', function(req,res){
+    var startDate = req.params.startDate;
+    var endDate = req.params.endDate;
+    var spareDate;
+
+    if (startDate > endDate) {
+      spareDate = startDate;
+      startDate = endDate;
+      endDate = spareDate;
+    }
+
+    connection.query('select sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) / sum(t.PS1_T01 + t.PS1_T02 + t.PS1_T03 + t.PS1_T04 + t.PS1_T05) as `PS01_avail`, sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) / sum(t.PS2_T01 + t.PS2_T02 + t.PS2_T03 + t.PS2_T04 + t.PS2_T05 + t.PS2_T06 + t.PS2_T07) as `PS02_avail`, sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) / sum(t.PS3_T01 + t.PS3_T02 + t.PS3_T03 + t.PS3_T04) as `PS03_avail`, sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) / sum(t.PS4_T01 + t.PS4_T02 + t.PS4_T03 + t.PS4_T04 + t.PS4_T05 + t.PS4_T06 + t.PS4_T07 + t.PS4_T08) as `PS04_avail`, sum(a.PS5) / sum(t.PS5) as `PS05_avail`, sum(a.PS7) / sum(t.PS7) as `PS07_avail`, sum(a.PS8) / sum(t.PS8) as `PS08_avail`, sum(a.PS9) / sum(t.PS9) as `PS09_avail`, sum(a.PS10) / sum(t.PS10) as `PS10_avail`, sum(a.PS11) / sum(t.PS11) as `PS11_avail`, sum(o.PS1_T01 + o.PS1_T02 + o.PS1_T03 + o.PS1_T04  + o.PS1_T05) / sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) as `PS01_Over0`, sum(o.PS2_T01 + o.PS2_T02 + o.PS2_T03 + o.PS2_T04 + o.PS2_T05 + o.PS2_T06 + o.PS2_T07) / sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) as `PS02_Over0`, sum(o.PS3_T01 + o.PS3_T02 + o.PS3_T03 + o.PS3_T04) / sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) as `PS03_Over0`, sum(o.PS4_T01 + o.PS4_T02 + o.PS4_T03 + o.PS4_T04 + o.PS4_T05 + o.PS4_T06 + o.PS4_T07 + o.PS4_T08) / sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) as `PS04_Over0`, sum(o.PS5) / sum(a.PS5) as `PS05_Over0`, sum(o.PS7) / sum(a.PS7) as `PS07_Over0`, sum(o.PS8) / sum(a.PS8) as `PS08_Over0`, sum(o.PS9) / sum(a.PS9) as `PS09_Over0`, sum(o.PS10) / sum(a.PS10) as `PS10_Over0`, sum(o.PS11) / sum(a.PS11) as `PS11_Over0`, sum(e.PS1) / sum(c.PS1 * (select tic_mwp from top_table where id = 1) * 1000) as `PS01_PR`, sum(e.PS2) / sum(c.PS2 * (select tic_mwp from top_table where id = 2) * 1000) as `PS02_PR`, sum(e.PS3) / sum(c.PS3 * (select tic_mwp from top_table where id = 3) * 1000) as `PS03_PR`, sum(e.PS4) / sum(c.PS4 * (select tic_mwp from top_table where id = 4) * 1000) as `PS04_PR`,sum(e.PS5) / sum(c.PS5 * (select tic_mwp from top_table where id = 5) * 1000) as `PS05_PR`,sum(e.PS7) / sum(c.PS7 * (select tic_mwp from top_table where id = 7) * 1000) as `PS07_PR`, sum(e.PS8) / sum(c.PS8 * (select tic_mwp from top_table where id = 8) * 1000) as `PS08_PR`, sum(e.PS9) / sum(c.PS9 * (select tic_mwp from top_table where id = 9) * 1000) as `PS09_PR`, sum(e.PS10) / sum(c.PS10 * (select tic_mwp from top_table where id = 10) * 1000) as `PS10_PR`, sum(e.PS11) / sum(c.PS11 * (select tic_mwp from top_table where id = 11) * 1000) as `PS11_PR`, sum(e.PS1) as `PS01_export`, sum(e.PS2) as `PS02_export`, sum(e.PS3) as `PS03_export`, sum(e.PS4) as `PS04_export`, sum(e.PS5) as `PS05_export`, sum(e.PS7) as `PS07_export`, sum(e.PS8) as `PS08_export`, sum(e.PS9) as `PS09_export`, sum(e.PS10) as `PS10_export`, sum(e.PS11) as `PS11_export` from dailySumExport e left join dailySumInverterOver0 o on e.date = o.date left join dailySumInverterAvailabilty a on e.date = a.date left join dailySumInverterTimeDiff t on e.date = t.date left join dailyEsol c on e.date = c.date where (e.date between "' + startDate + '" and "' + endDate + '");', function(err,rows){
       if (err){
         return res.json(err);
       } else {

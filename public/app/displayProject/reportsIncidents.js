@@ -8,18 +8,14 @@ angular.module('displayReportsIncidents', [
 .constant('_', window._)
 
 
-.controller('ReportIncidentsCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
+.controller('ReportIncidentsCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', '$filter', function($scope,$stateParams,$http,$log,$state,dataFactory,$filter){
 
   var SP = $stateParams.siteResult;
-  var year = $stateParams.year;
-  var month = $stateParams.month;
-  var day = $stateParams.day;
-  var numberOfDays = $stateParams.numberOfDays;
+  var startDate = $stateParams.startDate;
+  var endDate = $stateParams.endDate;
 
-  $scope.year = $stateParams.year;
-  $scope.month = $stateParams.month;
-  $scope.day = $stateParams.day;
-  $scope.numberOfDays = $stateParams.numberOfDays;
+  $scope.chosenStartDate = $stateParams.startDate;
+  $scope.chosenEndDate = $stateParams.endDate;
 
 
   getIncidentReportAll();
@@ -67,40 +63,25 @@ angular.module('displayReportsIncidents', [
     });
   }
 
-  getSelectReports(year, month, day, numberOfDays); //gets summary array of site
-  function getSelectReports(year, month, day, numberOfDays) {
-    dataFactory.getSelectReports(year, month, day, numberOfDays)
+  getSelectReports(startDate, endDate); //gets summary array of site
+  function getSelectReports(startDate, endDate) {
+    dataFactory.getSelectReports(startDate, endDate)
     .success(function(res){
-
       var newObj = _.reduce(res[0], function(accumulator, value, key) {
         var group = key.substring(0,4);
         var property = key.substring(5);
-
         if (!accumulator[group]) accumulator[group] = {};
         if (!accumulator[group].site) accumulator[group].site = group;
         accumulator[group][property] = value;
         return accumulator;
       }, {});
-
       $scope.selectReports = newObj;
-
     });
   }
 
-  $scope.datePicked = {day: null, month: null, year: null, numberOfDays: null};
-
-  $scope.months = [{name:"January", value:"01"},
-  {name:"February", value:"02"},
-  {name:"March", value:"03"},
-  {name:"April", value:"04"},
-  {name:"May", value:"05"},
-  {name:"June", value:"06"},
-  {name:"July", value:"07"},
-  {name:"August", value:"08"},
-  {name:"September", value:"09"},
-  {name:"October", value:"10"},
-  {name:"November", value:"11"},
-  {name:"December", value:"12"}];
+  $scope.convertDate = function(date) {
+    return $filter('date')(date, 'yyyy-MM-dd')
+  }
 
   getIncidentSiteName(SP); //gets summary array of site
   function getIncidentSiteName(SP) {

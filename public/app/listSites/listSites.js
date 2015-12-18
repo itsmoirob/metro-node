@@ -52,6 +52,47 @@ function config($httpProvider) {
     });
   }
 
+  var allSumDataMWp = [];
+  getAllSiteDailyMWp();
+  function getAllSiteDailyMWp(){
+    dataFactory.allSiteDailyMWp()
+    .success(function(res){
+      var groupings = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12].map(function(i) { return "ps" + i; });
+      // loop over the keys
+      groupings.forEach(function (deviceName) {
+        // data is one huge array that has readings for all sensors on each day
+        // Use .map on the array to transform each element of the array.
+        // The function will transform the array element by selecting a reading for a single device
+        var dataForOneDevice = res.map(function(item) {
+          return item[deviceName];
+        });
+        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
+        allSumDataMWp.push({name: deviceName, data:dataForOneDevice});
+      });
+    });
+  }
+
+  var allDailyEsol = [];
+  
+  getAllSiteDailyEsol();
+  function getAllSiteDailyEsol(){
+    dataFactory.allSiteDailyEsol()
+    .success(function(res){
+      var groupings = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12].map(function(i) { return "PS" + i; });
+      // loop over the keys
+      groupings.forEach(function (deviceName) {
+        // data is one huge array that has readings for all sensors on each day
+        // Use .map on the array to transform each element of the array.
+        // The function will transform the array element by selecting a reading for a single device
+        var dataForOneDevice = res.map(function(item) {
+          return item[deviceName];
+        });
+        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
+        allDailyEsol.push({name: deviceName, data:dataForOneDevice});
+      });
+    });
+  }
+
   //  Chart for export generation
   $scope.chartSumSites = {
     options: {
@@ -61,7 +102,7 @@ function config($httpProvider) {
       tooltip: {
         headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
         pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        '<td style="padding:0"><b>{point.y:.2f}</b></td></tr>',
         footerFormat: '</table>',
         valueSuffix: ' kWH',
         shared: true,
@@ -85,26 +126,6 @@ function config($httpProvider) {
     loading: false
   };
 
-  var allSumDataMWp = [];
-
-  getAllSiteDailyMWp();
-  function getAllSiteDailyMWp(){
-    dataFactory.allSiteDailyMWp()
-    .success(function(res){
-      var groupings = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12].map(function(i) { return "ps" + i; });
-      // loop over the keys
-      groupings.forEach(function (deviceName) {
-        // data is one huge array that has readings for all sensors on each day
-        // Use .map on the array to transform each element of the array.
-        // The function will transform the array element by selecting a reading for a single device
-        var dataForOneDevice = res.map(function(item) {
-          return item[deviceName];
-        });
-        // add a new key (the value of sensorName, e.g. "ps1") to allSumData.
-        allSumDataMWp.push({name: deviceName, data:dataForOneDevice});
-      });
-    });
-  }
 
   //  Chart for export generation
   $scope.chartSumMWpSites = {
@@ -115,7 +136,7 @@ function config($httpProvider) {
       tooltip: {
         headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
         pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+        '<td style="padding:0"><b>{point.y:.2f}</b></td></tr>',
         footerFormat: '</table>',
         valueSuffix: ' kWH',
         shared: true,
@@ -136,6 +157,39 @@ function config($httpProvider) {
       }
     },
     series: allSumDataMWp,
+    loading: false
+  };
+
+  //  Chart for export generation
+  $scope.chartEsolSites = {
+    options: {
+      chart: {
+        type: 'line'
+      },
+      tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.3f}</b></td></tr>',
+        footerFormat: '</table>',
+        valueSuffix: ' kWH',
+        shared: true,
+        useHTML: true
+      },
+    },
+    title: {
+      text: 'Daily esol'
+    },
+    xAxis: {
+      categories: chartDate,
+      crosshair: true
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Irradiation'
+      }
+    },
+    series: allDailyEsol,
     loading: false
   };
 

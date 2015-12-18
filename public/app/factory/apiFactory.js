@@ -43,6 +43,10 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/allSiteDailyMWp');
   };
 
+  dataFactory.allSiteDailyEsol = function (id) {
+    return $http.get(urlBase + 'displaySite/allSiteDailyEsol');
+  };
+
   dataFactory.getChartPyro = function (id) {
     return $http.get(urlBase + 'displaySite/pyroMean/' + id);
   };
@@ -71,8 +75,8 @@ angular.module('apiFactory', [])
     return $http.get(urlBase + 'displaySite/allReport/');
   };
 
-  dataFactory.getSelectReports = function (year, month, day, numberOfDays) {
-    return $http.get(urlBase + 'displaySite/reportSelect/' + year + '/' + month + '/' + day + '/' + numberOfDays + '/');
+  dataFactory.getSelectReports = function (startDate, endDate) {
+    return $http.get(urlBase + 'displaySite/reportSelect/' + startDate + '/' + endDate + '/');
   };
 
   dataFactory.getIncidentSiteName = function () {

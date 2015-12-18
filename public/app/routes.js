@@ -154,7 +154,7 @@ views: {
 }
 })
 .state('parent.reportsSelect', { //list the main body of the 'admin' page
-url:'/reportsSelect/:year/:month/:day/:numberOfDays',
+url:'/reportsSelect/:startDate/:endDate',
 views: {
   'display@': {
     controller: 'ReportIncidentsCtrl',
