@@ -22,9 +22,6 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
     var id = req.params.id;
     id = id - 1;
 
-    var filePathHH = "Primrose Solar Limited.csv";
-    var filePathNonHH = "Primrose Solar Limited NonHH.csv";
-
     if (req.params.id >= 8 && req.params.id <= 10)  {
       var filePath = "Primrose Solar Limited NonHH.csv";
       var startIndex = 2;
@@ -59,10 +56,10 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
             var sqlInputData = [];
             var n = 0;
 
-            for (j=0;j<readingsForExport[id].data.length;j++){ // use this line only for histroical data
+            for (var j=0;j<readingsForExport[id].data.length;j++){ // use this line only for histroical data
               var day = moment(readingsForExport[id].data[j][startIndex-1], "DD/MM/YYYY").format("YYYY-MM-DD");
               var hour = moment("00:00", "HH:mm").format("HH:mm");
-              for (i = startIndex; i < readingsForExport[id].data[j].length; i++) {
+              for (var i = startIndex; i < readingsForExport[id].data[j].length; i++) {
 
                 if (readingsForExport[id].data[j][i] === "-"){
                   readingsForExport[id].data[j][i] = "NULL";
@@ -192,75 +189,40 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 if (isNaN(data[j][1])) {
                   data[j][1] = "NULL";
                 }
-                if (data[j][1] < 0.01) {
-                  data[j][1] = 0;
-                }
                 if (isNaN(data[j][2])) {
                   data[j][2] = "NULL";
-                }
-                if (data[j][2] < 0.01) {
-                  data[j][2] = 0;
                 }
                 if (isNaN(data[j][3])) {
                   data[j][3] = "NULL";
                 }
-                if (data[j][3] < 0.01) {
-                  data[j][3] = 0;
-                }
                 if (isNaN(data[j][4])) {
                   data[j][4] = "NULL";
-                }
-                if (data[j][4] < 0.01) {
-                  data[j][4] = 0;
                 }
                 if (isNaN(data[j][5])) {
                   data[j][5] = "NULL";
                 }
-                if (data[j][5] < 0.01) {
-                  data[j][5] = 0;
-                }
                 if (isNaN(data[j][6])) {
                   data[j][6] = "NULL";
-                }
-                if (data[j][6] < 0.01) {
-                  data[j][6] = 0;
                 }
                 if (isNaN(data[j][7])) {
                   data[j][7] = "NULL";
                 }
-                if (data[j][7] < 0.01) {
-                  data[j][7] = 0;
-                }
                 if (isNaN(data[j][8])) {
                   data[j][8] = "NULL";
-                }
-                if (data[j][8] < 0.01) {
-                  data[j][8] = 0;
                 }
                 if (isNaN(data[j][9])) {
                   data[j][9] = "NULL";
                 }
-                if (data[j][9] < 0.01) {
-                  data[j][9] = 0;
-                }
                 if (isNaN(data[j][10])) {
                   data[j][10] = "NULL";
-                }
-                if (data[j][10] < 0.01) {
-                  data[j][10] = 0;
                 }
                 if (isNaN(data[j][11])) {
                   data[j][11] = "NULL";
                 }
-                if (data[j][11] < 0.01) {
-                  data[j][11] = 0;
-                }
                 if (isNaN(data[j][12])) {
                   data[j][12] = "NULL";
                 }
-                if (data[j][12] < 0.01) {
-                  data[j][12] = 0;
-                }
+
                 sqlInputData.push("('" + data[j][0] + "'");
                 sqlInputData.push(data[j][1]);
                 sqlInputData.push(data[j][2]);
@@ -277,7 +239,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 n++;
               }
 
-              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12); insert into dailyEsol (date, PS" + id + ") select date(dateTime), (ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0) + ifnull(avg(nullif(pyro_3,0)),0) + ifnull(avg(nullif(pyro_4,0)),0) + ifnull(avg(nullif(pyro_5,0)),0) + ifnull(avg(nullif(pyro_6,0)),0) + ifnull(avg(nullif(pyro_7,0)),0) + ifnull(avg(nullif(pyro_8,0)),0) + ifnull(avg(nullif(pyro_9,0)),0) + ifnull(avg(nullif(pyro_10,0)),0) + ifnull(avg(nullif(pyro_11,0)),0) + ifnull(avg(nullif(pyro_12,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_3,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_4,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_5,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_6,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_7,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_8,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_9,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_10,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_11,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_12,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4), pyro_5=VALUES(pyro_5), pyro_6=VALUES(pyro_6), pyro_7=VALUES(pyro_7), pyro_8=VALUES(pyro_8), pyro_9=VALUES(pyro_9), pyro_10=VALUES(pyro_10), pyro_11=VALUES(pyro_11), pyro_11=VALUES(pyro_11), pyro_12=VALUES(pyro_12); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0) + ifnull(pyro_5,0) + ifnull(pyro_6,0) + ifnull(pyro_7,0) + ifnull(pyro_8,0) + ifnull(pyro_9,0) + ifnull(pyro_10,0) + ifnull(pyro_11,0) + ifnull(pyro_12,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end) + (case when pyro_5 >= 0 then 1 else 0 end) + (case when pyro_6 >= 0 then 1 else 0 end) + (case when pyro_7 >= 0 then 1 else 0 end) + (case when pyro_8 >= 0 then 1 else 0 end) + (case when pyro_9 >= 0 then 1 else 0 end) + (case when pyro_10 >= 0 then 1 else 0 end) + (case when pyro_11 >= 0 then 1 else 0 end) +(case when pyro_12 >= 0 then 1 else 0 end)))/60000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function(err, result){
                 if (err) throw err;
                 console.log(result.insertId);
                 res.send("Done: INSERT INTO pyro_site" + id + " VALUES " + sqlInputData);
@@ -285,7 +247,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
 
             } else if (id > 7 && id < 11) {
 
-              for (j=2;j<data.length;j++){ // if site is 7 to 11
+              for (var j=2;j<data.length;j++){ // if site is 7 to 11
                 data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
                 data[j][1] = parseFloat(data[j][1]);
                 data[j][2] = parseFloat(data[j][2]);
