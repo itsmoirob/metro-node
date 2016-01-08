@@ -1,5 +1,5 @@
 module.exports = function(app,connection,csvParse,fs,moment,pool) {
-  var request = require('request');
+//   var request = require('request');
 
 
   var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"},{"id":12, "mpan":"2000056366930"}];
@@ -23,10 +23,10 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
     id = id - 1;
 
     if (req.params.id >= 8 && req.params.id <= 10)  {
-      var filePath = "Primrose Solar Limited NonHH.csv";
+      var filePath = "./files/Primrose Solar Limited NonHH.csv";
       var startIndex = 2;
     } else {
-      var filePath = "Primrose Solar Limited.csv";
+      var filePath = "./files/Primrose Solar Limited.csv";
       var startIndex = 3;
     }
 
@@ -86,7 +86,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
     // upload pyro data.
     app.get('/api/mySQL/pyroUpload/:id', function(req,res){
       var id = req.params.id;
-      var filePath = "./PS" + id + " Pyro.csv";
+      var filePath = "./files/PS" + id + " Pyro.csv";
 
       fs.readFile(filePath, {
         encoding: 'utf-8'
@@ -123,7 +123,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
                 n++;
               }
-              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime),(ifnull(avg(nullif(pyro_1,0)),0) + ifnull(avg(nullif(pyro_2,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end)) * (select sum(case when generation > 0 then 0.5 else 0 end) from export_" + id + " where date = date(dateTime)) / 1000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
+              connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end)))/60000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function(err, result){
                 if (err) throw err;
                 console.log(result.insertId);
                 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
@@ -266,7 +266,6 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                 sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
                 n++;
               }
-              // res.send("INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2)");
               connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime),(ifnull(sum(nullif(pyro_1,0)),0) + ifnull(sum(nullif(pyro_2,0)),0)) / ((case when avg(ifnull(pyro_1,0)) = 0 then 0 else 1 end) + (case when avg(ifnull(pyro_2,0)) = 0 then 0 else 1 end)) / 12000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = VALUES(PS" + id + "); Commit;", function(err, result){
                 if (err) throw err;
                 console.log(result.insertId);
@@ -319,7 +318,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
     // upload pyro data.
     app.get('/api/mySQL/invUpload/:id', function(req,res){
       var id = req.params.id;
-      var filePath = "./PS" + id + " Inv.csv";
+      var filePath = "./files/PS" + id + " Inv.csv";
 
       fs.readFile(filePath, {
         encoding: 'utf-8'
@@ -338,10 +337,10 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
             // var n = 1;
 
             if(id >= 8 && id <= 10) {
-              for (j=2;j<data.length;j++){
+              for (var j=2;j<data.length;j++){
                 data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
                 sqlInputData.push("('" + data[j][0] + "'");
-                for (i=1;i<=data[j].length-1;i++){
+                for (var i=1;i<=data[j].length-1;i++){
                   data[j][i] = parseFloat(data[j][i]);
                   if (isNaN(data[j][i])) {
                     data[j][i] = "NULL";
@@ -466,7 +465,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
                     data[j][i] = 0;
                   }
                   sqlInputData.push("('" + data[j][0] + "'");
-                  for (k=1;k<=data[j].length-1;k++){
+                  for (var k=1;k<=data[j].length-1;k++){
                     if(k==data[j].length-1){
                       sqlInputData.push("17," + data[j][k] + ")");
                     } else {
