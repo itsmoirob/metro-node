@@ -19,7 +19,6 @@ var CronJob = require('cron').CronJob;
 var mysql = require('mysql');
 var csvParse = require('csv-parse');
 var fs = require('fs');
-var JSFtp = require("jsftp");
 var moment = require('moment');
 
 
@@ -48,14 +47,6 @@ var pool = mysql.createPool({
     database: config.mysql.database,
     multipleStatements: true
 });
-
-// // connect ftp
-// var Ftp = new JSFtp({
-//   host: config.ftp.host,
-//   // port: 3331, // defaults to 21
-//   user: config.ftp.user, // defaults to "anonymous"
-//   pass: config.ftp.pass // defaults to "@anonymous"
-// });
 
 var app = express();
 
