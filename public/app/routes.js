@@ -186,6 +186,19 @@ views: {
   }
 }
 })
+.state('parent.weeklyReportPage', { //list the main body of the 'admin' page
+url:'/site/weekReport/:incidentId',
+views: {
+  'display@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/weeklyReportPage.tmpl.html'
+  },
+  'other@': {
+    controller: 'DisplayCtrl',
+    templateUrl: 'pages/displaySiteList.tmpl.html'
+  }
+}
+})
 ;
 // $urlRouterProvider.otherwise('/index'); //take to front page
 })
