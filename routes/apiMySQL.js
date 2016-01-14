@@ -3,7 +3,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
 //   var request = require('request');
 
 
-  var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":null,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"},{"id":12, "mpan":"2000056366930"}];
+  var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":6,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"},{"id":12, "mpan":"2000056366930"},{"id":13, "mpan":"2000056456265"},{"id":14, "mpan":""},{"id":15, "mpan":"1640000523609"}];
   
   // // connect ftp
 // var Ftp = new JSFtp({
@@ -36,7 +36,7 @@ module.exports = function(app,connection,csvParse,fs,moment,pool) {
     var id = req.params.id;
     id = id - 1;
 
-    if (req.params.id >= 8 && req.params.id <= 10)  {
+    if ((req.params.id >= 8 && req.params.id <= 10) || (req.params.id >= 13 && req.params.id <= 15))  {
       var filePath = "./files/Primrose Solar Limited NonHH.csv";
       var startIndex = 2;
     } else {

@@ -220,7 +220,7 @@ module.exports = function(app,connection) {
   // Get data main display chart
   app.get('/api/displaySite/allSiteDaily/', function(req,res){
     var selectedDate = "NOW()"
-    connection.query("select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11, ps12 from dailySumExport where (date between (" + selectedDate + " - INTERVAL 31 DAY) and " + selectedDate + ") order by date asc;", function(err,rows){
+    connection.query("select date, ps1, ps2, ps3, ps4, ps5, ps7, ps8, ps9, ps10, ps11, ps12, ps13, ps15 from dailySumExport where (date between (" + selectedDate + " - INTERVAL 31 DAY) and " + selectedDate + ") order by date asc;", function(err,rows){
       if (err){
         return res.json(err);
       } else {
@@ -231,7 +231,7 @@ module.exports = function(app,connection) {
 
   // Get data main display chart
   app.get('/api/displaySite/allSiteDailyMWp/', function(req,res){
-    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11`, ps12/4.999 as `ps12` from dailySumExport where (date between (NOW() - INTERVAL 31 DAY) and NOW()) order by date asc;', function(err,rows){
+    connection.query('select date, ps1/6.3 as `ps1`, ps2/9.272 as `ps2`, ps3/4.9030 as `ps3`, ps4/11.3140 as `ps4`,ps5/32.8 as `ps5`, ps7/39.9780 as `ps7`, ps8/14.96 as `ps8`, ps9/9.52 as `ps9`, ps10/14.96 as `ps10`, ps11/7.48 as `ps11`, ps12/4.04 as `ps12`, ps13/3.96 as `ps13`, ps15/3.96 as `ps15` from dailySumExport where (date between (NOW() - INTERVAL 31 DAY) and NOW()) order by date asc;', function(err,rows){
       if (err){
         return res.json(err);
       } else {
