@@ -1,93 +1,97 @@
 angular.module('apiFactory', [])
-.factory('dataFactory', ['$http', function($http){
-  var urlBase = ('./api/');
-  var dataFactory = {};
+    .factory('dataFactory', ['$http', function ($http) {
+        var urlBase = ('./api/');
+        var dataFactory = {};
 
-  dataFactory.getPickUp = function(){ //GET all of the basic info for front page
-    return $http.get(urlBase + 'pickUp');
-  };
+        dataFactory.getPickUp = function () { //GET all of the basic info for front page
+            return $http.get(urlBase + 'pickUp');
+        };
 
-  dataFactory.getSiteSummary = function (id) {
-    return $http.get(urlBase + 'displaySite/site/' + id);
-  };
+        dataFactory.getSiteSummary = function (id) {
+            return $http.get(urlBase + 'displaySite/site/' + id);
+        };
 
-  dataFactory.getSiteInverterGeneration = function (id) {
-    return $http.get(urlBase + 'displaySite/generation/' + id);
-  };
+        dataFactory.getSiteInverterGeneration = function (id) {
+            return $http.get(urlBase + 'displaySite/generation/' + id);
+        };
 
-  dataFactory.getSiteExportGeneration = function (id) {
-    return $http.get(urlBase + 'displaySite/export/' + id);
-  };
+        dataFactory.getSiteExportGeneration = function (id) {
+            return $http.get(urlBase + 'displaySite/export/' + id);
+        };
 
-  dataFactory.getEPC = function (id) {
-    return $http.get(urlBase + 'displaySite/epc/' + id);
-  };
+        dataFactory.getEPC = function (id) {
+            return $http.get(urlBase + 'displaySite/epc/' + id);
+        };
 
-  dataFactory.getAdmin = function (id) {
-    return $http.get(urlBase + 'displaySite/admin/' + id);
-  };
+        dataFactory.getAdmin = function (id) {
+            return $http.get(urlBase + 'displaySite/admin/' + id);
+        };
 
-  dataFactory.getSitePyro = function (id) {
-    return $http.get(urlBase + 'displaySite/pyro/' + id);
-  };
+        dataFactory.getSitePyro = function (id) {
+            return $http.get(urlBase + 'displaySite/pyro/' + id);
+        };
 
-  dataFactory.getMKReport = function (id) {
-    return $http.get(urlBase + 'displaySite/report/' + id);
-  };
+        dataFactory.getMKReport = function (id) {
+            return $http.get(urlBase + 'displaySite/report/' + id);
+        };
 
-  dataFactory.allSiteDaily = function (id) {
-    return $http.get(urlBase + 'displaySite/allSiteDaily');
-  };
+        dataFactory.allSiteDaily = function (id) {
+            return $http.get(urlBase + 'displaySite/allSiteDaily');
+        };
 
-  dataFactory.allSiteDailyMWp = function (id) {
-    return $http.get(urlBase + 'displaySite/allSiteDailyMWp');
-  };
+        dataFactory.allSiteDailyMWp = function (id) {
+            return $http.get(urlBase + 'displaySite/allSiteDailyMWp');
+        };
 
-  dataFactory.allSiteDailyEsol = function (id) {
-    return $http.get(urlBase + 'displaySite/allSiteDailyEsol');
-  };
+        dataFactory.allSiteDailyEsol = function (id) {
+            return $http.get(urlBase + 'displaySite/allSiteDailyEsol');
+        };
 
-  dataFactory.getChartPyro = function (id) {
-    return $http.get(urlBase + 'displaySite/pyroMean/' + id);
-  };
+        dataFactory.getChartPyro = function (id) {
+            return $http.get(urlBase + 'displaySite/pyroMean/' + id);
+        };
 
-  dataFactory.getIncidentReport = function () {
-    return $http.get(urlBase + 'reports/incidents');
-  };
+        dataFactory.getIncidentReport = function () {
+            return $http.get(urlBase + 'reports/incidents');
+        };
 
-  dataFactory.getIncidentReportAll = function () {
-    return $http.get(urlBase + 'reports/incidentsAll');
-  };
+        dataFactory.getIncidentReportAll = function () {
+            return $http.get(urlBase + 'reports/incidentsAll');
+        };
 
-  dataFactory.getIncidentReportSite = function (id) {
-    return $http.get(urlBase + 'reports/incidentsSite/' + id);
-  };
+        dataFactory.getIncidentReportSite = function (id) {
+            return $http.get(urlBase + 'reports/incidentsSite/' + id);
+        };
 
-  dataFactory.getIncidentReportLog = function (id) {
-    return $http.get(urlBase + 'reports/incidentLog/' + id);
-  };
+        dataFactory.getOpenIncidentSite = function (id) {
+            return $http.get(urlBase + 'reports/openIncidentsSite/' + id);
+        };
 
-  dataFactory.getIncidentReportLogComment = function (id) {
-    return $http.get(urlBase + 'reports/incidentLogComments/' + id);
-  };
+        dataFactory.getIncidentReportLog = function (id) {
+            return $http.get(urlBase + 'reports/incidentLog/' + id);
+        };
 
-  dataFactory.getAllReports = function () {
-    return $http.get(urlBase + 'displaySite/allReport/');
-  };
+        dataFactory.getIncidentReportLogComment = function (id) {
+            return $http.get(urlBase + 'reports/incidentLogComments/' + id);
+        };
 
-  dataFactory.getSelectReports = function (startDate, endDate) {
-    return $http.get(urlBase + 'displaySite/reportSelect/' + startDate + '/' + endDate + '/');
-  };
+        dataFactory.getAllReports = function () {
+            return $http.get(urlBase + 'displaySite/allReport/');
+        };
 
-  dataFactory.getIncidentSiteName = function () {
-    return $http.get(urlBase + 'incidents/incidentSiteName/');
-  };
+        dataFactory.getSelectReports = function (startDate, endDate) {
+            return $http.get(urlBase + 'displaySite/reportSelect/' + startDate + '/' + endDate + '/');
+        };
 
-  dataFactory.getIncidentCategory = function () {
-    return $http.get(urlBase + 'incidents/incidentCategory/');
-  };
+        dataFactory.getIncidentSiteName = function () {
+            return $http.get(urlBase + 'incidents/incidentSiteName/');
+        };
 
-  return dataFactory;
-}])
+        dataFactory.getIncidentCategory = function () {
+            return $http.get(urlBase + 'incidents/incidentCategory/');
+        };
+
+        return dataFactory;
+    }])
 
 ;

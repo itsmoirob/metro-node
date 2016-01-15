@@ -1,34 +1,34 @@
-module.exports = function(app,connection,csvParse,fs,moment,pool) {
+module.exports = function(app,connection,csvParse,fs,moment,pool, config) {
     var JSFtp = require("jsftp");
 //   var request = require('request');
 
 
   var mpanList = [{"id":1,"mpan":"2100041172109"},{"id":2,"mpan":"2000055901355"},{"id":3,"mpan":"2000055901300"},{"id":4,"mpan":"1050000588215"},{"id":5,"mpan":"2200042384200"},{"id":6,"mpan":null},{"id":7,"mpan":"2000056147387"},{"id":8,"mpan":"1900091171276"},{"id":9,"mpan":"1900091178963"},{"id":10,"mpan":"1900091183411"},{"id":11,"mpan":"2200042480656"},{"id":12, "mpan":"2000056366930"},{"id":13, "mpan":"2000056456265"},{"id":14, "mpan":""},{"id":15, "mpan":"1640000523609"}];
   
-  // // connect ftp
-// var Ftp = new JSFtp({
-//   host: config.ftp.host,
-//   // port: 3331, // defaults to 21
-//   user: config.ftp.user, // defaults to "anonymous"
-//   pass: config.ftp.pass // defaults to "@anonymous"
-// });
+// connect ftp
+var Ftp = new JSFtp({
+  host: config.ftp.host,
+  // port: 3331, // defaults to 21
+  user: config.ftp.user,
+  pass: config.ftp.pass
+});
+Ftp.keepAlive()
 
-// The server address is ftp://ftp.stark.co.uk
-// Username: SKPS1805
-// Password: 9Sk8*sK#
-
-
-  // app.get('/api/ftp/:id' ,function(req,res) {
-  //   var id = req.params.id-1;
-  //
-  //   Ftp.get(mpanList[id].mpan+".csv", mpanList[id].mpan+".csv", function(hadErr) {
-  //     if (hadErr)
-  //     console.error('There was an error retrieving the file.'+hadErr);
-  //     else
-  //     console.log('File copied successfully!');
-  //     res.send("File "+mpanList[id].mpan+".csv has been downloaded");
-  //   });
-  // });
+  app.get('/api/ftp/:id' ,function(req,res) {
+    var id = req.params.id;
+    if(id === 'NonHH') {
+        var fileName = 'Primrose Solar Limited NonHH.csv'; 
+    } else {
+        fileName = 'Primrose Solar Limited.csv'
+    }
+    Ftp.get(fileName, './files/' + fileName, function(hadErr) {
+      if (hadErr)
+      console.error('There was an error retrieving the file.'+hadErr);
+      else
+      console.log('File copied successfully!');
+      res.send('File ' + fileName + '.csv has been downloaded');
+    });
+  });
 
 // upload export to database tables export_# and dailySumExport
   app.get('/api/mySQL/exportUpload/:id', function(req, res) {
