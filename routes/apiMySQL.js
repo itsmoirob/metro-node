@@ -36,7 +36,7 @@ Ftp.keepAlive()
     var id = req.params.id;
     id = id - 1;
 
-    if ((req.params.id >= 8 && req.params.id <= 10) || (req.params.id >= 13 && req.params.id <= 15))  {
+    if ((req.params.id >= 8 && req.params.id <= 10) || req.params.id === 13)  {
       var filePath = "./files/Primrose Solar Limited NonHH.csv";
       var startIndex = 2;
     } else {
