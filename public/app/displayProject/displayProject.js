@@ -34,22 +34,6 @@ angular.module('displayProject', [
     });
   }
 
-  getEPC(SP);
-  function getEPC(SP) {
-    dataFactory.getEPC(SP)
-    .success(function(res){
-      $scope.epc = res;
-    });
-  }
-
-  getAdmin(SP);
-  function getAdmin(SP) {
-    dataFactory.getAdmin(SP)
-    .success(function(res){
-      $scope.admin = res;
-    });
-  }
-
   getReport(SP);
   function getReport(SP) {
     dataFactory.getMKReport(SP)
