@@ -15,20 +15,27 @@ angular.module('apiFactory', [])
             return $http.get(urlBase + 'displaySite/generation/' + id);
         };
 
+        dataFactory.getMonthReport = function (id) {
+            return $http.get(urlBase + 'displaySite/monthReport/' + id);
+        };
+
+        dataFactory.getMonthGeneration = function (id, month) {
+            if (month == '') {
+                month = '2015-12';
+            }
+            return $http.get(urlBase + 'displaySite/siteMonthGeneration/' + id + '/' + month);
+        };
+
+        dataFactory.siteMonthSumGeneration = function (id) {
+            return $http.get(urlBase + 'displaySite/siteMonthSumGeneration/' + id);
+        };
+
+        dataFactory.siteMonthIncidents = function (id) {
+            return $http.get(urlBase + 'displaySite/siteMonthIncidents/' + id);
+        };
+
         dataFactory.getSiteExportGeneration = function (id) {
             return $http.get(urlBase + 'displaySite/export/' + id);
-        };
-
-        dataFactory.getEPC = function (id) {
-            return $http.get(urlBase + 'displaySite/epc/' + id);
-        };
-
-        dataFactory.getAdmin = function (id) {
-            return $http.get(urlBase + 'displaySite/admin/' + id);
-        };
-
-        dataFactory.getSitePyro = function (id) {
-            return $http.get(urlBase + 'displaySite/pyro/' + id);
         };
 
         dataFactory.getMKReport = function (id) {
