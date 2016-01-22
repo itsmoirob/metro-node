@@ -15,7 +15,7 @@ module.exports = function (app, connection) {
     // api for getting summary of specific site
     app.get('/api/displaySite/site/:id', function (req, res) {
         var id = req.params.id;
-        connection.query('SELECT name, id, latitude, longitude, location, tic_mwp, dnc_mw, homes_powered, carbon_saved_tones, epc from top_table where id = ?', [id], function (err, rows) {
+        connection.query('SELECT name, id, latitude, longitude, location, tic_mwp, dnc_mw, homes_powered, carbon_saved_tones, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export from top_table where id = ' + id + ';', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -24,17 +24,6 @@ module.exports = function (app, connection) {
         });
     });
 
-    // api for getting inverter generation for specific site
-    app.get('/api/displaySite/generation/:id', function (req, res) {
-        var id = req.params.id;
-        connection.query('SELECT UNIX_TIMESTAMP(cast(`date` AS datetime) + cast(`time` as time))*1000 as `timeU`, `generation`, `inverter_number` from `inverter_site_generation_' + id + '` order by `inverter_number`, `timeU` ;', function (err, rows) {
-            if (err) {
-                return res.json(err);
-            } else {
-                return res.json(rows);
-            }
-        });
-    });
 
     // get export generation
     app.get('/api/displaySite/export/:id', function (req, res) {
@@ -48,7 +37,7 @@ module.exports = function (app, connection) {
         });
     });
 
-    // get export generation
+    // get pyro generation
     app.get('/api/displaySite/pyroMean/:id', function (req, res) {
         var id = req.params.id;
         if (id == 5) {
@@ -87,43 +76,6 @@ module.exports = function (app, connection) {
         }
     });
 
-    // get export generation for met office test
-    app.get('/apiTestSite/displaySite/export/site_:id', function (req, res) {
-        var date = req.params.date;
-        var days = req.params.days;
-        var id = req.params.id;
-        connection.query('SELECT `date`, `time`, `generation` from  `export_' + id + '`  where (date between (now() - interval 7 day) and now());', function (err, rows) {
-            if (err) {
-                return res.json(err);
-            } else {
-                return res.json(rows);
-            }
-        });
-    });
-
-    // Get the epc info.
-    app.get('/api/displaySite/epc/:id', function (req, res) {
-        var id = req.params.id;
-        connection.query('SELECT top_table.id, epc.epcName from top_table left join epc on top_table.epc = epc.epcIndex where id = ' + id + ';', function (err, rows) {
-            if (err) {
-                return res.json(err);
-            } else {
-                return res.json(rows);
-            }
-        });
-    });
-
-    app.get('/api/displaySite/admin/:id', function (req, res) {
-        var id = req.params.id;
-        connection.query('SELECT id, dno, mpan_export from top_table where id = ' + id + ';', function (err, rows) {
-            if (err) {
-                return res.json(err);
-            } else {
-                return res.json(rows);
-            }
-        });
-    });
-
     app.get('/api/displaySite/install/:id', function (req, res) {
         var id = req.params.id;
         var queryInverter = 'select id, inverter_name, inverter_number, inverter_power, inverter_warranty from inverterInfo where id = ' + id + ' and active = 1;';
@@ -138,17 +90,6 @@ module.exports = function (app, connection) {
         });
     });
 
-    // get export generation for met office test
-    app.get('/api/displaySite/pyro/:id', function (req, res) {
-        var id = req.params.id;
-        connection.query('SELECT UNIX_TIMESTAMP(dateTime) * 1000 as `timeU`, if(pyro_1 = 0, 0, if(pyro_1>greatest(pyro_1,pyro_2)*0.6,pyro_1,"")) as `pyro_mod_1`, if(pyro_1 = 0, 0, if(pyro_2>greatest(pyro_1,pyro_2)*0.6,pyro_2,"")) as `pyro_mod_2`, (if(pyro_1 = 0, 0, if(pyro_1>greatest(pyro_1,pyro_2)*0.6,pyro_1,""))+if(pyro_2 = 0, 0, if(pyro_2>greatest(pyro_1,pyro_2)*0.6,pyro_2,""))) as `pyro_mod_sum`, (select(pyro_mod_1) <>"") + (select(pyro_mod_2) <>"") as `count`, (select(`pyro_mod_sum`)) / (select(`count`)) as `average` from  `pyro_site_' + id + '`;', function (err, rows) {
-            if (err) {
-                return res.json(err);
-            } else {
-                return res.json(rows);
-            }
-        });
-    });
 
     // get export generation for met office test
     app.get('/api/displaySite/report/:id', function (req, res) {
@@ -274,7 +215,6 @@ module.exports = function (app, connection) {
     });
 
     app.get('/api/displaySite/allReport/', function (req, res) {
-        var id = req.params.id;
         connection.query('select sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) / sum(t.PS1_T01 + t.PS1_T02 + t.PS1_T03 + t.PS1_T04 + t.PS1_T05) as `PS01_avail`, sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) / sum(t.PS2_T01 + t.PS2_T02 + t.PS2_T03 + t.PS2_T04 + t.PS2_T05 + t.PS2_T06 + t.PS2_T07) as `PS02_avail`, sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) / sum(t.PS3_T01 + t.PS3_T02 + t.PS3_T03 + t.PS3_T04) as `PS03_avail`, sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) / sum(t.PS4_T01 + t.PS4_T02 + t.PS4_T03 + t.PS4_T04 + t.PS4_T05 + t.PS4_T06 + t.PS4_T07 + t.PS4_T08) as `PS04_avail`, sum(a.PS5) / sum(t.PS5) as `PS05_avail`, sum(a.PS7) / sum(t.PS7) as `PS07_avail`, sum(a.PS8) / sum(t.PS8) as `PS08_avail`, sum(a.PS9) / sum(t.PS9) as `PS09_avail`, sum(a.PS10) / sum(t.PS10) as `PS10_avail`, sum(a.PS11) / sum(t.PS11) as `PS11_avail`, sum(o.PS1_T01 + o.PS1_T02 + o.PS1_T03 + o.PS1_T04  + o.PS1_T05) / sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) as `PS01_Over0`, sum(o.PS2_T01 + o.PS2_T02 + o.PS2_T03 + o.PS2_T04 + o.PS2_T05 + o.PS2_T06 + o.PS2_T07) / sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) as `PS02_Over0`, sum(o.PS3_T01 + o.PS3_T02 + o.PS3_T03 + o.PS3_T04) / sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) as `PS03_Over0`, sum(o.PS4_T01 + o.PS4_T02 + o.PS4_T03 + o.PS4_T04 + o.PS4_T05 + o.PS4_T06 + o.PS4_T07 + o.PS4_T08) / sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) as `PS04_Over0`, sum(o.PS5) / sum(a.PS5) as `PS05_Over0`, sum(o.PS7) / sum(a.PS7) as `PS07_Over0`, sum(o.PS8) / sum(a.PS8) as `PS08_Over0`, sum(o.PS9) / sum(a.PS9) as `PS09_Over0`, sum(o.PS10) / sum(a.PS10) as `PS10_Over0`, sum(o.PS11) / sum(a.PS11) as `PS11_Over0`, sum(e.PS1) / sum(c.PS1 * (select tic_mwp from top_table where id = 1) * 1000) as `PS01_PR`, sum(e.PS2) / sum(c.PS2 * (select tic_mwp from top_table where id = 2) * 1000) as `PS02_PR`, sum(e.PS3) / sum(c.PS3 * (select tic_mwp from top_table where id = 3) * 1000) as `PS03_PR`, sum(e.PS4) / sum(c.PS4 * (select tic_mwp from top_table where id = 4) * 1000) as `PS04_PR`,sum(e.PS5) / sum(c.PS5 * (select tic_mwp from top_table where id = 5) * 1000) as `PS05_PR`,sum(e.PS7) / sum(c.PS7 * (select tic_mwp from top_table where id = 7) * 1000) as `PS07_PR`, sum(e.PS8) / sum(c.PS8 * (select tic_mwp from top_table where id = 8) * 1000) as `PS08_PR`, sum(e.PS9) / sum(c.PS9 * (select tic_mwp from top_table where id = 9) * 1000) as `PS09_PR`, sum(e.PS10) / sum(c.PS10 * (select tic_mwp from top_table where id = 10) * 1000) as `PS10_PR`, sum(e.PS11) / sum(c.PS11 * (select tic_mwp from top_table where id = 11) * 1000) as `PS11_PR`, sum(e.PS1) as `PS01_export`, sum(e.PS2) as `PS02_export`, sum(e.PS3) as `PS03_export`, sum(e.PS4) as `PS04_export`, sum(e.PS5) as `PS05_export`, sum(e.PS7) as `PS07_export`, sum(e.PS8) as `PS08_export`, sum(e.PS9) as `PS09_export`, sum(e.PS10) as `PS10_export`, sum(e.PS11) as `PS11_export` from dailySumExport e join dailySumInverterOver0 o on e.date = o.date join dailySumInverterAvailabilty a on e.date = a.date join dailySumInverterTimeDiff t on e.date = t.date join dailyEsol c on e.date = c.date where e.date <= (now() - interval 1 day) and e.date >= (now() - interval 15 day);', function (err, rows) {
             if (err) {
                 return res.json(err);
@@ -323,5 +263,70 @@ module.exports = function (app, connection) {
             }
         });
     });
+    
+    app.get('/api/displaySite/monthReport/:id', function (req, res) {
+        var id = req.params.id;
+        var inverters = null;
+        
+        if (id == 1) {
+            inverters = "sum(ps1_T01) + sum(ps1_T02) + sum(ps1_T03) + sum(PS1_T04) + sum(PS1_T05)";
+        } else if (id == 2) {
+            inverters = "sum(ps2_T01) + sum(ps2_T02) + sum(ps2_T03) + sum(PS2_T04) + sum(PS2_T05) + sum(PS2_T06) + sum(PS2_T07)";
+        } else if (id == 3) {
+            inverters = "sum(ps3_T01) + sum(ps3_T02) + sum(ps3_T03) + sum(PS3_T04)";
+        } else if (id == 4) {
+            inverters = "sum(ps4_T01) + sum(ps4_T02) + sum(ps4_T03) + sum(PS4_T04) + sum(PS4_T05) + sum(PS4_T06) + sum(PS4_T07) + sum(PS4_T08)";
+        } else {
+            inverters = "sum(ps" + id + ")";
+        }
+        
+         connection.query('SELECT s.id, name, location, tic_mwp, dnc_mw, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, panel_name, inverter_name, transformer_type, (select sum(ps' + id + ') from dailySumExport where year(date) = "2015" and month(date) = "12") as export, (select sum(ps' + id + ') from dailyEsol where year(date) = "2015" and month(date) = "12") * tic_mwp * 1000 as theoretical, (select export) / (select theoretical) as pr, (select '+ inverters + ' from dailySumInverterOver0 where year(date) = "2015" and month(date) = "12") / (select '+ inverters + ' from dailySumInverterTimeDiff where year(date) = "2015" and month(date) = "12") as availabilty from top_table s join panelInfo p on s.id = p.site_id join inverterInfo i on s.id = i.site_id join transformerInfo t on s.id = t.site_id where s.id = ' + id + ' limit 1;', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+    // Get data report display chart month
+    app.get('/api/displaySite/siteMonthGeneration/:id/:month', function (req, res) {
+        var id = req.params.id;
+        var month = req.params.month;
+        // res.send('select date, sum(ps' + id + ') as generation from dailySumExport where date_format(date, "%Y-%m") = "' + month + '" group by date order by date asc;');
+        connection.query('select date, sum(ps' + id + ') as generation from dailySumExport where date_format(date, "%Y-%m") = "' + month + '" group by date order by date asc;', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+    // Get data report display chart cumulative all
+    app.get('/api/displaySite/siteMonthSumGeneration/:id', function (req, res) {
+        var id = req.params.id;
+        connection.query('select m.date, ps' + id + ' as predicted, sum from monthlyPredicted m left join (select DATE_FORMAT(date, "%Y-%m") as date, sum(ps' + id + ') as sum from dailySumExport group by year(date), month(date)) e on DATE_FORMAT(m.date, "%Y-%m") = e.date;', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+
+    app.get('/api/displaySite/siteMonthIncidents/:id', function (req, res) {
+        var id = req.params.id;
+        connection.query('select id, date_logged, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ' and year(date_logged) = 2015 and month(date_logged) = 12;', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+
+
+
 
 };
