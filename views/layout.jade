@@ -33,7 +33,7 @@ html
 					a(href="#", data-activates="slide-out", class="button-collapse")
 						i(class="mdi-navigation-menu")
 
-		.container(id="wrapper", class="container", ng-controller="MainCtrl")
+		.container(id="wrapper", class="container")
 			!= messages()
 			block content
 		.container(class="footer")
@@ -54,11 +54,13 @@ html
 		script(src="../app/displayProject/reportsIncidents.js")
         
 		script(src="../app/listSites/listSites.js")
+		script(src="../app/displayProject/displaySite.js")
 		script(src="../app/displayProject/displayProject.js")
 		script(src="../app/displayProject/displayReportTest.js")
 		script(src="../app/displayProject/displayExport.js")
 		script(src="../app/displayProject/reportSingleIncident.js")
 		script(src="../app/displayProject/monthReport.js")
+		script(src="../app/displayProject/portfolioReport.js")
 
 		script(src="//maps.googleapis.com/maps/api/js?sensor=false")
 		script(src="../javascripts/angular-google-maps.js")

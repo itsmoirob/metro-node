@@ -2,6 +2,7 @@ angular.module('metro', [
   'ui.router',
   'ngAnimate',
   'listSites',
+  'displaySite',
   'routes',
   'displayProject',
   'displayExport',
@@ -9,6 +10,7 @@ angular.module('metro', [
   'displayProjectTest',
   'displayReportsIncidents',
   'displaySingleReportsIncident',
-  'monthReport'
+  'monthReport',
+  'portfolioReport'
 ])
 ;

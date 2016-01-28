@@ -13,11 +13,11 @@ angular.module('routes', [
                 url: '',
                 views: {
                     'display@': {
-                        controller: 'MainCtrl',
+                        controller: 'SiteCtrl',
                         templateUrl: 'pages/select.tmpl.html'
                     },
                     'other@': {
-                        controller: 'MainCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/selectList.tmpl.html'
 
                     }
@@ -31,7 +31,7 @@ angular.module('routes', [
                         templateUrl: 'pages/displaySite.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -44,7 +44,7 @@ angular.module('routes', [
                         templateUrl: 'pages/displaySiteGeneration.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -57,7 +57,7 @@ angular.module('routes', [
                         templateUrl: 'pages/displaySiteInstall.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -70,7 +70,7 @@ angular.module('routes', [
                         templateUrl: 'pages/displaySiteFinance.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -83,7 +83,7 @@ angular.module('routes', [
                         templateUrl: 'pages/displaySiteAdmin.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -96,7 +96,7 @@ angular.module('routes', [
                         templateUrl: 'pages/displaySiteMKReport.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -135,7 +135,7 @@ angular.module('routes', [
                         templateUrl: 'pages/reportsViewSiteIncidents.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
@@ -194,7 +194,20 @@ angular.module('routes', [
                         templateUrl: 'pages/monthlyReportPage.tmpl.html'
                     },
                     'other@': {
-                        controller: 'DisplayCtrl',
+                        controller: 'ListCtrl',
+                        templateUrl: 'pages/displaySiteList.tmpl.html'
+                    }
+                }
+            })
+            .state('parent.monthReportPortfolio', { //list the main body of the 'admin' page
+                url: '/portfolio/monthReport',
+                views: {
+                    'display@': {
+                        controller: 'PortfolioReportCtrl',
+                        templateUrl: 'pages/reportPortfolio.tmpl.html'
+                    },
+                    'other@': {
+                        controller: 'ListCtrl',
                         templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
