@@ -24,9 +24,11 @@ header, body, footer {
 
 body {
   /*padding-top: 50px;*/
-  background-color: #fcfcfc;
-  /*font-size: 62.5%;*/
-  /*margin: 0;*/
+  /*background-color: #fcfcfc;*/
+  margin: 0;
+  margin: 0 auto;
+  font-size: 1em;
+  
 }
 
 a {
@@ -59,7 +61,30 @@ ul.success li{
   border-color: #d6e9c6;
 }
 
+.letter {
+  width: 21cm;
+  height: 29.7cm;
+  padding-left: 1cm;
+  padding-right: 1cm;
+  padding-top: 5mm;
+  page-break-after: always;
+  page-break-inside: avoid;
+  font-size: 9pt;
+  position:relative;
+  font-family: "Helvetica Neue", sans-serif;
+  /*background-color: white;*/
+}
 
+
+
+@media screen {
+  .letter {
+    border: 1px solid black;
+    box-shadow: 7px 7px 7px #666;
+    margin:2em auto;
+    line-height: 1;
+  }
+}
 
 .primroseYellow {
   background-color: rgb(251, 161, 27);
@@ -98,3 +123,52 @@ ul.success li{
 #formBorder {
   border: solid thin;
 }
+
+.monthReport th,td {
+    text-align: left;
+    padding: 0px;
+}
+
+.monthReport tr:nth-child(even){background-color: #f2f2f2}
+
+.monthReport th {
+    background-color: rgb(251, 161, 27);
+    color: white;
+    border-left: 1px solid white ;
+    border-right: 1px solid white ;
+    border-bottom: 1px solid white ;
+    text-align: center;
+}
+
+.monthReportCol .row .col {
+    padding: 0 !important;
+}
+
+.logo {
+    text-align: right;
+}
+
+.tableTitle {
+    background-color: rgb(251, 161, 27);
+    color: white;
+    text-align: center;
+    margin: 0px;
+}
+
+#chartMonthGeneration {
+    height: 300px;
+    width: 100%;
+}
+
+#chartMonthSumGeneration {
+    height: 250px;
+    width: 50%;
+    float: left;
+}
+
+#chartMonthPR {
+    height: 250px;
+    width: 50%;
+    float: right;
+}
+

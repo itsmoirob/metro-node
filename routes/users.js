@@ -199,7 +199,7 @@ router.post('/newComment', function(req, res, next) {
     console.log(error);
     // res.writeHead(200, {'Content-Type': 'text/plain'});
     req.flash('success','Comment has been inserted');
-    res.redirect('/#/report/incident/' + log_id);
+    res.redirect('/#/report/incident?incidentId=' + log_id);
   });
 });
 

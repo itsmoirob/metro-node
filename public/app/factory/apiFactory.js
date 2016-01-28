@@ -15,23 +15,24 @@ angular.module('apiFactory', [])
             return $http.get(urlBase + 'displaySite/generation/' + id);
         };
 
-        dataFactory.getMonthReport = function (id) {
-            return $http.get(urlBase + 'displaySite/monthReport/' + id);
+        dataFactory.getMonthReport = function (id, month) {
+            return $http.get(urlBase + 'displaySite/monthReport/' + id + '/' + month);
         };
 
         dataFactory.getMonthGeneration = function (id, month) {
-            if (month == '') {
-                month = '2015-12';
-            }
             return $http.get(urlBase + 'displaySite/siteMonthGeneration/' + id + '/' + month);
         };
 
-        dataFactory.siteMonthSumGeneration = function (id) {
-            return $http.get(urlBase + 'displaySite/siteMonthSumGeneration/' + id);
+        dataFactory.siteMonthSumGeneration = function (id, month) {
+            return $http.get(urlBase + 'displaySite/siteMonthSumGeneration/' + id + '/' + month);
         };
 
-        dataFactory.siteMonthIncidents = function (id) {
-            return $http.get(urlBase + 'displaySite/siteMonthIncidents/' + id);
+        dataFactory.siteMonthIncidents = function (id, month) {
+            return $http.get(urlBase + 'displaySite/siteMonthIncidents/' + id + '/' + month);
+        };
+        
+        dataFactory.siteMonthSumPR = function (id, month) {
+            return $http.get(urlBase + 'displaySite/siteMonthSumPR/' + id + '/' + month);
         };
 
         dataFactory.getSiteExportGeneration = function (id) {

@@ -115,7 +115,7 @@ module.exports = function (app, connection) {
     });
 
     app.get('/api/reports/incidentsAll', function (req, res) {
-        connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status,incident_report_number from incident_log;', function (err, rows) {
+        connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status,incident_report_number from incident_log order by date_logged desc;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -126,7 +126,7 @@ module.exports = function (app, connection) {
 
     app.get('/api/reports/incidentsSite/:id', function (req, res) {
         var id = req.params.id;
-        connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ';', function (err, rows) {
+        connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ' order by date_logged desc;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -264,8 +264,10 @@ module.exports = function (app, connection) {
         });
     });
     
-    app.get('/api/displaySite/monthReport/:id', function (req, res) {
+    app.get('/api/displaySite/monthReport/:id/:month', function (req, res) {
         var id = req.params.id;
+        var month = req.params.month;
+        var year = req.params.month.substring(0,4)
         var inverters = null;
         
         if (id == 1) {
@@ -280,7 +282,8 @@ module.exports = function (app, connection) {
             inverters = "sum(ps" + id + ")";
         }
         
-         connection.query('SELECT s.id, name, location, tic_mwp, dnc_mw, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, panel_name, inverter_name, transformer_type, (select sum(ps' + id + ') from dailySumExport where year(date) = "2015" and month(date) = "12") as export, (select sum(ps' + id + ') from dailyEsol where year(date) = "2015" and month(date) = "12") * tic_mwp * 1000 as theoretical, (select export) / (select theoretical) as pr, (select '+ inverters + ' from dailySumInverterOver0 where year(date) = "2015" and month(date) = "12") / (select '+ inverters + ' from dailySumInverterTimeDiff where year(date) = "2015" and month(date) = "12") as availabilty from top_table s join panelInfo p on s.id = p.site_id join inverterInfo i on s.id = i.site_id join transformerInfo t on s.id = t.site_id where s.id = ' + id + ' limit 1;', function (err, rows) {
+        
+        connection.query('SELECT s.id, name, location, tic_mwp, dnc_mw, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, panel_name, inverter_name, transformer_type, commissioning, pac, (select ps' + id + ' from monthlyPredictedGeneration where date_format(date, "%Y-%m") = "' + month + '") as pvsyst, (select sum(ps' + id + ') from monthlyPredictedGeneration where (date_format(date, "%Y") = "' + year + '") and (date_format(date, "%Y-%m") <= "' + month + '")) as pvsystYTD, (select sum(ps' + id + ') from dailySumExport where date_format(date, "%Y-%m") = "' + month + '") as export, (select sum(ps' + id + ') from dailyEsol where date_format(date, "%Y-%m") = "' + month + '") * tic_mwp * 1000 as theoretical, (select export) / (select theoretical) as pr, (select sum(ps' + id + ') from dailySumExport where date_format(date, "%Y") = "' + year + '") as exportYTD, (select sum(ps' + id + ') from dailyEsol where date_format(date, "%Y") = "' + year + '") * tic_mwp * 1000 as theoreticalYTD, (select exportYTD) / (select theoreticalYTD) as prYTD, (select '+ inverters + ' from dailySumInverterOver0 where date_format(date, "%Y-%m") = "' + month + '") / (select '+ inverters + ' from dailySumInverterTimeDiff where date_format(date, "%Y-%m") = "' + month + '") as availabilty, (select '+ inverters + ' from dailySumInverterOver0 where date_format(date, "%Y") = "' + year + '") / (select '+ inverters + ' from dailySumInverterTimeDiff where date_format(date, "%Y") = "' + year + '") as availabiltyYTD from top_table s join panelInfo p on s.id = p.site_id join inverterInfo i on s.id = i.site_id join transformerInfo t on s.id = t.site_id where s.id = ' + id + ' limit 1;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -293,8 +296,7 @@ module.exports = function (app, connection) {
     app.get('/api/displaySite/siteMonthGeneration/:id/:month', function (req, res) {
         var id = req.params.id;
         var month = req.params.month;
-        // res.send('select date, sum(ps' + id + ') as generation from dailySumExport where date_format(date, "%Y-%m") = "' + month + '" group by date order by date asc;');
-        connection.query('select date, sum(ps' + id + ') as generation from dailySumExport where date_format(date, "%Y-%m") = "' + month + '" group by date order by date asc;', function (err, rows) {
+        connection.query('select g.date, g.ps' + id + ' as generation, i.ps' + id + ' as esol, (select ps' + id + ' from monthlyPredictedGeneration where date_format(date, "%Y-%m") = "' + month + '") / (SELECT DAY(LAST_DAY(g.date))) as predictGen, (select ps' + id + ' from monthlyPredictedEsol where date_format(date, "%Y-%m") = "' + month + '") / (SELECT DAY(LAST_DAY(g.date))) as predictEsol from dailySumExport g join dailyEsol i on g.date = i.date where date_format(g.date, "%Y-%m") = "' + month + '" order by g.date asc;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -304,9 +306,11 @@ module.exports = function (app, connection) {
     });
     
     // Get data report display chart cumulative all
-    app.get('/api/displaySite/siteMonthSumGeneration/:id', function (req, res) {
+    app.get('/api/displaySite/siteMonthSumGeneration/:id/:month', function (req, res) {
         var id = req.params.id;
-        connection.query('select m.date, ps' + id + ' as predicted, sum from monthlyPredicted m left join (select DATE_FORMAT(date, "%Y-%m") as date, sum(ps' + id + ') as sum from dailySumExport group by year(date), month(date)) e on DATE_FORMAT(m.date, "%Y-%m") = e.date;', function (err, rows) {
+        var month = req.params.month;
+        var year = req.params.month.substring(0,4);
+        connection.query('select m.date, ps' + id + ' as predicted, sum from monthlyPredictedGeneration m left join (select DATE_FORMAT(date, "%Y-%m") as date, sum(ps' + id + ') as sum from dailySumExport where DATE_FORMAT(date, "%Y-%m") <="' + month + '" group by year(date), month(date)) e on DATE_FORMAT(m.date, "%Y-%m") = e.date where year(m.date)="' + year + '";', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -315,9 +319,10 @@ module.exports = function (app, connection) {
         });
     });
 
-    app.get('/api/displaySite/siteMonthIncidents/:id', function (req, res) {
+    app.get('/api/displaySite/siteMonthIncidents/:id/:month', function (req, res) {
         var id = req.params.id;
-        connection.query('select id, date_logged, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ' and year(date_logged) = 2015 and month(date_logged) = 12;', function (err, rows) {
+        var month = req.params.month;
+        connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ' and date_format(date_logged, "%Y-%m") = "' + month + '";', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -325,7 +330,20 @@ module.exports = function (app, connection) {
             }
         });
     });
-
+    
+    app.get('/api/displaySite/siteMonthSumPR/:id/:month', function (req, res) {
+        var id = req.params.id;
+        var month = req.params.month;
+        var year = req.params.month.substring(0,4);
+        
+        connection.query('select e.date as date, g.ps' + id + ' / (select tic_mwp * 1000 from top_table where id = ' + id + ') / e.ps' + id + ' * 100 as prPvsyst, prActual, (select pr_guaranteed from top_table where id = ' + id + ') as prGuarantee from monthlyPredictedEsol e left join (select g.date, sum(g.ps' + id + ') / (sum(e.ps' + id + ') * (select tic_mwp from top_table where id = ' + id + ') * 1000) * 100 as prActual from dailySumExport g join dailyEsol e on g.date = e.date where date_format(g.date, "%Y-%m") <= "' + month + '" group by date_format(g.date, "%Y-%m")) a on e.date = a.date left join monthlyPredictedGeneration g on e.date = g.date where year(e.date) = "' + year + '";', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
 
 
 

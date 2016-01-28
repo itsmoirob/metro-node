@@ -3,156 +3,153 @@
     <div class="col s6 m6">
         <label for="selectStartDate">Select month: </label>
         <input type="month" name="selectStartDate" ng-model="selectStartDate" required>
-          <button class="btn waves-effect waves-light" ui-sref="parent.monthReportPage({siteResult:monthReport.id, month:convertDateMonth(selectStartDate)})">Go to month</button>
+        <button class="btn waves-effect waves-light" ui-sref="parent.monthReportPage({siteResult:monthReport.id, month:convertDateMonth(selectStartDate)})">Go to month</button>
     </div>
 </div>
 
 <div id="section-to-print">
-    <div class="row">
-        <div>
-            <h4>Asset information</h4>
-        </div>
+    <div class="letter">
+        <div class="row">
         <div class="col s6 m6">
-            <h5>Site information</h5>
-            <table>
-                <tr>
-                    <td>Site name</td>
-                    <td>{{ monthReport.name }}</td>
-                </tr>
-                <tr>
-                    <td>Site address</td>
-                    <td>{{ monthReport.location }}</td>
-                </tr>
-                <tr>
-                    <td>O&M Provider</td>
-                    <td>{{ monthReport.epc }}</td>
-                </tr>
-            </table>
-        </div>
-        <div class="col s6 m6">
-            <h5>Technical information</h5>
-            <table>
-                <tr>
-                    <td>TIC (MWp)</td>
-                    <td>{{ monthReport.tic_mwp }}</td>
-                </tr>
-                <tr>
-                    <td>DNC (MWp)</td>
-                    <td>{{ monthReport.dnc_mw }}</td>
-                </tr>
-                <tr>
-                    <td>Panels</td>
-                    <td>{{ monthReport.panel_name }}</td>
-                </tr>
-                <tr>
-                    <td>Inverters</td>
-                    <td>{{ monthReport.inverter_name }}</td>
-                </tr>
-                <tr>
-                    <td>Transformers</td>
-                    <td>{{ monthReport.transformer_type }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div class="row">
-        <div>
-            <h4>Results</h4>
-            <div class="col s6 m6">
-                <h5>Performance</h5>
-                <table>
+            <h6>{{monthReport.name}} {{month}}</h6></div>
+        <div class="logo col s6 m6">
+            <img src="../images/primrose-solar-logo.jpg" alt="" height="70"></div>
+            </div>
+        <div class="row">
+            <div>
+                <p class="tableTitle">Asset information</p>
+            </div>
+            <!--<div class="col s6 m6">-->
+                <table class="monthReport" style="width:50%; float:left">
+                    <th colspan="2">Site information
+                    </th>
                     <tr>
-                        <td>Export actual (kWh)</td>
-                        <td>{{ monthReport.export | number:2 }}</td>
+                        <td>Site name</td>
+                        <td>{{ monthReport.name }}</td>
                     </tr>
                     <tr>
-                        <td>Export expected (kWh)</td>
-                        <td>{{ monthReport.theoretical | number:2 }}</td>
+                        <td>Site address</td>
+                        <td>{{ monthReport.location }}</td>
                     </tr>
                     <tr>
-                        <td>PR Actual</td>
-                        <td>{{ monthReport.pr * 100 | number:2 }}%</td>
+                        <td>O&M Provider</td>
+                        <td>{{ monthReport.epc }}</td>
                     </tr>
                     <tr>
-                        <td>Availabilty</td>
-                        <td>{{ monthReport.availabilty * 100 | number:2 }}%</td>
+                        <td>PAC date</td>
+                        <td>{{ monthReport.pac }}</td>
+                    </tr>
+                    <tr>
+                        <td>Commission date</td>
+                        <td>{{ monthReport.commissioning | date:'dd/MM/yy'  }}</td>
                     </tr>
                 </table>
-            </div>
-            <div class="col s6 m6">
-                <h5>Financial</h5>
-                <table>
+            <!--</div>-->
+            <!--<div class="col s6 m6">-->
+                <table class="monthReport" style="width:50%; float:right">
+                    <th colspan="2">Technical information
+                    </th>
                     <tr>
-                        <td>RO price</td>
-                        <td></td>
+                        <td>TIC (MWp)</td>
+                        <td>{{ monthReport.tic_mwp }}</td>
                     </tr>
                     <tr>
-                        <td>RO income</td>
-                        <td></td>
+                        <td>DNC (MW)</td>
+                        <td>{{ monthReport.dnc_mw }}</td>
                     </tr>
                     <tr>
-                        <td>PPA price</td>
-                        <td></td>
+                        <td>Panels</td>
+                        <td>{{ monthReport.panel_name }}</td>
                     </tr>
                     <tr>
-                        <td>PPA income</td>
-                        <td></td>
+                        <td>Inverters</td>
+                        <td>{{ monthReport.inverter_name }}</td>
                     </tr>
                     <tr>
-                        <td>Total income</td>
-                        <td></td>
+                        <td>Transformers</td>
+                        <td>{{ monthReport.transformer_type }}</td>
                     </tr>
                 </table>
+            <!--</div>-->
+        </div>
+        <div class="row">
+            <div>
+                <p class="tableTitle">Results</p>
+                <!--<div class="col s6 m6">-->
+                    <table class="monthReport" style="width:50%; float:left;">
+                        <th colspan="2">Performance month</th>
+                        <tr>
+                            <td>Export actual (kWh)</td>
+                            <td>{{ monthReport.export | number:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Export expected (kWh) - pvsyst</td>
+                            <td>{{ monthReport.pvsyst | number:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>PR Actual - against pyro</td>
+                            <td>{{ monthReport.pr * 100 | number:2 }}%</td>
+                        </tr>
+                        <tr>
+                            <td>Availabilty</td>
+                            <td>{{ monthReport.availabilty * 100 | number:2 }}%</td>
+                        </tr>
+                    </table>
+                    <table class="monthReport" style="width:50%; float:right;">
+                        <th colspan="2">Performance YTD</th>
+                        <tr>
+                            <td>Export actual (kWh)</td>
+                            <td>{{ monthReport.exportYTD | number:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Export expected (kWh) - pvsyst</td>
+                            <td>{{ monthReport.pvsystYTD | number:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>PR Actual - against pyro</td>
+                            <td>{{ monthReport.prYTD * 100 | number:2 }}%</td>
+                        </tr>
+                        <tr>
+                            <td>Availabilty</td>
+                            <td>{{ monthReport.availabiltyYTD * 100 | number:2 }}%</td>
+                        </tr>
+                    </table>
+                <!--</div>-->
             </div>
         </div>
-    </div>
-    <div class="row">
-        <h4>Data</h4>
-        <div class="col s12 m12">
-            <highchart id="chartMonthGeneration" config="chartMonthGeneration"></highchart>
+        <div class="row">
+            <div>
+                <highchart id="chartMonthGeneration" config="chartMonthGeneration"></highchart>
+            </div>
+            <div>
+                <highchart id="chartMonthSumGeneration" config="chartMonthSumGeneration"></highchart>
+            </div>
+            <div>
+                <highchart id="chartMonthPR" config="chartMonthPR"></highchart>
+            </div>
         </div>
-        <div class="col s12 m12">
-            <highchart id="chartMonthSumGeneration" config="chartMonthSumGeneration"></highchart>
-        </div>
-    </div>
-    <div class="row">
-        <h4>Relevant issues</h4>
-        <p>Issues created in this month</p>
-        <div class="col s12 m6">
-            <h5>Open</h5>
-            <table ng-if="openMonthIncidents[0]">
+        <div class="row">
+            <p class="tableTitle">Incidents</p>
+            <table class="monthReport" style="width:100%">
                 <tr>
-                    <th>Date logged</th>
-                    <th>Category</th>
-                    <th>Loss of generation</th>
-                    <th>Reported by</th>
+                    <th>start</th>
+                    <th>end</th>
+                    <th>details</th>
+                    <th>category</th>
+                    <th>loss gen</th>
+                    <th>incident number</th>
+                    <th>status</th>
                 </tr>
-                <tr ng-repeat="incident in openMonthIncidents">
-                    <td>{{ incident.date_logged  | date:'EEEE d'}}</td>
+                <tr ng-repeat="incident in monthIncidents">
+                    <td>{{ incident.start_time | date:'dd/mm HH:mm' }}</td>
+                    <td>{{ incident.end_time | date:'dd/mm HH:mm' }}</td>
+                    <td>{{ incident.details }}</td>
                     <td>{{ incident.category }}</td>
                     <td>{{ incident.loss_of_generation }}</td>
-                    <td>{{ incident.reported_by_company }}</td>
+                    <td><a ui-sref=parent.reportIncident({incidentId:incident.id})>{{ incident.incident_report_number }}</a></td>
+                    <td>{{ incident.status }}</td>
                 </tr>
             </table>
-            <p ng-if="!openMonthIncidents[0]">None</p>
-        </div>
-        <div class="col s12 m6">
-            <h5>Closed</h5>
-            <table ng-if="closedMonthIncidents[0]">
-                <tr>
-                    <th>Date logged</th>
-                    <th>Category</th>
-                    <th>Loss of generation</th>
-                    <th>Reported by</th>
-                </tr>
-                <tr ng-repeat="incident in closedMonthIncidents">
-                    <td>{{ incident.date_logged  | date:'EEEE d' }}</td>
-                    <td>{{ incident.category }}</td>
-                    <td>{{ incident.loss_of_generation }}</td>
-                    <td>{{ incident.reported_by_company }}</td>
-                </tr>
-            </table>
-            <p ng-if="!closedMonthIncidents[0]">None</p>
         </div>
     </div>
 </div>

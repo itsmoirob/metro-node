@@ -13,3 +13,5 @@ setTimeout(function() {
   $('.success').each(hideFlashMessages);
 }, 5000);
 $('.success').click(hideFlashMessages);
+
+
