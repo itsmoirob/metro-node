@@ -18,5 +18,11 @@ angular.module('listSites', [
                     $scope.introSites = res;
                 });
         }
+        
+          var SP = $stateParams.siteResult;
+          $scope.SP = SP;
+          
+          
+          
     }])
 ;

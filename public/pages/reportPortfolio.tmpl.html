@@ -1,1 +1,22 @@
-{{introSites}}
+
+table
+<table class="portfolioTable">
+    <tr>
+        <td>Site</td>
+        <td ng-repeat="site in portfolioSiteInfo[0]">{{site.name}}</td>
+    </tr>
+    <tr>
+        <td>Location</td>
+        <td ng-repeat="site in portfolioSiteInfo[0]">{{site.location}}</td>
+    </tr>
+    <tr>
+        <td>TIC (Mwp)</td>
+        <td ng-repeat="site in portfolioSiteInfo[0]">{{site.tic_mwp}}</td>
+    </tr>
+</table>
+<hr>
+test {{test}}
+<hr>
+month {{portfolioSiteDataMonth}}
+<hr>
+all {{portfolioSiteData}}

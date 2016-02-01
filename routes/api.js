@@ -263,13 +263,13 @@ module.exports = function (app, connection) {
             }
         });
     });
-    
+
     app.get('/api/displaySite/monthReport/:id/:month', function (req, res) {
         var id = req.params.id;
         var month = req.params.month;
-        var year = req.params.month.substring(0,4)
+        var year = req.params.month.substring(0, 4)
         var inverters = null;
-        
+
         if (id == 1) {
             inverters = "sum(ps1_T01) + sum(ps1_T02) + sum(ps1_T03) + sum(PS1_T04) + sum(PS1_T05)";
         } else if (id == 2) {
@@ -281,9 +281,9 @@ module.exports = function (app, connection) {
         } else {
             inverters = "sum(ps" + id + ")";
         }
-        
-        
-        connection.query('SELECT s.id, name, location, tic_mwp, dnc_mw, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, panel_name, inverter_name, transformer_type, commissioning, pac, (select ps' + id + ' from monthlyPredictedGeneration where date_format(date, "%Y-%m") = "' + month + '") as pvsyst, (select sum(ps' + id + ') from monthlyPredictedGeneration where (date_format(date, "%Y") = "' + year + '") and (date_format(date, "%Y-%m") <= "' + month + '")) as pvsystYTD, (select sum(ps' + id + ') from dailySumExport where date_format(date, "%Y-%m") = "' + month + '") as export, (select sum(ps' + id + ') from dailyEsol where date_format(date, "%Y-%m") = "' + month + '") * tic_mwp * 1000 as theoretical, (select export) / (select theoretical) as pr, (select sum(ps' + id + ') from dailySumExport where date_format(date, "%Y") = "' + year + '") as exportYTD, (select sum(ps' + id + ') from dailyEsol where date_format(date, "%Y") = "' + year + '") * tic_mwp * 1000 as theoreticalYTD, (select exportYTD) / (select theoreticalYTD) as prYTD, (select '+ inverters + ' from dailySumInverterOver0 where date_format(date, "%Y-%m") = "' + month + '") / (select '+ inverters + ' from dailySumInverterTimeDiff where date_format(date, "%Y-%m") = "' + month + '") as availabilty, (select '+ inverters + ' from dailySumInverterOver0 where date_format(date, "%Y") = "' + year + '") / (select '+ inverters + ' from dailySumInverterTimeDiff where date_format(date, "%Y") = "' + year + '") as availabiltyYTD from top_table s join panelInfo p on s.id = p.site_id join inverterInfo i on s.id = i.site_id join transformerInfo t on s.id = t.site_id where s.id = ' + id + ' limit 1;', function (err, rows) {
+
+
+        connection.query('SELECT s.id, name, location, tic_mwp, dnc_mw, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, panel_name, inverter_name, transformer_type, commissioning, pac, (select ps' + id + ' from monthlyPredictedGeneration where date_format(date, "%Y-%m") = "' + month + '") as pvsyst, (select sum(ps' + id + ') from monthlyPredictedGeneration where (date_format(date, "%Y") = "' + year + '") and (date_format(date, "%Y-%m") <= "' + month + '")) as pvsystYTD, (select sum(ps' + id + ') from dailySumExport where date_format(date, "%Y-%m") = "' + month + '") as export, (select sum(ps' + id + ') from dailyEsol where date_format(date, "%Y-%m") = "' + month + '") * tic_mwp * 1000 as theoretical, (select export) / (select theoretical) as pr, (select sum(ps' + id + ') from dailySumExport where date_format(date, "%Y") = "' + year + '") as exportYTD, (select sum(ps' + id + ') from dailyEsol where date_format(date, "%Y") = "' + year + '") * tic_mwp * 1000 as theoreticalYTD, (select exportYTD) / (select theoreticalYTD) as prYTD, (select ' + inverters + ' from dailySumInverterOver0 where date_format(date, "%Y-%m") = "' + month + '") / (select ' + inverters + ' from dailySumInverterTimeDiff where date_format(date, "%Y-%m") = "' + month + '") as availabilty, (select ' + inverters + ' from dailySumInverterOver0 where date_format(date, "%Y") = "' + year + '") / (select ' + inverters + ' from dailySumInverterTimeDiff where date_format(date, "%Y") = "' + year + '") as availabiltyYTD from top_table s join panelInfo p on s.id = p.site_id join inverterInfo i on s.id = i.site_id join transformerInfo t on s.id = t.site_id where s.id = ' + id + ' limit 1;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -309,7 +309,7 @@ module.exports = function (app, connection) {
     app.get('/api/displaySite/siteMonthSumGeneration/:id/:month', function (req, res) {
         var id = req.params.id;
         var month = req.params.month;
-        var year = req.params.month.substring(0,4);
+        var year = req.params.month.substring(0, 4);
         connection.query('select m.date, ps' + id + ' as predicted, sum from monthlyPredictedGeneration m left join (select DATE_FORMAT(date, "%Y-%m") as date, sum(ps' + id + ') as sum from dailySumExport where DATE_FORMAT(date, "%Y-%m") <="' + month + '" group by year(date), month(date)) e on DATE_FORMAT(m.date, "%Y-%m") = e.date where year(m.date)="' + year + '";', function (err, rows) {
             if (err) {
                 return res.json(err);
@@ -330,12 +330,12 @@ module.exports = function (app, connection) {
             }
         });
     });
-    
+
     app.get('/api/displaySite/siteMonthSumPR/:id/:month', function (req, res) {
         var id = req.params.id;
         var month = req.params.month;
-        var year = req.params.month.substring(0,4);
-        
+        var year = req.params.month.substring(0, 4);
+
         connection.query('select e.date as date, g.ps' + id + ' / (select tic_mwp * 1000 from top_table where id = ' + id + ') / e.ps' + id + ' * 100 as prPvsyst, prActual, (select pr_guaranteed from top_table where id = ' + id + ') as prGuarantee from monthlyPredictedEsol e left join (select g.date, sum(g.ps' + id + ') / (sum(e.ps' + id + ') * (select tic_mwp from top_table where id = ' + id + ') * 1000) * 100 as prActual from dailySumExport g join dailyEsol e on g.date = e.date where date_format(g.date, "%Y-%m") <= "' + month + '" group by date_format(g.date, "%Y-%m")) a on e.date = a.date left join monthlyPredictedGeneration g on e.date = g.date where year(e.date) = "' + year + '";', function (err, rows) {
             if (err) {
                 return res.json(err);
@@ -345,6 +345,48 @@ module.exports = function (app, connection) {
         });
     });
 
+    app.get('/api/displaySite/portfolioSiteInfo', function (req, res) {
 
+        connection.query('select name, location, tic_mwp from top_table where primrose_company > 0;', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+
+    app.get('/api/displaySite/portfolioAllSiteMwp', function (req, res) {
+
+        connection.query('select sum(tic_mwp) as sumTic from top_table where primrose_company > 0;', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+        app.get('/api/displaySite/portfolioSiteData', function (req, res) {
+
+        connection.query('select date_format(p.date, "%Y-%m") as date, p.PS1 as pPS1, p.PS2 as pPS2, p.PS3 as pPS3, p.PS4 as pPS4, p.PS5 as pPS5, p.PS11 as pPS11, e.PS1 as pPS1, e.PS2 as ePS2, e.PS3 as ePS3, e.PS4 as ePS4, e.PS5 as ePS5, e.PS11 as ePS11, e.PS1 / p.PS1 as prPS1, e.PS2 / p.PS2 as prPS2, e.PS3 / p.PS3 as prPS3, e.PS4 / p.PS4 as prPS4, e.PS5 / p.PS5 as prPS5, e.PS11 / p.PS11 as prPS11, ifnull(p.PS11,0), e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0) as allActual, p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0) as allPredicted, (e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0)) / (p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0)) as allPR from monthlyPredictedGeneration p join (select date_format(date, "%Y-%m") as date, sum(PS1) as ps1,  sum(PS2) as ps2,  sum(PS3) as ps3, sum(PS4) as ps4, sum(PS5) as ps5, sum(PS11) as ps11, sum(PS12) as ps12, sum(PS13) as ps13 from dailySumExport group by date_format(date, "%Y-%m")) e on date_format(p.date, "%Y-%m") = e.date where date_format(p.date, "%Y") = "2015" and date_format(p.date, "%Y-%m") <= "2015-12";', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+     app.get('/api/displaySite/portfolioSiteDataMonth', function (req, res) {
+
+        connection.query('select date_format(p.date, "%Y-%m") as date, p.PS1 as pPS1, p.PS2 as pPS2, p.PS3 as pPS3, p.PS4 as pPS4, p.PS5 as pPS5, p.PS11 as pPS11, e.PS1 as pPS1, e.PS2 as ePS2, e.PS3 as ePS3, e.PS4 as ePS4, e.PS5 as ePS5, e.PS11 as ePS11, e.PS1 / p.PS1 as prPS1, e.PS2 / p.PS2 as prPS2, e.PS3 / p.PS3 as prPS3, e.PS4 / p.PS4 as prPS4, e.PS5 / p.PS5 as prPS5, e.PS11 / p.PS11 as prPS11, e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0) as allActual, p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0) as allPredicted, (e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0)) / (p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0)) as allPR from monthlyPredictedGeneration p join (select date_format(date, "%Y-%m") as date, sum(PS1) as ps1,  sum(PS2) as ps2,  sum(PS3) as ps3, sum(PS4) as ps4, sum(PS5) as ps5, sum(PS11) as ps11, sum(PS12) as ps12, sum(PS13) as ps13 from dailySumExport group by date_format(date, "%Y-%m")) e on date_format(p.date, "%Y-%m") = e.date where date_format(p.date, "%Y-%m") = "2015-12";', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
 
 };

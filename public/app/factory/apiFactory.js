@@ -98,6 +98,18 @@ angular.module('apiFactory', [])
         dataFactory.getIncidentCategory = function () {
             return $http.get(urlBase + 'incidents/incidentCategory/');
         };
+        
+        dataFactory.getPortfolioSiteInfo = function () {
+            return $http.get(urlBase + 'displaySite/portfolioSiteInfo/');
+        };
+        
+        dataFactory.getPortfolioAllSiteMwp = function () {
+            return $http.get(urlBase + 'displaySite/portfolioAllSiteMwp/');
+        };
+        
+        dataFactory.getPortfolioSiteData = function () {
+            return $http.get(urlBase + 'displaySite/portfolioSiteData/');
+        };
 
         return dataFactory;
     }])
