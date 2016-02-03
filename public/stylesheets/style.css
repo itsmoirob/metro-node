@@ -12,10 +12,10 @@ header, body, footer {
   body * {
     visibility: hidden;
   }
-  #section-to-print, #section-to-print * {
+  .section-to-print, .section-to-print * {
     visibility: visible;
   }
-  #section-to-print {
+  .section-to-print {
     position: absolute;
     left: 0;
     top: 0;
@@ -112,7 +112,7 @@ ul.success li{
 }
 
 #wrapper {
-  margin: 0 auto;
+  /*margin: 0 auto;*/
   /*font-size: 1.6em;*/
 }
 
@@ -175,3 +175,27 @@ ul.success li{
 .portfolioTable td {
     border: 1px solid black;
 }
+
+/*#chartMonthGenerationPortfolio {
+    height: 250px;
+    width: 50%;
+    float: left;
+}
+
+#chartMonthPRPortfolio {
+    height: 250px;
+    width: 50%;
+    float: right;
+}
+
+#chartMonthEsolPortfolio {
+    height: 250px;
+    width: 50%;
+    float: left;
+}
+
+#chartYearGenerationPortfolio {
+    height: 250px;
+    width: 50%;
+    float: right;
+}*/

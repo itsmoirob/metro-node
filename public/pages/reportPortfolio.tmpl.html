@@ -1,22 +1,69 @@
+<div class="row">
+    <h4>You are viewing {{ month }}.</h4>
+    <div class="col s6 m6">
+        <label for="selectStartDate">Select month: </label>
+        <input type="month" name="selectStartDate" ng-model="selectStartDate" required>
+        <button class="btn waves-effect waves-light" ui-sref="parent.monthReportPortfolio({month:convertDateMonth(selectStartDate)})">Go to month</button>
+    </div>
+</div>
+<div class="section-to-print">
+    <div class="row">
+        <div class="col m12 s12">
+            <table class="portfolioTable">
+                <tr>
+                    <th>Site</th>
+                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.name}}</td>
+                </tr>
+                <tr>
+                    <th>Location</th>
+                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.location}}</td>
+                </tr>
+                <tr>
+                    <th>TIC (MW)</th>
+                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.tic_mwp | number:2 }}</td>
+                </tr>
+                <tr>
+                    <th>Payment scheme</th>
+                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.rocs}}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.status}}</td>
+                </tr>
+                <tr>
+                    <th>Actual PR</th>
+                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,15]">{{ portfolioSiteDataMonth[0]["aPR"+a] | number:2 }}%</td>
+                    <td>{{ portfolioSiteDataMonth[0].allPR * 100 | number:2 }}%</td>
+                </tr>
+                <tr>
+                    <th>Milestone PR</th>
+                    <td>Some%</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <highchart id="chartMonthGenerationPortfolio" config="chartMonthGeneration"></highchart>
+        </div>
+        <div>
+            <highchart id="chartMonthPRPortfolio" config="chartMonthPR"></highchart>
+        </div>
+        <div>
+            <highchart id="chartMonthEsolPortfolio" config="chartMonthEsol"></highchart>
+        </div>
+        <div>
+            <highchart id="chartYearGenerationPortfolio" config="chartYearGeneration"></highchart>
+        </div>
+        <div>
+            <highchart id="chartYearAllGenerationPortfolio" config="chartYearAllGeneration"></highchart>
+        </div>
 
-table
-<table class="portfolioTable">
-    <tr>
-        <td>Site</td>
-        <td ng-repeat="site in portfolioSiteInfo[0]">{{site.name}}</td>
-    </tr>
-    <tr>
-        <td>Location</td>
-        <td ng-repeat="site in portfolioSiteInfo[0]">{{site.location}}</td>
-    </tr>
-    <tr>
-        <td>TIC (Mwp)</td>
-        <td ng-repeat="site in portfolioSiteInfo[0]">{{site.tic_mwp}}</td>
-    </tr>
-</table>
-<hr>
-test {{test}}
-<hr>
-month {{portfolioSiteDataMonth}}
-<hr>
-all {{portfolioSiteData}}
+    </div>
+    <div class="row">
+        <p>Comments</p>
+        <hr>
+        <textarea name="" id="" cols="30" rows="10"></textarea>
+    </div>
+
+</div>

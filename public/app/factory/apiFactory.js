@@ -83,13 +83,13 @@ angular.module('apiFactory', [])
             return $http.get(urlBase + 'reports/incidentLogComments/' + id);
         };
 
-        dataFactory.getAllReports = function () {
-            return $http.get(urlBase + 'displaySite/allReport/');
+        dataFactory.getAllReports = function (startDate, endDate) {
+            return $http.get(urlBase + 'displaySite/allReport/' + startDate + '/' + endDate + '/');
         };
 
-        dataFactory.getSelectReports = function (startDate, endDate) {
-            return $http.get(urlBase + 'displaySite/reportSelect/' + startDate + '/' + endDate + '/');
-        };
+        // dataFactory.getSelectReports = function (startDate, endDate) {
+        //     return $http.get(urlBase + 'displaySite/reportSelect/' + startDate + '/' + endDate + '/');
+        // };
 
         dataFactory.getIncidentSiteName = function () {
             return $http.get(urlBase + 'incidents/incidentSiteName/');
@@ -107,8 +107,20 @@ angular.module('apiFactory', [])
             return $http.get(urlBase + 'displaySite/portfolioAllSiteMwp/');
         };
         
-        dataFactory.getPortfolioSiteData = function () {
-            return $http.get(urlBase + 'displaySite/portfolioSiteData/');
+        dataFactory.getPortfolioSiteDataMonth = function (month) {
+            return $http.get(urlBase + 'displaySite/portfolioSiteDataMonth/' + month);
+        };
+        
+        dataFactory.getPortfolioSiteEsolMonth = function (month) {
+            return $http.get(urlBase + 'displaySite/portfolioSiteEsolMonth/' + month);
+        };
+        
+        dataFactory.getPortfolioSiteDataYear = function (month) {
+            return $http.get(urlBase + 'displaySite/portfolioSiteDataYear/' + month);
+        };
+        
+        dataFactory.getPortfolioAllDataYear = function (month) {
+            return $http.get(urlBase + 'displaySite/portfolioAllDataYear/' + month);
         };
 
         return dataFactory;

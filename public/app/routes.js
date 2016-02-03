@@ -141,10 +141,10 @@ angular.module('routes', [
                 }
             })
             .state('parent.reportsAll', { //list the main body of the 'admin' page
-                url: '/reportsAll',
+                url: '/reportsAll?startDate&endDate',
                 views: {
                     'display@': {
-                        controller: 'ReportIncidentsCtrl',
+                        controller: 'ReportCtrl',
                         templateUrl: 'pages/reportsAll.tmpl.html'
                     },
                     'other@': {
@@ -153,26 +153,7 @@ angular.module('routes', [
                     }
                 }
             })
-            .state('parent.reportsSelect', { //list the main body of the 'admin' page
-                url: '/reportsSelect?startDate&endDate',
-                views: {
-                    'display@': {
-                        controller: 'ReportIncidentsCtrl',
-                        templateUrl: 'pages/reportsSelect.tmpl.html'
-                    },
-                    'other@': {
-                        // controller: 'DisplayCtrl',
-                        // templateUrl: 'pages/displaySiteList.tmpl.html'
-                    }
-                },
-                params: {
-                    day: null,
-                    month: null,
-                    year: null,
-                    numberOfDays: null
-                }
 
-            })
             .state('parent.reportIncident', { //list the main body of the 'admin' page
                 url: '/report/incident?incidentId',
                 views: {
@@ -200,15 +181,15 @@ angular.module('routes', [
                 }
             })
             .state('parent.monthReportPortfolio', { //list the main body of the 'admin' page
-                url: '/portfolio/monthReport',
+                url: '/portfolio/monthReport?month',
                 views: {
                     'display@': {
                         controller: 'PortfolioReportCtrl',
                         templateUrl: 'pages/reportPortfolio.tmpl.html'
                     },
                     'other@': {
-                        controller: 'ListCtrl',
-                        templateUrl: 'pages/displaySiteList.tmpl.html'
+                        // controller: 'ListCtrl',
+                        // templateUrl: 'pages/displaySiteList.tmpl.html'
                     }
                 }
             })

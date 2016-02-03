@@ -214,17 +214,8 @@ module.exports = function (app, connection) {
         });
     });
 
-    app.get('/api/displaySite/allReport/', function (req, res) {
-        connection.query('select sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) / sum(t.PS1_T01 + t.PS1_T02 + t.PS1_T03 + t.PS1_T04 + t.PS1_T05) as `PS01_avail`, sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) / sum(t.PS2_T01 + t.PS2_T02 + t.PS2_T03 + t.PS2_T04 + t.PS2_T05 + t.PS2_T06 + t.PS2_T07) as `PS02_avail`, sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) / sum(t.PS3_T01 + t.PS3_T02 + t.PS3_T03 + t.PS3_T04) as `PS03_avail`, sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) / sum(t.PS4_T01 + t.PS4_T02 + t.PS4_T03 + t.PS4_T04 + t.PS4_T05 + t.PS4_T06 + t.PS4_T07 + t.PS4_T08) as `PS04_avail`, sum(a.PS5) / sum(t.PS5) as `PS05_avail`, sum(a.PS7) / sum(t.PS7) as `PS07_avail`, sum(a.PS8) / sum(t.PS8) as `PS08_avail`, sum(a.PS9) / sum(t.PS9) as `PS09_avail`, sum(a.PS10) / sum(t.PS10) as `PS10_avail`, sum(a.PS11) / sum(t.PS11) as `PS11_avail`, sum(o.PS1_T01 + o.PS1_T02 + o.PS1_T03 + o.PS1_T04  + o.PS1_T05) / sum(a.PS1_T01 + a.PS1_T02 + a.PS1_T03 + a.PS1_T04 + a.PS1_T05) as `PS01_Over0`, sum(o.PS2_T01 + o.PS2_T02 + o.PS2_T03 + o.PS2_T04 + o.PS2_T05 + o.PS2_T06 + o.PS2_T07) / sum(a.PS2_T01 + a.PS2_T02 + a.PS2_T03 + a.PS2_T04 + a.PS2_T05 + a.PS2_T06 + a.PS2_T07) as `PS02_Over0`, sum(o.PS3_T01 + o.PS3_T02 + o.PS3_T03 + o.PS3_T04) / sum(a.PS3_T01 + a.PS3_T02 + a.PS3_T03 + a.PS3_T04) as `PS03_Over0`, sum(o.PS4_T01 + o.PS4_T02 + o.PS4_T03 + o.PS4_T04 + o.PS4_T05 + o.PS4_T06 + o.PS4_T07 + o.PS4_T08) / sum(a.PS4_T01 + a.PS4_T02 + a.PS4_T03 + a.PS4_T04 + a.PS4_T05 + a.PS4_T06 + a.PS4_T07 + a.PS4_T08) as `PS04_Over0`, sum(o.PS5) / sum(a.PS5) as `PS05_Over0`, sum(o.PS7) / sum(a.PS7) as `PS07_Over0`, sum(o.PS8) / sum(a.PS8) as `PS08_Over0`, sum(o.PS9) / sum(a.PS9) as `PS09_Over0`, sum(o.PS10) / sum(a.PS10) as `PS10_Over0`, sum(o.PS11) / sum(a.PS11) as `PS11_Over0`, sum(e.PS1) / sum(c.PS1 * (select tic_mwp from top_table where id = 1) * 1000) as `PS01_PR`, sum(e.PS2) / sum(c.PS2 * (select tic_mwp from top_table where id = 2) * 1000) as `PS02_PR`, sum(e.PS3) / sum(c.PS3 * (select tic_mwp from top_table where id = 3) * 1000) as `PS03_PR`, sum(e.PS4) / sum(c.PS4 * (select tic_mwp from top_table where id = 4) * 1000) as `PS04_PR`,sum(e.PS5) / sum(c.PS5 * (select tic_mwp from top_table where id = 5) * 1000) as `PS05_PR`,sum(e.PS7) / sum(c.PS7 * (select tic_mwp from top_table where id = 7) * 1000) as `PS07_PR`, sum(e.PS8) / sum(c.PS8 * (select tic_mwp from top_table where id = 8) * 1000) as `PS08_PR`, sum(e.PS9) / sum(c.PS9 * (select tic_mwp from top_table where id = 9) * 1000) as `PS09_PR`, sum(e.PS10) / sum(c.PS10 * (select tic_mwp from top_table where id = 10) * 1000) as `PS10_PR`, sum(e.PS11) / sum(c.PS11 * (select tic_mwp from top_table where id = 11) * 1000) as `PS11_PR`, sum(e.PS1) as `PS01_export`, sum(e.PS2) as `PS02_export`, sum(e.PS3) as `PS03_export`, sum(e.PS4) as `PS04_export`, sum(e.PS5) as `PS05_export`, sum(e.PS7) as `PS07_export`, sum(e.PS8) as `PS08_export`, sum(e.PS9) as `PS09_export`, sum(e.PS10) as `PS10_export`, sum(e.PS11) as `PS11_export` from dailySumExport e join dailySumInverterOver0 o on e.date = o.date join dailySumInverterAvailabilty a on e.date = a.date join dailySumInverterTimeDiff t on e.date = t.date join dailyEsol c on e.date = c.date where e.date <= (now() - interval 1 day) and e.date >= (now() - interval 15 day);', function (err, rows) {
-            if (err) {
-                return res.json(err);
-            } else {
-                return res.json(rows);
-            }
-        });
-    });
 
-    app.get('/api/displaySite/reportSelect/:startDate/:endDate', function (req, res) {
+    app.get('/api/displaySite/allReport/:startDate/:endDate', function (req, res) {
         var startDate = req.params.startDate;
         var endDate = req.params.endDate;
         var spareDate;
@@ -347,7 +338,7 @@ module.exports = function (app, connection) {
 
     app.get('/api/displaySite/portfolioSiteInfo', function (req, res) {
 
-        connection.query('select name, location, tic_mwp from top_table where primrose_company > 0;', function (err, rows) {
+        connection.query('select name, location, tic_mwp, status, rocs from top_table where primrose_company > 0;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -369,7 +360,7 @@ module.exports = function (app, connection) {
     
         app.get('/api/displaySite/portfolioSiteData', function (req, res) {
 
-        connection.query('select date_format(p.date, "%Y-%m") as date, p.PS1 as pPS1, p.PS2 as pPS2, p.PS3 as pPS3, p.PS4 as pPS4, p.PS5 as pPS5, p.PS11 as pPS11, e.PS1 as pPS1, e.PS2 as ePS2, e.PS3 as ePS3, e.PS4 as ePS4, e.PS5 as ePS5, e.PS11 as ePS11, e.PS1 / p.PS1 as prPS1, e.PS2 / p.PS2 as prPS2, e.PS3 / p.PS3 as prPS3, e.PS4 / p.PS4 as prPS4, e.PS5 / p.PS5 as prPS5, e.PS11 / p.PS11 as prPS11, ifnull(p.PS11,0), e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0) as allActual, p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0) as allPredicted, (e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0)) / (p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0)) as allPR from monthlyPredictedGeneration p join (select date_format(date, "%Y-%m") as date, sum(PS1) as ps1,  sum(PS2) as ps2,  sum(PS3) as ps3, sum(PS4) as ps4, sum(PS5) as ps5, sum(PS11) as ps11, sum(PS12) as ps12, sum(PS13) as ps13 from dailySumExport group by date_format(date, "%Y-%m")) e on date_format(p.date, "%Y-%m") = e.date where date_format(p.date, "%Y") = "2015" and date_format(p.date, "%Y-%m") <= "2015-12";', function (err, rows) {
+        connection.query('select date_format(p.date, "%Y-%m") as date, p.PS1 as pPS1, p.PS2 as pPS2, p.PS3 as pPS3, p.PS4 as pPS4, p.PS5 as pPS5, p.PS11 as pPS11, e.PS1 as ePS1, e.PS2 as ePS2, e.PS3 as ePS3, e.PS4 as ePS4, e.PS5 as ePS5, e.PS11 as ePS11, e.PS1 / p.PS1 as prPS1, e.PS2 / p.PS2 as prPS2, e.PS3 / p.PS3 as prPS3, e.PS4 / p.PS4 as prPS4, e.PS5 / p.PS5 as prPS5, e.PS11 / p.PS11 as prPS11, e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0) as allActual, p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0) as allPredicted, (e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0)) / (p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0)) as allPR from monthlyPredictedGeneration p join (select date_format(date, "%Y-%m") as date, sum(PS1) as ps1,  sum(PS2) as ps2,  sum(PS3) as ps3, sum(PS4) as ps4, sum(PS5) as ps5, sum(PS11) as ps11, sum(PS12) as ps12, sum(PS13) as ps13 from dailySumExport group by date_format(date, "%Y-%m")) e on date_format(p.date, "%Y-%m") = e.date where date_format(p.date, "%Y") = "2015" and date_format(p.date, "%Y-%m") <= "2015-12";', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -378,9 +369,50 @@ module.exports = function (app, connection) {
         });
     });
     
-     app.get('/api/displaySite/portfolioSiteDataMonth', function (req, res) {
+     app.get('/api/displaySite/portfolioSiteDataMonth/:month', function (req, res) {
+         
+         var month = req.params.month;
 
-        connection.query('select date_format(p.date, "%Y-%m") as date, p.PS1 as pPS1, p.PS2 as pPS2, p.PS3 as pPS3, p.PS4 as pPS4, p.PS5 as pPS5, p.PS11 as pPS11, e.PS1 as pPS1, e.PS2 as ePS2, e.PS3 as ePS3, e.PS4 as ePS4, e.PS5 as ePS5, e.PS11 as ePS11, e.PS1 / p.PS1 as prPS1, e.PS2 / p.PS2 as prPS2, e.PS3 / p.PS3 as prPS3, e.PS4 / p.PS4 as prPS4, e.PS5 / p.PS5 as prPS5, e.PS11 / p.PS11 as prPS11, e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0) as allActual, p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0) as allPredicted, (e.PS1 + e.PS2 + e.PS3 + e.PS4 + e.PS5 + ifnull(e.PS11,0)) / (p.PS1 + p.PS2 + p.PS3 + p.PS4 + p.PS5 + ifnull(p.PS11,0)) as allPR from monthlyPredictedGeneration p join (select date_format(date, "%Y-%m") as date, sum(PS1) as ps1,  sum(PS2) as ps2,  sum(PS3) as ps3, sum(PS4) as ps4, sum(PS5) as ps5, sum(PS11) as ps11, sum(PS12) as ps12, sum(PS13) as ps13 from dailySumExport group by date_format(date, "%Y-%m")) e on date_format(p.date, "%Y-%m") = e.date where date_format(p.date, "%Y-%m") = "2015-12";', function (err, rows) {
+        connection.query('select pG.date, pG.ps1 as pPS1, pG.ps2 as pPS2, pG.ps3 as pPS3, pG.ps4 as pPS4, pG.ps5 as pPS5, pG.ps11 as pPS11, aG.ps1 as aPS1, aG.ps2 as aPS2, aG.ps3 as aPS3, aG.ps4 as aPS4, aG.ps5 as aPS5, aG.ps11 as aPS11, pG.ps1 / (pE.ps1 * (select tic_mwp from top_table where id = 1)) / 10 as pPR1, pG.ps2 / (pE.ps2 * (select tic_mwp from top_table where id = 2)) / 10 as pPR2, pG.ps3 / (pE.ps3 * (select tic_mwp from top_table where id = 3)) / 10 as pPR3, pG.ps4 / (pE.ps4 * (select tic_mwp from top_table where id = 4)) / 10 as pPR4, pG.ps5 / (pE.ps5 * (select tic_mwp from top_table where id = 5)) / 10 as pPR5, pG.ps11 / (pE.ps11 * (select tic_mwp from top_table where id = 11)) / 10 as pPR11, aG.ps1 / (aE.ps1 * (select tic_mwp from top_table where id = 1)) / 10 as aPR1, aG.ps2 / (aE.ps2 * (select tic_mwp from top_table where id = 2)) / 10 as aPR2, aG.ps3 / (aE.ps3 * (select tic_mwp from top_table where id = 3)) / 10 as aPR3, aG.ps4 / (aE.ps4 * (select tic_mwp from top_table where id = 4)) / 10 as aPR4, aG.ps5 / (aE.ps5 * (select tic_mwp from top_table where id = 5)) / 10 as aPR5, aG.ps11 / (aE.ps11 * (select tic_mwp from top_table where id = 11)) / 10 as aPR11 from monthlyPredictedGeneration pG join monthlyPredictedEsol pE on pG.date = pE.date join (select date_format(date, "%Y-%m") as date, sum(ps1) as ps1, sum(ps2) as ps2, sum(ps3) as ps3, sum(ps4) as ps4, sum(ps5) as ps5, sum(ps11) as ps11 from dailySumExport group by date_format(date, "%Y-%m")) aG on date_format(pG.date, "%Y-%m") = aG.date join (select date_format(date, "%Y-%m") as date, sum(ps1) as ps1,  sum(ps2) as ps2, sum(ps3) as ps3, sum(ps4) as ps4, sum(ps5) as ps5, sum(ps11) as ps11 from dailyEsol group by date_format(date, "%Y-%m")) aE on date_format(pG.date, "%Y-%m") = aE.date where date_format(pG.date, "%Y-%m") = "' + month + '";', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+    app.get('/api/displaySite/portfolioSiteEsolMonth/:month', function (req, res) {
+         
+         var month = req.params.month;
+
+        connection.query('select date_format(p.date, "%Y-%m") as date, p.PS1 as pPS1, p.PS2 as pPS2, p.PS3 as pPS3, p.PS4 as pPS4, p.PS5 as pPS5, p.PS11 as pPS11, a.PS1 as aPS1, a.PS2 as aPS2, a.PS3 as aPS3, a.PS4 as aPS4, a.PS5 as aPS5, a.PS11 as aPS11 from monthlyPredictedEsol p join (Select date_format(date, "%Y-%m") as date, sum(PS1) as PS1, sum(PS2) as PS2, sum(PS3) as PS3, sum(PS4) as PS4, sum(PS5) as PS5, sum(PS11) as PS11 from dailyEsol group by date_format(date, "%Y-%m")) a on date_format(p.date, "%Y-%m") = a.date where date_format(p.date, "%Y-%m") = "' + month + '";', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+    app.get('/api/displaySite/portfolioSiteDataYear/:month', function (req, res) {
+         
+         var month = req.params.month + "-01";
+
+        connection.query('select date_format(p.date, "%Y-%m") as date, sum(p.PS1) as pPS1, sum(p.PS2) as pPS2, sum(p.PS3) as pPS3, sum(p.PS4) as pPS4, sum(p.PS5) as pPS5, sum(p.PS11) as pPS11, sum(p.PS12) as pPS12, sum(p.PS13) as pPS13, sum(p.PS15) as pPS15, sum(e.PS1) as ePS1, sum(e.PS2) as ePS2, sum(e.PS3) as ePS3, sum(e.PS4) as ePS4, sum(e.PS5) as ePS5, sum(e.PS11) as ePS11, sum(e.PS12) as ePS12, sum(e.PS13) as ePS13, sum(e.PS15) as ePS15 from monthlyPredictedGeneration p join (select date_format(date, "%Y-%m") as date, sum(PS1) as ps1, sum(PS2) as ps2, sum(PS3) as ps3, sum(PS4) as ps4, sum(PS5) as ps5, sum(PS11) as ps11, sum(PS12) as ps12, sum(PS13) as ps13, sum(PS15) as ps15 from dailySumExport group by date_format(date, "%Y-%m")) e on date_format(p.date, "%Y-%m") = e.date where p.date > "' + month + '" - interval 1 year and p.date <= "' + month + '";', function (err, rows) {
+            if (err) {
+                return res.json(err);
+            } else {
+                return res.json(rows);
+            }
+        });
+    });
+    
+    app.get('/api/displaySite/portfolioAllDataYear/:month', function (req, res) {
+         
+         var month = req.params.month + "-01";
+
+        connection.query('select pG.date, ifnull(pG.ps1,0) + ifnull(pG.ps2,0) + ifnull(pG.ps3,0) + ifnull(pG.ps4,0) + ifnull(pG.ps5,0) + ifnull(pG.ps11,0) as predicted, ifnull(aG.ps1,0) + ifnull(aG.ps2,0) + ifnull(aG.ps3,0) + ifnull(aG.ps4,0) + ifnull(aG.ps5,0) + ifnull(aG.ps11,0) as actual from monthlyPredictedGeneration pG join (select date_format(date, "%Y-%m") as date, sum(ps1) as ps1, sum(ps2) as ps2, sum(ps3) as ps3, sum(ps4) as ps4, sum(ps5) as ps5, sum(ps11) as ps11 from dailySumExport group by date_format(date, "%Y-%m")) aG on date_format(pG.date, "%Y-%m") = aG.date where (pG.date between "' + month + '"  - interval 11 month and "' + month + '") group by date_format(pG.date, "%Y-%m");', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {

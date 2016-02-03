@@ -33,7 +33,7 @@ angular.module('monthReport', [
         };
         
         var monthEsolActual = {
-            name: "Actual esol",
+            name: "Actual insolation",
             data: [],
             // color: '#FBA11B',
             type: "line",
@@ -49,7 +49,7 @@ angular.module('monthReport', [
         };
         
         var monthEsolPredict = {
-            name: "Predicted esol",
+            name: "Predicted insolation",
             type: 'line',
             dashStyle: 'longdash',
             data: [],
