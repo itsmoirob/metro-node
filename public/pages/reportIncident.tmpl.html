@@ -1,57 +1,127 @@
 <div class="row">
-  <div class="col s12 m12">
-    <div class="card blue-grey darken-1">
-      <div class="card-content white-text">
-        <span class="card-title">Incident: {{ incidentReportLog.incident_report_number }}</span>
-        <p>
-          {{ incidentReportLog.details }}
-        </p>
-        <hr>
-        <ul>
-          <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date:"dd/MM/yyyy" }}</li>
-          <li><b>Start time: </b>{{ incidentReportLog.start_time | date:"dd/MM/yyyy" }}</li>
-          <li><b>End time: </b>{{ incidentReportLog.end_time | date:"dd/MM/yyyy" }}</li>
-          <li><b>Reported by: </b>{{ incidentReportLog.reported_by_person }} ({{ incidentReportLog.reported_by_company }})</li>
-        </ul>
-        <ul>
-          <li><b>Category: </b>{{ incidentReportLog.category }}</li>
-          <li><b>Planned: </b>{{ incidentReportLog.planned }}</li>
-          <li><b>Loss of generation: </b>{{ incidentReportLog.loss_of_generation }}</li>
-          <li><b>Status: </b>{{ incidentReportLog.status }}</li>
-        </ul>
-      </div>
-      <div class="card-action">
-        <a href="#">Edit (not working)</a>
-        <a ng-if="incidentReportLog.status == 'Closed'">Closed</a>
-        <input type="hidden" name="status" value=0 />
-        <button ng-if="incidentReportLog.status == 'Open'" class="btn waves-effect waves-light formSubmit" ng-click="closeStatus()" name="updateStatus">Close</button>
-      </div>
+    <div class="col s12 m12">
+        <div class="card blue-grey darken-1">
+            <div class="card-content white-text" ng-hide="editIncident">
+                <span class="card-title">Incident: {{ incidentReportLog.incident_report_number }}</span>
+                <p>
+                    {{ incidentReportLog.details }}
+                </p>
+                <hr>
+                <ul>
+                    <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date:"dd/MM/yyyy" }}</li>
+                    <li><b>Start time: </b>{{ incidentReportLog.start_time | date:"dd/MM/yyyy" }}</li>
+                    <li><b>End time: </b>{{ incidentReportLog.end_time | date:"dd/MM/yyyy" }}</li>
+                    <li><b>Reported by: </b>{{ incidentReportLog.reported_by_person }} ({{ incidentReportLog.reported_by_company
+                        }})
+                    </li>
+                </ul>
+                <ul>
+                    <li><b>Category: </b>{{ incidentReportLog.category }}</li>
+                    <li><b>Planned: </b>{{ incidentReportLog.planned }}</li>
+                    <li><b>Loss of generation: </b>{{ incidentReportLog.loss_of_generation }}</li>
+                    <li><b>Status: </b>{{ incidentReportLog.status }}</li>
+                </ul>
+            </div>
+            <div class="card-content white-text" ng-hide="!editIncident">
+                <form name="incidentForm" role="form" action="/users/updateIncidentLog" method="post">
+                    <span class="card-title">You are now editing: {{ incidentReportLog.incident_report_number }}</span>
+                    <div class="input-field white black-text">
+                        <textarea name="details" ng-model="incidentReportLog.details" required></textarea>
+                    </div>
+                    <hr>
+                    <ul>
+                        <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date:"dd/MM/yyyy" }}</li>
+                    </ul>
+                    <div class="row">
+                        <div class="col s6 m6">
+                            <label for="selectStartDate">Select start date: </label>
+                            <input type="date" class="white black-text" name="selectStartDate" ng-model='editStartDate' required>
+                        </div>
+                        <div class="col s6 m6">
+                            <label for="selectStartTime">Select start time: </label>
+                            <input type="time" class="white black-text" name="selectStartTime" ng-model='editStartTime' required>
+                        </div>
+                        <div class="col s6 m6">
+                            <label for="selectEndDate">Select end date: </label>
+                            <input type="date" class="white black-text" name="selectEndDate" ng-model='editEndDate'>
+                        </div>
+                        <div class="col s6 m6">
+                            <label for="selectEndTime">Select end time: </label>
+                            <input type="time" class="white black-text" name="selectEndTime" ng-model='editEndTime'>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <input name="reportedByPerson" type="text" class="white black-text validate" ng-model="incidentReportLog.reported_by_person"
+                        required>
+                    </div>
+                    <label>Which company reported?</label>
+                    <select class="browser-default white black-text" name="reportedByCompany" ng-model="reported_by_company" required>
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">Primrose</option>
+                        <option value="2">EPC</option>
+                        <option value="3">Other</option>
+                    </select>
+                    <label>Planned</label>
+                    <select class="browser-default white black-text" name="planned" ng-model="planned" required>
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="2">No</option>
+                        <option value="1">Yes</option>
+                        <option value="0">N/A</option>
+                    </select>
+                    <label>Loss of generation</label>
+                    <select class="browser-default white black-text" name="lossOfGeneration" ng-model="loss_of_generation" required>
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                    <label>Category</label>
+                    <select class="browser-default white black-text" name="category" ng-model="category" required>
+                        <option value="" disabled selected>Choose your option</option>
+                        <option ng-repeat="category in incidentCategory" value={{category.id}}>{{category.value}}</option>
+                    </select>
+                    <label>Closed</label>
+                    <select class="browser-default white black-text" name="isClosed" ng-model="status" required>
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">No</option>
+                        <option value="0">Yes</option>
+                    </select>
+                    <button class="btn waves-effect waves-light formSubmit" type="submit" name="action">Submit</button>
+                </form>
+            </div>
+
+            <div class="card-action">
+                <button class="btn waves-effect waves-light" ng-click="setEditIncident()" ng-hide="editIncident">Edit</button>
+                <button class="btn waves-effect waves-light" ng-click="setEditIncident()" ng-hide="!editIncident">Cancel</button>
+            </div>
+        </div>
     </div>
-  </div>
-  <div ng-if="!incidentReportLogComment[0]">
-    <h4>There are no comments. Say something.</h4>
-  </div>
-  <div ng-if="incidentReportLogComment[0]">
-    <h4>Comments</h4>
-    <div ng-repeat="comment in incidentReportLogComment">
-      <div class="card-panel teal">
-        <span class="white-text">"{{ comment.comment }}"
+    
+    <!--COMMENTS GO HERE-->
+    
+    <div ng-if="!incidentReportLogComment[0]">
+        <h4>There are no comments. Say something.</h4>
+    </div>
+    <div ng-if="incidentReportLogComment[0]">
+        <h4>Comments</h4>
+        <div ng-repeat="comment in incidentReportLogComment">
+            <div class="card-panel teal">
+                <span class="white-text">"{{ comment.comment }}"
         </span>
-        <p ng-if="!comment.created_by" class="white-text">Comment from {{ comment.date | date:'dd/MM/yyyy' }}
-        </p>
-        <p ng-if="comment.created_by" class="white-text">Comment from {{comment.created_by}} on {{ comment.date | date:'dd/MM/yyyy' }}
-        </p>
-      </div>
+                <p ng-if="!comment.created_by" class="white-text">Comment from {{ comment.date | date:'dd/MM/yyyy' }}
+                </p>
+                <p ng-if="comment.created_by" class="white-text">Comment from {{comment.created_by}} on {{ comment.date | date:'dd/MM/yyyy' }}
+                </p>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="addComment">
-    <form name="commentForm" role="form" action="/users/newComment" method="post">
-      <div class="input-field col s12">
-        <textarea name="comment" class="materialize-textarea" required></textarea>
-        <label for="Comment">Add a new comment</label>
-      </div>
-      <input type="hidden" name="log_id" value="{{ incidentReportLog.id }}" />
-      <button class="btn waves-effect waves-light formSubmit" type="submit" name="submitComment">Submit</button>
-    </form>
-  </div>
+    <div class="addComment">
+        <form name="commentForm" role="form" action="/users/newComment" method="post">
+            <div class="input-field col s12">
+                <textarea name="comment" class="materialize-textarea" required></textarea>
+                <label for="Comment">Add a new comment</label>
+            </div>
+            <input type="hidden" name="log_id" value="{{ incidentReportLog.id }}" />
+            <button class="btn waves-effect waves-light formSubmit" type="submit" name="submitComment">Submit</button>
+        </form>
+    </div>
 </div>
