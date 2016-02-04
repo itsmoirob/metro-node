@@ -87,10 +87,6 @@ angular.module('apiFactory', [])
             return $http.get(urlBase + 'displaySite/allReport/' + startDate + '/' + endDate + '/');
         };
 
-        // dataFactory.getSelectReports = function (startDate, endDate) {
-        //     return $http.get(urlBase + 'displaySite/reportSelect/' + startDate + '/' + endDate + '/');
-        // };
-
         dataFactory.getIncidentSiteName = function () {
             return $http.get(urlBase + 'incidents/incidentSiteName/');
         };
@@ -121,6 +117,10 @@ angular.module('apiFactory', [])
         
         dataFactory.getPortfolioAllDataYear = function (month) {
             return $http.get(urlBase + 'displaySite/portfolioAllDataYear/' + month);
+        };
+        
+        dataFactory.getPortfolioAvailability = function (month) {
+            return $http.get(urlBase + 'displaySite/portfolioAvailability/' + month);
         };
 
         return dataFactory;

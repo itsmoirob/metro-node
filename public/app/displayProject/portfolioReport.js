@@ -191,6 +191,13 @@ angular.module('portfolioReport', [
             data: [],
             yAxis: 0
         };
+        
+        var monthAvailability = {
+            name: "Inverter availability",
+            type: 'line',
+            data: [],
+            yAxis: 1
+        };
 
         getPortfolioSiteInfo();
         function getPortfolioSiteInfo() {
@@ -231,19 +238,19 @@ angular.module('portfolioReport', [
                     });
                     
                     angular.forEach(actualGrouping, function (value, key) {
-                        monthGenerationActual.data.push(res[0][value]);
+                        monthGenerationActual.data.push(res[0][value] / 1000);
                     });
                     
                     angular.forEach(predictGrouping, function (value, key) {
-                        monthGenerationPredict.data.push(res[0][value]);
+                        monthGenerationPredict.data.push(res[0][value] / 1000);
                     });
                     
                     angular.forEach(aPRGrouping, function (value, key) {
-                        monthActualPR.data.push(res[0][value]);
+                        monthActualPR.data.push(res[0][value] * 100);
                     });
                     
                     angular.forEach(pPRGrouping, function (value, key) {
-                        monthPredictPR.data.push(res[0][value]);
+                        monthPredictPR.data.push(res[0][value] * 100);
                     });
                     
                 })
@@ -281,11 +288,11 @@ angular.module('portfolioReport', [
                     });
                     
                     angular.forEach(actualGrouping, function (value, key) {
-                        yearGenerationActual.data.push(res[0][value]);
+                        yearGenerationActual.data.push(res[0][value] / 1000);
                     });
                     
                     angular.forEach(predictGrouping, function (value, key) {
-                        yearGenerationPredict.data.push(res[0][value]);
+                        yearGenerationPredict.data.push(res[0][value] / 1000);
                     });
 
                 });
@@ -297,10 +304,24 @@ angular.module('portfolioReport', [
                 .success(function (res) {
                     angular.forEach(res, function (res) {
                         chartDate.push(moment(res.date).format("MMM-YY"));
-                        yearGenerationAllActual.data.push(res.actual);
-                        yearGenerationAllPredict.data.push(res.predicted);
+                        yearGenerationAllActual.data.push(res.actual / 1000);
+                        yearGenerationAllPredict.data.push(res.predicted / 1000);
                     });
                 });
+        }
+        
+        getPortfolioAvailability(month);
+        function getPortfolioAvailability(month) {
+            dataFactory.getPortfolioAvailability(month)
+                .success(function (res) {
+                    var availabilityGrouping = sites.map(function (i) {
+                        return 'PS' + i + '_Over0';
+                    });
+                    
+                    angular.forEach(availabilityGrouping, function (value, key) {
+                        monthAvailability.data.push(res[0][value] * 100);
+                    });
+                })
         }
         
 
@@ -340,7 +361,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation kWh'
+                   text: 'Generation MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -389,6 +410,15 @@ angular.module('portfolioReport', [
                },
                opposite: false,
                lineWidth: 2,
+               min: 0,
+               max: 100
+           },{
+               title: {
+                   text: 'Availability %'
+               },
+               opposite: true,
+               lineWidth: 2,
+               min: 40,
                max: 100
            }],
            legend: {
@@ -415,7 +445,7 @@ angular.module('portfolioReport', [
                     pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
                     '<td style="padding:0"><b>{point.y:.2f}</b></td></tr>',
                     footerFormat: '</table>',
-                    valueSuffix: ' kWH',
+                    valueSuffix: ' MWh',
                     shared: true,
                     useHTML: true
                 },
@@ -460,7 +490,7 @@ angular.module('portfolioReport', [
                     pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
                     '<td style="padding:0"><b>{point.y:.2f}</b></td></tr>',
                     footerFormat: '</table>',
-                    valueSuffix: ' kWH',
+                    valueSuffix: ' MWh',
                     shared: true,
                     useHTML: true
                 },
@@ -475,7 +505,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation KWh'
+                   text: 'Generation MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -520,7 +550,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation KWh'
+                   text: 'Generation MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -540,6 +570,7 @@ angular.module('portfolioReport', [
         $scope.chartMonthGeneration.series.push(monthGenerationPredict);
         $scope.chartMonthPR.series.push(monthActualPR);
         $scope.chartMonthPR.series.push(monthPredictPR);
+        $scope.chartMonthPR.series.push(monthAvailability);
         $scope.chartMonthEsol.series.push(monthActualEsol);
         $scope.chartMonthEsol.series.push(monthPredictEsol);
         $scope.chartYearGeneration.series.push(yearGenerationActual);

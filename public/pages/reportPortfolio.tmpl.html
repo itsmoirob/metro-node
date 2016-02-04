@@ -32,13 +32,18 @@
                 </tr>
                 <tr>
                     <th>Actual PR</th>
-                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,15]">{{ portfolioSiteDataMonth[0]["aPR"+a] | number:2 }}%</td>
-                    <td>{{ portfolioSiteDataMonth[0].allPR * 100 | number:2 }}%</td>
+                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,15]">{{ portfolioSiteDataMonth[0]["aPR"+a] * 100 | number:2 }}%</td>
+                    <td>{{ portfolioSiteDataMonth[0].aPRAll * 100 | number:2 }}%</td>
                 </tr>
                 <tr>
+                    <th>PVsyst PR</th>
+                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,15]">{{ portfolioSiteDataMonth[0]["pPR"+a]  * 100 | number:2 }}%</td>
+                    <td>{{ portfolioSiteDataMonth[0].pPRAll * 100 | number:2 }}%</td>
+                </tr>
+                <!--<tr>
                     <th>Milestone PR</th>
                     <td>Some%</td>
-                </tr>
+                </tr>-->
             </table>
         </div>
     </div>
