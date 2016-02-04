@@ -50,22 +50,6 @@ angular.module('displayReportsIncidents', [
                 });
         }
 
-        getSelectReports(startDate, endDate); //gets summary array of site
-        function getSelectReports(startDate, endDate) {
-            dataFactory.getSelectReports(startDate, endDate)
-                .success(function (res) {
-                    var newObj = _.reduce(res[0], function (accumulator, value, key) {
-                        var group = key.substring(0, 4);
-                        var property = key.substring(5);
-                        if (!accumulator[group]) accumulator[group] = {};
-                        if (!accumulator[group].site) accumulator[group].site = group;
-                        accumulator[group][property] = value;
-                        return accumulator;
-                    }, {});
-                    $scope.selectReports = newObj;
-                });
-        }
-
         $scope.convertDate = function (date) {
             return $filter('date')(date, 'yyyy-MM-dd')
         }
