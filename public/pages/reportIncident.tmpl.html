@@ -8,9 +8,9 @@
                 </p>
                 <hr>
                 <ul>
-                    <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date:"dd/MM/yyyy" }}</li>
-                    <li><b>Start time: </b>{{ incidentReportLog.start_time | date:"dd/MM/yyyy" }}</li>
-                    <li><b>End time: </b>{{ incidentReportLog.end_time | date:"dd/MM/yyyy" }}</li>
+                    <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date:"dd/MM/yyyy HH:mm" }}</li>
+                    <li><b>Start time: </b>{{ incidentReportLog.start_time | date:"dd/MM/yyyy HH:mm" }}</li>
+                    <li><b>End time: </b>{{ incidentReportLog.end_time | date:"dd/MM/yyyy HH:mm" }}</li>
                     <li><b>Reported by: </b>{{ incidentReportLog.reported_by_person }} ({{ incidentReportLog.reported_by_company
                         }})
                     </li>
@@ -24,6 +24,7 @@
             </div>
             <div class="card-content white-text" ng-hide="!editIncident">
                 <form name="incidentForm" role="form" action="/users/updateIncidentLog" method="post">
+                    <input type="hidden" name="log_id" value="{{param}}">
                     <span class="card-title">You are now editing: {{ incidentReportLog.incident_report_number }}</span>
                     <div class="input-field white black-text">
                         <textarea name="details" ng-model="incidentReportLog.details" required></textarea>
@@ -91,13 +92,14 @@
 
             <div class="card-action">
                 <button class="btn waves-effect waves-light" ng-click="setEditIncident()" ng-hide="editIncident">Edit</button>
-                <button class="btn waves-effect waves-light" ng-click="setEditIncident()" ng-hide="!editIncident">Cancel</button>
+                <button class="btn waves-effect waves-light red" ng-click="setEditIncident()" ng-hide="!editIncident">Cancel</button>
+                <p ng-hide="!incidentReportLog.last_updated_by">Last update by {{incidentReportLog.last_updated_by}} on {{incidentReportLog.last_updated_dateTime | date:'dd/MM/yyyy HH:mm'}}</p>
             </div>
         </div>
     </div>
-    
+
     <!--COMMENTS GO HERE-->
-    
+
     <div ng-if="!incidentReportLogComment[0]">
         <h4>There are no comments. Say something.</h4>
     </div>
