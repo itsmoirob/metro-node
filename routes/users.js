@@ -151,22 +151,24 @@ router.post('/newIncidentLog', function(req, res, next) {
   // connection.connect();
 
   name = req.user.name;
-  site = req.body.site;
-  selectStartDate = req.body.selectStartDate;
-  selectStartTime = req.body.selectStartTime;
-  selectEndTime = "00:00" || req.body.selectEndTime;
+  var site = req.body.site;
+  var selectStartDate = req.body.selectStartDate;
+  var selectStartTime = req.body.selectStartTime;
+  var selectEndTime = "23:59" || req.body.selectEndTime;
+  var endDateTime;
   if(req.body.selectEndDate) {
     endDateTime = "'" + req.body.selectEndDate + " " + selectEndTime + "'";
   } else {
     endDateTime = "NULL";
   }
-  reportedByPerson = req.body.reportedByPerson;
-  reportedByCompany = req.body.reportedByCompany;
-  planned = req.body.planned;
-  lossOfGeneration = req.body.lossOfGeneration;
-  category = req.body.category;
-  details = req.body.details;
-  isClosed = req.body.isClosed;
+  var reportedByPerson = req.body.reportedByPerson;
+  var reportedByCompany = req.body.reportedByCompany;
+  var planned = req.body.planned;
+  var lossOfGeneration = req.body.lossOfGeneration;
+  var category = req.body.category;
+  var details = req.body.details;
+  var isClosed = req.body.isClosed;
+  
 
   connection.query("start transaction; insert into incident_log values (NULL," +
   site + ", now(), '" +
@@ -179,12 +181,56 @@ router.post('/newIncidentLog', function(req, res, next) {
   lossOfGeneration + ", '" +
   details + "', " +
   isClosed
-  + ",NULL, '" + name +"'); Update incident_log set incident_report_number = concat('IRF_', date(now()), '_', lpad(id-11,3,'0')) order by id desc limit 1; commit;", function (error, rows, fields) {
+  + ",NULL, '" + name + "', NULL, NULL); Update incident_log set incident_report_number = concat('IRF_', date(now()), '_', lpad(id-11,3,'0')) order by id desc limit 1; commit;", function (error, rows, fields) {
     console.log(error);
     // res.writeHead(200, {'Content-Type': 'text/plain'});
     req.flash('success','Record has been inserted');
     res.redirect('/#/incidentsAll');
   });
+});
+
+router.post('/updateIncidentLog', function(req, res, next) {
+  console.log("POST: ");
+  // connection.connect();
+
+  name = req.user.name;
+  var log_id = req.body.log_id;
+  var selectStartDate = req.body.selectStartDate;
+  var selectStartTime = req.body.selectStartTime;
+  var startDateTime = '\'' + selectStartDate + ' ' + selectStartTime + '\'';
+  var selectEndTime = '23:59' || req.body.selectEndTime;
+  var endDateTime;
+  if(req.body.selectEndDate) {
+    endDateTime = '\'' + req.body.selectEndDate + ' ' + selectEndTime + '\'';
+  } else {
+    endDateTime = 'NULL';
+  }
+  var reportedByPerson = req.body.reportedByPerson;
+  var reportedByCompany = req.body.reportedByCompany;
+  var planned = req.body.planned;
+  var lossOfGeneration = req.body.lossOfGeneration;
+  var category = req.body.category;
+  var details = req.body.details;
+  var status = req.body.isClosed;
+
+
+  connection.query('Update incident_log set start_time = ' + startDateTime + 
+  ', end_time = ' + endDateTime + 
+  ', reported_by_person = \'' + reportedByPerson + 
+  '\', reported_by_company = ' + reportedByCompany +  
+  ', category = ' + category + 
+  ', planned = ' + planned + 
+  ', loss_of_generation = ' + lossOfGeneration + 
+  ', details = \'' + details + 
+  '\', status = ' + status + 
+  ', last_updated_by = \'' + name +
+  '\', last_updated_dateTime = now() where id = ' + log_id + ';', function (error, rows, fields) {
+    console.log(error);
+    // res.writeHead(200, {'Content-Type': 'text/plain'});
+    req.flash('success','Record has been updated');
+    res.redirect('/#/report/incident?incidentId=' + log_id);
+  });
+
 });
 
 router.post('/newComment', function(req, res, next) {
