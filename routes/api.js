@@ -94,7 +94,24 @@ module.exports = function (app, connection) {
     // get export generation for met office test
     app.get('/api/displaySite/report/:id', function (req, res) {
         var id = req.params.id;
-        connection.query("select e.date, sum(generation) as generation, ps" + id + " * 1000 / (sum(case when generation > 0 then 0.5 else 0 end)) as avgPyro, sum(case when generation > 0 then 0.5 else 0 end) as opHours, ps" + id + " as esol, ps" + id + " * (select tic_mwp from top_table where id = " + id + " ) * 1000 as theoretical, sum(generation)/(ps" + id + " * (select tic_mwp from top_table where id = " + id + " ) * 1000) as pr from export_" + id + "  e join dailyEsol i on e.date = i.date group by e.date order by e.date desc;", function (err, rows) {
+        var inverters = null;
+        
+        if (id == 1) {
+            inverters = "ps1_T01 + ps1_T02 + ps1_T03 + PS1_T04 + PS1_T05";
+        } else if (id == 2) {
+            inverters = "ps2_T01 + ps2_T02 + ps2_T03 + PS2_T04 + PS2_T05 + PS2_T06 + PS2_T07";
+        } else if (id == 3) {
+            inverters = "ps3_T01 + ps3_T02 + ps3_T03 + PS3_T04";
+        } else if (id == 4) {
+            inverters = "ps4_T01 + ps4_T02 + ps4_T03 + PS4_T04 + PS4_T05 + PS4_T06 + PS4_T07 + PS4_T08";
+        } else {
+            inverters = "ps" + id;
+            
+        }
+        
+        // res.send('SELECT e.date, SUM(generation) AS generation, i.ps' + id + ' * 1000 / (SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END)) AS avgPyro, SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END) AS opHours, i.ps' + id + ' AS esol, i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000 AS theoretical, SUM(generation) / (i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000) AS pr, ia.ps' + id + ' / td.ps' + id + ' AS commsAvailabilty, oo.ps' + id + ' / ia.ps' + id + ' AS notWorking FROM export_' + id + ' e LEFT JOIN dailyEsol i ON e.date = i.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterTimeDiff) td ON e.date = td.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterAvailabilty) ia ON e.date = ia.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterOver0) oo ON e.date = oo.date GROUP BY e.date ORDER BY e.date DESC;');
+        
+        connection.query('SELECT e.date, SUM(generation) AS generation, i.ps' + id + ' * 1000 / (SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END)) AS avgPyro, SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END) AS opHours, i.ps' + id + ' AS esol, i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000 AS theoretical, SUM(generation) / (i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000) AS pr, ia.ps' + id + ' / td.ps' + id + ' AS commsAvailabilty, oo.ps' + id + ' / ia.ps' + id + ' AS technicalAvailability FROM export_' + id + ' e LEFT JOIN dailyEsol i ON e.date = i.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterTimeDiff) td ON e.date = td.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterAvailabilty) ia ON e.date = ia.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterOver0) oo ON e.date = oo.date GROUP BY e.date ORDER BY e.date DESC;', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
