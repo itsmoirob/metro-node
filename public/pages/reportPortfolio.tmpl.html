@@ -37,7 +37,7 @@
                 </tr>
                 <tr>
                     <th>PVsyst PR</th>
-                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,15]">{{ portfolioSiteDataMonth[0]["pPR"+a]  * 100 | number:2 }}%</td>
+                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,15]">{{ portfolioSiteDataMonth[0]["pPR"+a] * 100 | number:2 }}%</td>
                     <td>{{ portfolioSiteDataMonth[0].pPRAll * 100 | number:2 }}%</td>
                 </tr>
                 <!--<tr>
@@ -45,30 +45,47 @@
                     <td>Some%</td>
                 </tr>-->
             </table>
+            <p>Table overview</p>
+            <textarea name="" id="" cols="30" rows="10"></textarea>
         </div>
     </div>
     <div class="row">
         <div>
             <highchart id="chartMonthGenerationPortfolio" config="chartMonthGeneration"></highchart>
         </div>
+        <p>Explanation</p>
+        <textarea name="chartMonthGenerationPortfolioExplanation" id="chartMonthGenerationPortfolioExplanation" cols="30" rows="10"></textarea>
+        <hr>
         <div>
             <highchart id="chartMonthPRPortfolio" config="chartMonthPR"></highchart>
         </div>
+        <p>Explanation</p>
+        <textarea name="chartMonthPRPortfolioExplanation" id="chartMonthPRPortfolioExplanation" cols="30" rows="10"></textarea>
+        <hr>
         <div>
             <highchart id="chartMonthEsolPortfolio" config="chartMonthEsol"></highchart>
         </div>
+        <p>Explanation</p>
+        <textarea name="chartMonthEsolPortfolioExplanation" id="chartMonthEsolPortfolioExplanation" cols="30" rows="10"></textarea>
+        <hr>
         <div>
             <highchart id="chartYearGenerationPortfolio" config="chartYearGeneration"></highchart>
         </div>
+        <p>Explanation</p>
+        <textarea name="chartYearGenerationPortfolioExplanation" id="chartYearGenerationPortfolioExplanation" cols="30" rows="10"></textarea>
+        <hr>
         <div>
             <highchart id="chartYearAllGenerationPortfolio" config="chartYearAllGeneration"></highchart>
         </div>
+        <p>Explanation</p>
+        <textarea name="chartYearAllGenerationPortfolioExplanation" id="chartYearAllGenerationPortfolioExplanation" cols="30" rows="10"></textarea>
+        <hr>
 
     </div>
     <div class="row">
-        <p>Comments</p>
+        <p>Additional comments</p>
         <hr>
-        <textarea name="" id="" cols="30" rows="10"></textarea>
+        <textarea name="" id="additionalComments" cols="30" rows="10"></textarea>
     </div>
 
 </div>

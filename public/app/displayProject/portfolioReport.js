@@ -406,7 +406,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Comparison %'
+                   text: 'Performance Ratio %'
                },
                opposite: false,
                lineWidth: 2,
