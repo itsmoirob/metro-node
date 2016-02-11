@@ -198,6 +198,21 @@ angular.module('portfolioReport', [
             data: [],
             yAxis: 1
         };
+        
+        var cumulativeGenerationAllActual = {
+            name: "Actual generation",
+            type: 'column',
+            data: [],
+            color: '#FBA11B',
+            yAxis: 0
+        };
+        
+        var cumulativeGenerationAllPredict = {
+            name: "Predicted generation",
+            type: 'column',
+            data: [],
+            yAxis: 0
+        };
 
         getPortfolioSiteInfo();
         function getPortfolioSiteInfo() {
@@ -302,6 +317,7 @@ angular.module('portfolioReport', [
         function getPortfolioAllDataYear(month) {
             dataFactory.getPortfolioAllDataYear(month)
                 .success(function (res) {
+                    $scope.getPortfolioAllDataYear = res;
                     angular.forEach(res, function (res) {
                         chartDate.push(moment(res.date).format("MMM-YY"));
                         yearGenerationAllActual.data.push(res.actual / 1000);
@@ -322,6 +338,39 @@ angular.module('portfolioReport', [
                         monthAvailability.data.push(res[0][value] * 100);
                     });
                 })
+        }
+        
+        siteMonthSumGeneration(month);
+        function siteMonthSumGeneration(month) {            
+            dataFactory.getPortfolioAllDataYear(month)
+            .success(function (res) {
+                var modifiedArray = [];
+                for (var index = 0; index < res.length; index++) {
+                    if(index === 0) {
+                        modifiedArray.push({
+                            date:res[index].date,
+                            actual:res[index].actual,
+                            predicted: res[index].predicted
+                        });
+                    } else {
+                        modifiedArray.push({
+                            date: res[index].date,
+                            actual: res[index].actual + modifiedArray[index-1].actual,
+                            predicted: res[index].predicted + modifiedArray[index-1].predicted
+                    });
+                }
+            }
+                
+                
+                $scope.modifiedArray = modifiedArray;
+                $scope.test1 = modifiedArray[0].date;
+                
+                angular.forEach(modifiedArray, function (modifiedArray) {
+                    cumulativeGenerationAllActual.data.push(modifiedArray.actual);
+                    cumulativeGenerationAllPredict.data.push(modifiedArray.predicted);
+                })
+                    
+            });
         }
         
 
@@ -541,7 +590,52 @@ angular.module('portfolioReport', [
                 },
             },
             title: {
-                text: 'Year generation - ' + titleMonth
+                text: 'Monthly generation all sites for year to ' + titleMonth
+            },
+            xAxis: {categories: chartDate,
+                title: {
+                    text: null
+                }
+            },
+            yAxis: [{
+               title: {
+                   text: 'Generation MWh'
+               },
+               opposite: false,
+               lineWidth: 2,
+               min: 0
+           }],
+           legend: {
+               layout: 'vertical',
+               align: 'right',
+               verticalAlign: 'middle',
+               borderWidth: 0
+            },
+            series: [],
+            loading: false
+        };
+        
+        //  Chart for export generation
+        $scope.chartCumulativeAllGeneration = {
+            credits: {
+                enabled: false
+            },
+            options: {
+                chart: {
+                    type: 'column'
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.2f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    valueSuffix: ' kWH',
+                    shared: true,
+                    useHTML: true
+                },
+            },
+            title: {
+                text: 'Cumulative generation all sites for year to ' + titleMonth
             },
             xAxis: {categories: chartDate,
                 title: {
@@ -577,6 +671,8 @@ angular.module('portfolioReport', [
         $scope.chartYearGeneration.series.push(yearGenerationPredict);
         $scope.chartYearAllGeneration.series.push(yearGenerationAllActual);
         $scope.chartYearAllGeneration.series.push(yearGenerationAllPredict);
+        $scope.chartCumulativeAllGeneration.series.push(cumulativeGenerationAllActual);
+        $scope.chartCumulativeAllGeneration.series.push(cumulativeGenerationAllPredict);
         
 
 

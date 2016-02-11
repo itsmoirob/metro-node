@@ -108,29 +108,6 @@ angular.module('monthReport', [
                 });
         }
         
-        // siteMonthSumGeneration(SP);
-        // function siteMonthSumGeneration(SP) {
-        //     dataFactory.siteMonthSumGeneration(SP)
-        //         .success(function (res) {
-        //             $scope.sumTest = res;
-        //             var groupedByDateData = _.groupBy(res, function(date) {
-        //                 return date.date.substring(0,7);
-        //                 });
-        //             var aggregateByDate = _.map(groupedByDateData, function(generationObject, month) {
-        //                 return {
-        //                     month: month,
-        //                     generation: _.reduce(generationObject, function(m,x) {
-        //                         return m + x.sum;
-        //                     }, 0)
-        //                 };
-        //             });
-        //             angular.forEach(aggregateByDate, function (aggregateByDate) {
-        //                 highChartsSumData.data.push(aggregateByDate.generation);
-        //                 sumChartDate.push(moment(aggregateByDate.month).format("MMM YY"));
-        //             })
-        //         });
-        // }
-        
         siteMonthIncidents(SP, month);
         function siteMonthIncidents(SP, month) {
             dataFactory.siteMonthIncidents(SP, month)
