@@ -55,7 +55,7 @@ angular.module('displayExport', [
     },
     yAxis: [{
                title: {
-                   text: 'Generation'
+                   text: 'Export'
                },
                opposite: false,
                lineWidth: 2,

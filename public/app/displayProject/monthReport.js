@@ -26,14 +26,14 @@ angular.module('monthReport', [
         }
         
         var monthGenerationActual = {
-            name: "Actual generation",
+            name: "Actual export",
             data: [],
             color: '#FBA11B',
             yAxis: 0
         };
         
         var monthEsolActual = {
-            name: "Actual insolation",
+            name: "Actual irradiation",
             data: [],
             // color: '#FBA11B',
             type: "line",
@@ -41,7 +41,7 @@ angular.module('monthReport', [
         };
         
         var monthGenerationPredict = {
-            name: "Predicted generation",
+            name: "Predicted export",
             type: 'line',
             dashStyle: 'shortdot',
             data: [],
@@ -49,7 +49,7 @@ angular.module('monthReport', [
         };
         
         var monthEsolPredict = {
-            name: "Predicted insolation",
+            name: "Predicted irradiation",
             type: 'line',
             dashStyle: 'longdash',
             data: [],
@@ -169,14 +169,14 @@ angular.module('monthReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation kWh'
+                   text: 'Export kWh'
                },
                opposite: false,
                lineWidth: 2,
                min: 0
            }, {
                title: {
-                   text: 'Pyro kWh/m2'
+                   text: 'Irradiation kWh/m2'
                },
                opposite: true,
                min: 0
@@ -221,7 +221,7 @@ angular.module('monthReport', [
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Generation (kWh)'
+                    text: 'Export kWh'
                 }
             },
             series: [],
@@ -234,7 +234,7 @@ angular.module('monthReport', [
             },
             options: {
                 chart: {
-                    type: 'column'
+                    type: 'line'
                 },
                 tooltip: {
                     headerFormat: '<span style="font-size:10px">{point.key}</span><table>',

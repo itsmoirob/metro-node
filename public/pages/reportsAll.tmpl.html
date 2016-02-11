@@ -23,10 +23,10 @@
         </tr>
         <tr ng-repeat="site in allReports">
             <td>{{site.site}}</td>
-            <td>{{site.avail * 100 | number:2 }}%</td>
-            <td>{{site.Over0 * 100 | number:2 }}%</td>
-            <td>{{site.PR * 100 | number:2 }}%</td>
-            <td>{{site.export | number:2 }}</td>
+            <td>{{site.avail * 100 | number:1 }}%</td>
+            <td>{{site.Over0 * 100 | number:1 }}%</td>
+            <td>{{site.PR * 100 | number:1 }}%</td>
+            <td>{{site.export | number:1 }}</td>
         </tr>
     </table>
 </div>

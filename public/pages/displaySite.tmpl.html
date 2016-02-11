@@ -3,8 +3,8 @@
     <hr/>
   <div class="col s12 m6">
     <h4>Summary</h4>
-    <p>TIC {{ currentDisplaySite[0].tic_mwp }} MWp</p>
-    <p>Co2 savings {{ currentDisplaySite[0].carbon_saved_tones }} tonnes</p>
+    <p>TIC {{ currentDisplaySite[0].tic_mwp | number:1  }} MWp</p>
+    <p>Co2 savings {{ currentDisplaySite[0].carbon_saved_tones | number:1 }} tonnes</p>
     <p>Power {{ currentDisplaySite[0].homes_powered }} homes</p>
   </div>
   <h4>

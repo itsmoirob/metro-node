@@ -10,110 +10,110 @@
 <div id="section-to-print">
     <div class="letter">
         <div class="row">
-        <div class="col s6 m6">
-            <h6>{{monthReport.name}} {{month}}</h6></div>
-        <div class="logo col s6 m6">
-            <img src="../images/primrose-solar-logo.jpg" alt="" height="70"></div>
-            </div>
+            <div class="col s6 m6">
+                <h6>{{monthReport.name}} {{month}}</h6></div>
+            <div class="logo col s6 m6">
+                <img src="../images/primrose-solar-logo.jpg" alt="" height="70"></div>
+        </div>
         <div class="row">
             <div>
                 <p class="tableTitle">Asset information</p>
             </div>
             <!--<div class="col s6 m6">-->
-                <table class="monthReport" style="width:50%; float:left">
-                    <th colspan="2">Site information
-                    </th>
-                    <tr>
-                        <td>Site name</td>
-                        <td>{{ monthReport.name }}</td>
-                    </tr>
-                    <tr>
-                        <td>Site address</td>
-                        <td>{{ monthReport.location }}</td>
-                    </tr>
-                    <tr>
-                        <td>O&M Provider</td>
-                        <td>{{ monthReport.epc }}</td>
-                    </tr>
-                    <tr>
-                        <td>PAC date</td>
-                        <td>{{ monthReport.pac }}</td>
-                    </tr>
-                    <tr>
-                        <td>Commission date</td>
-                        <td>{{ monthReport.commissioning | date:'dd/MM/yy'  }}</td>
-                    </tr>
-                </table>
+            <table class="monthReport" style="width:50%; float:left">
+                <th colspan="2">Site information
+                </th>
+                <tr>
+                    <td>Site name</td>
+                    <td>{{ monthReport.name }}</td>
+                </tr>
+                <tr>
+                    <td>Site address</td>
+                    <td>{{ monthReport.location }}</td>
+                </tr>
+                <tr>
+                    <td>O&M Provider</td>
+                    <td>{{ monthReport.epc }}</td>
+                </tr>
+                <tr>
+                    <td>PAC date</td>
+                    <td>{{ monthReport.pac }}</td>
+                </tr>
+                <tr>
+                    <td>Commission date</td>
+                    <td>{{ monthReport.commissioning | date:'dd/MM/yy' }}</td>
+                </tr>
+            </table>
             <!--</div>-->
             <!--<div class="col s6 m6">-->
-                <table class="monthReport" style="width:50%; float:right">
-                    <th colspan="2">Technical information
-                    </th>
-                    <tr>
-                        <td>TIC (MWp)</td>
-                        <td>{{ monthReport.tic_mwp }}</td>
-                    </tr>
-                    <tr>
-                        <td>DNC (MW)</td>
-                        <td>{{ monthReport.dnc_mw }}</td>
-                    </tr>
-                    <tr>
-                        <td>Panels</td>
-                        <td>{{ monthReport.panel_name }}</td>
-                    </tr>
-                    <tr>
-                        <td>Inverters</td>
-                        <td>{{ monthReport.inverter_name }}</td>
-                    </tr>
-                    <tr>
-                        <td>Transformers</td>
-                        <td>{{ monthReport.transformer_type }}</td>
-                    </tr>
-                </table>
+            <table class="monthReport" style="width:50%; float:right">
+                <th colspan="2">Technical information
+                </th>
+                <tr>
+                    <td>TIC (MWp)</td>
+                    <td>{{ monthReport.tic_mwp | number:1 }}</td>
+                </tr>
+                <tr>
+                    <td>DNC (MW)</td>
+                    <td>{{ monthReport.dnc_mw | number:1 }}</td>
+                </tr>
+                <tr>
+                    <td>Panels</td>
+                    <td>{{ monthReport.panel_name }}</td>
+                </tr>
+                <tr>
+                    <td>Inverters</td>
+                    <td>{{ monthReport.inverter_name }}</td>
+                </tr>
+                <tr>
+                    <td>Transformers</td>
+                    <td>{{ monthReport.transformer_type }}</td>
+                </tr>
+            </table>
             <!--</div>-->
         </div>
         <div class="row">
             <div>
                 <p class="tableTitle">Results</p>
                 <!--<div class="col s6 m6">-->
-                    <table class="monthReport" style="width:50%; float:left;">
-                        <th colspan="2">Performance month</th>
-                        <tr>
-                            <td>Export actual (kWh)</td>
-                            <td>{{ monthReport.export | number:2 }}</td>
-                        </tr>
-                        <tr>
-                            <td>Export expected (kWh) - pvsyst</td>
-                            <td>{{ monthReport.pvsyst | number:2 }}</td>
-                        </tr>
-                        <tr>
-                            <td>PR Actual - against pyro</td>
-                            <td>{{ monthReport.pr * 100 | number:2 }}%</td>
-                        </tr>
-                        <tr>
-                            <td>Availabilty</td>
-                            <td>{{ monthReport.availabilty * 100 | number:2 }}%</td>
-                        </tr>
-                    </table>
-                    <table class="monthReport" style="width:50%; float:right;">
-                        <th colspan="2">Performance YTD</th>
-                        <tr>
-                            <td>Export actual (kWh)</td>
-                            <td>{{ monthReport.exportYTD | number:2 }}</td>
-                        </tr>
-                        <tr>
-                            <td>Export expected (kWh) - pvsyst</td>
-                            <td>{{ monthReport.pvsystYTD | number:2 }}</td>
-                        </tr>
-                        <tr>
-                            <td>PR Actual - against pyro</td>
-                            <td>{{ monthReport.prYTD * 100 | number:2 }}%</td>
-                        </tr>
-                        <tr>
-                            <td>Availabilty</td>
-                            <td>{{ monthReport.availabiltyYTD * 100 | number:2 }}%</td>
-                        </tr>
-                    </table>
+                <table class="monthReport" style="width:50%; float:left;">
+                    <th colspan="2">Performance month</th>
+                    <tr>
+                        <td>Export actual (kWh)</td>
+                        <td>{{ monthReport.export | number:1 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Export expected (kWh) - pvsyst</td>
+                        <td>{{ monthReport.pvsyst | number:1 }}</td>
+                    </tr>
+                    <tr>
+                        <td>PR Actual</td>
+                        <td>{{ monthReport.pr * 100 | number:1 }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Availabilty</td>
+                        <td>{{ monthReport.availabilty * 100 | number:1 }}%</td>
+                    </tr>
+                </table>
+                <table class="monthReport" style="width:50%; float:right;">
+                    <th colspan="2">Performance YTD</th>
+                    <tr>
+                        <td>Export actual (kWh)</td>
+                        <td>{{ monthReport.exportYTD | number:1 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Export expected (kWh) - pvsyst</td>
+                        <td>{{ monthReport.pvsystYTD | number:1 }}</td>
+                    </tr>
+                    <tr>
+                        <td>PR Actual</td>
+                        <td>{{ monthReport.prYTD * 100 | number:1 }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Availabilty</td>
+                        <td>{{ monthReport.availabiltyYTD * 100 | number:1 }}%</td>
+                    </tr>
+                </table>
                 <!--</div>-->
             </div>
         </div>
@@ -129,8 +129,9 @@
             </div>
         </div>
         <div class="row">
-            <p class="tableTitle">Incidents</p>
-            <table class="monthReport" style="width:100%">
+            <p class="tableTitle">Comment</p>
+            <textarea name="monthlySiteComment" id="monthlySiteComment" cols="30" rows="10"></textarea>
+            <!--<table class="monthReport" style="width:100%">
                 <tr>
                     <th>start</th>
                     <th>end</th>
@@ -149,7 +150,7 @@
                     <td><a ui-sref=parent.reportIncident({incidentId:incident.id})>{{ incident.incident_report_number }}</a></td>
                     <td>{{ incident.status }}</td>
                 </tr>
-            </table>
+            </table>-->
         </div>
     </div>
 </div>

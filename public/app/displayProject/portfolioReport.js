@@ -26,7 +26,7 @@ angular.module('portfolioReport', [
         var portfolioSiteDataMonth = [];
 
         var monthGenerationActual = {
-            name: "Actual generation",
+            name: "Actual export",
             data: [],
             dataLabels: {
                 enabled: true,
@@ -45,7 +45,7 @@ angular.module('portfolioReport', [
         };
         
         var monthGenerationPredict = {
-            name: "Predicted generation",
+            name: "Predicted export",
             data: [],
             dataLabels: {
                 enabled: true,
@@ -100,7 +100,7 @@ angular.module('portfolioReport', [
         };
         
         var monthActualEsol = {
-            name: "Actual insolation",
+            name: "Actual irradiation",
             type: 'column',
             data: [],
             dataLabels: {
@@ -120,7 +120,7 @@ angular.module('portfolioReport', [
         };
         
         var monthPredictEsol = {
-            name: "Predicted insolation",
+            name: "Predicted irradiation",
             type: 'column',
             data: [],
             dataLabels: {
@@ -159,7 +159,7 @@ angular.module('portfolioReport', [
         };
         
         var yearGenerationPredict = {
-            name: "Predicted generation",
+            name: "Predicted export",
             type: 'column',
             data: [],
             dataLabels: {
@@ -178,7 +178,7 @@ angular.module('portfolioReport', [
         };
         
         var yearGenerationAllActual = {
-            name: "Actual generation",
+            name: "Actual export",
             type: 'column',
             data: [],
             color: '#FBA11B',
@@ -186,7 +186,7 @@ angular.module('portfolioReport', [
         };
         
         var yearGenerationAllPredict = {
-            name: "Predicted generation",
+            name: "Predicted export",
             type: 'column',
             data: [],
             yAxis: 0
@@ -200,7 +200,7 @@ angular.module('portfolioReport', [
         };
         
         var cumulativeGenerationAllActual = {
-            name: "Actual generation",
+            name: "Actual export",
             type: 'column',
             data: [],
             color: '#FBA11B',
@@ -208,7 +208,7 @@ angular.module('portfolioReport', [
         };
         
         var cumulativeGenerationAllPredict = {
-            name: "Predicted generation",
+            name: "Predicted export",
             type: 'column',
             data: [],
             yAxis: 0
@@ -326,19 +326,19 @@ angular.module('portfolioReport', [
                 });
         }
         
-        getPortfolioAvailability(month);
-        function getPortfolioAvailability(month) {
-            dataFactory.getPortfolioAvailability(month)
-                .success(function (res) {
-                    var availabilityGrouping = sites.map(function (i) {
-                        return 'PS' + i + '_Over0';
-                    });
+        // getPortfolioAvailability(month);
+        // function getPortfolioAvailability(month) {
+        //     dataFactory.getPortfolioAvailability(month)
+        //         .success(function (res) {
+        //             var availabilityGrouping = sites.map(function (i) {
+        //                 return 'PS' + i + '_Over0';
+        //             });
                     
-                    angular.forEach(availabilityGrouping, function (value, key) {
-                        monthAvailability.data.push(res[0][value] * 100);
-                    });
-                })
-        }
+        //             angular.forEach(availabilityGrouping, function (value, key) {
+        //                 monthAvailability.data.push(res[0][value] * 100);
+        //             });
+        //         })
+        // }
         
         siteMonthSumGeneration(month);
         function siteMonthSumGeneration(month) {            
@@ -401,7 +401,7 @@ angular.module('portfolioReport', [
                 },
             },
             title: {
-                text: 'Monthly generation - ' + titleMonth
+                text: 'Monthly export - ' + titleMonth
             },
             xAxis: {categories: nameGrouping,
                 title: {
@@ -410,7 +410,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation MWh'
+                   text: 'Export MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -461,15 +461,17 @@ angular.module('portfolioReport', [
                lineWidth: 2,
                min: 0,
                max: 100
-           },{
-               title: {
-                   text: 'Availability %'
-               },
-               opposite: true,
-               lineWidth: 2,
-               min: 40,
-               max: 100
-           }],
+           }
+        //    ,{
+        //        title: {
+        //            text: 'Availability %'
+        //        },
+        //        opposite: true,
+        //        lineWidth: 2,
+        //        min: 40,
+        //        max: 100
+        //    }
+           ],
            legend: {
                layout: 'vertical',
                align: 'right',
@@ -500,7 +502,7 @@ angular.module('portfolioReport', [
                 },
             },
             title: {
-                text: 'Monthly insolation - ' + titleMonth
+                text: 'Monthly irradiation - ' + titleMonth
             },
             xAxis: {categories: nameGrouping,
                 title: {
@@ -509,7 +511,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Insolation Wh/m2'
+                   text: 'Irradiation kWh/m2'
                },
                opposite: false,
                lineWidth: 2,
@@ -545,7 +547,7 @@ angular.module('portfolioReport', [
                 },
             },
             title: {
-                text: 'Year generation - ' + titleMonth
+                text: 'Year export - ' + titleMonth
             },
             xAxis: {categories: nameGrouping,
                 title: {
@@ -554,7 +556,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation MWh'
+                   text: 'Export MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -590,7 +592,7 @@ angular.module('portfolioReport', [
                 },
             },
             title: {
-                text: 'Monthly generation all sites for year to ' + titleMonth
+                text: 'Monthly export all sites for year to ' + titleMonth
             },
             xAxis: {categories: chartDate,
                 title: {
@@ -599,7 +601,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation MWh'
+                   text: 'Export MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -635,7 +637,7 @@ angular.module('portfolioReport', [
                 },
             },
             title: {
-                text: 'Cumulative generation all sites for year to ' + titleMonth
+                text: 'Cumulative export all sites for year to ' + titleMonth
             },
             xAxis: {categories: chartDate,
                 title: {
@@ -644,7 +646,7 @@ angular.module('portfolioReport', [
             },
             yAxis: [{
                title: {
-                   text: 'Generation MWh'
+                   text: 'Export MWh'
                },
                opposite: false,
                lineWidth: 2,
@@ -664,7 +666,7 @@ angular.module('portfolioReport', [
         $scope.chartMonthGeneration.series.push(monthGenerationPredict);
         $scope.chartMonthPR.series.push(monthActualPR);
         $scope.chartMonthPR.series.push(monthPredictPR);
-        $scope.chartMonthPR.series.push(monthAvailability);
+        // $scope.chartMonthPR.series.push(monthAvailability);
         $scope.chartMonthEsol.series.push(monthActualEsol);
         $scope.chartMonthEsol.series.push(monthPredictEsol);
         $scope.chartYearGeneration.series.push(yearGenerationActual);
