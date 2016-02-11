@@ -212,9 +212,8 @@ router.post('/updateIncidentLog', function(req, res, next) {
   var category = req.body.category;
   var details = req.body.details;
   var status = req.body.isClosed;
-
-
-  connection.query('Update incident_log set start_time = ' + startDateTime + 
+  
+  res.send('Update incident_log set start_time = ' + startDateTime + 
   ', end_time = ' + endDateTime + 
   ', reported_by_person = \'' + reportedByPerson + 
   '\', reported_by_company = ' + reportedByCompany +  
@@ -224,12 +223,25 @@ router.post('/updateIncidentLog', function(req, res, next) {
   ', details = \'' + details + 
   '\', status = ' + status + 
   ', last_updated_by = \'' + name +
-  '\', last_updated_dateTime = now() where id = ' + log_id + ';', function (error, rows, fields) {
-    console.log(error);
-    // res.writeHead(200, {'Content-Type': 'text/plain'});
-    req.flash('success','Record has been updated');
-    res.redirect('/#/report/incident?incidentId=' + log_id);
-  });
+  '\', last_updated_dateTime = now() where id = ' + log_id + ';');
+
+
+//   connection.query('Update incident_log set start_time = ' + startDateTime + 
+//   ', end_time = ' + endDateTime + 
+//   ', reported_by_person = \'' + reportedByPerson + 
+//   '\', reported_by_company = ' + reportedByCompany +  
+//   ', category = ' + category + 
+//   ', planned = ' + planned + 
+//   ', loss_of_generation = ' + lossOfGeneration + 
+//   ', details = \'' + details + 
+//   '\', status = ' + status + 
+//   ', last_updated_by = \'' + name +
+//   '\', last_updated_dateTime = now() where id = ' + log_id + ';', function (error, rows, fields) {
+//     console.log(error);
+//     // res.writeHead(200, {'Content-Type': 'text/plain'});
+//     req.flash('success','Record has been updated');
+//     res.redirect('/#/report/incident?incidentId=' + log_id);
+//   });
 
 });
 
