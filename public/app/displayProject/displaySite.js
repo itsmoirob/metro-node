@@ -21,12 +21,19 @@ function config($httpProvider) {
 
   var allSumData = [];
   var chartDate = [];
-
+  
+  var groupingSwitch = 1;
+    
+  var groupedGroupings = [{id:1, sites:[1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15]},
+  {id:2, sites:[1, 2, 3, 4, 5, 11, 12, 13, 15]}];
+  
+  var selectedGrouping = groupedGroupings[groupingSwitch].sites;
+  
   getAllSiteDaily();
   function getAllSiteDaily(){
     dataFactory.allSiteDaily()
     .success(function(res){
-      var groupings = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15].map(function(i) { return "ps" + i; });
+      var groupings = selectedGrouping.map(function(i) { return "ps" + i; });
       // loop over the keys
       groupings.forEach(function (deviceName) {
         // data is one huge array that has readings for all sensors on each day
@@ -49,7 +56,7 @@ function config($httpProvider) {
   function getAllSiteDailyMWp(){
     dataFactory.allSiteDailyMWp()
     .success(function(res){
-      var groupings = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15].map(function(i) { return "ps" + i; });
+      var groupings = selectedGrouping.map(function(i) { return "ps" + i; });
       // loop over the keys
       groupings.forEach(function (deviceName) {
         // data is one huge array that has readings for all sensors on each day
@@ -70,7 +77,7 @@ function config($httpProvider) {
   function getAllSiteDailyEsol(){
     dataFactory.allSiteDailyEsol()
     .success(function(res){
-      var groupings = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15].map(function(i) { return "PS" + i; });
+      var groupings = selectedGrouping.map(function(i) { return "PS" + i; });
       // loop over the keys
       groupings.forEach(function (deviceName) {
         // data is one huge array that has readings for all sensors on each day
