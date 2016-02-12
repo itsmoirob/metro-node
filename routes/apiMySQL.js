@@ -321,8 +321,49 @@ Ftp.keepAlive()
                 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
               });
 
-            } else {
-              res.send("Hello last else "+id);
+            } else if (id == 15){
+              for (j=1;j<data.length;j++){
+                
+                data[j][0] = moment(data[j][0], 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
+                data[j][1] = parseFloat(data[j][1]);
+                data[j][2] = parseFloat(data[j][2]);
+                data[j][3] = parseFloat(data[j][3]);
+                data[j][4] = parseFloat(data[j][4]);
+                if (isNaN(data[j][1])) {
+                  data[j][1] = 'NULL';
+                }
+                if (data[j][1] < 0) {
+                  data[j][1] = 0;
+                }
+                if (isNaN(data[j][2])) {
+                  data[j][2] = 'NULL';
+                }
+                if (data[j][2] < 0) {
+                  data[j][2] = 0;
+                }
+                if (isNaN(data[j][3])) {
+                  data[j][3] = 'NULL';
+                }
+                if (data[j][3] < 0) {
+                  data[j][3] = 0;
+                }
+                if (isNaN(data[j][4])) {
+                  data[j][4] = 'NULL';
+                }
+                if (data[j][4] < 0) {
+                  data[j][4] = 0;
+                }
+                sqlInputData[n] = ['(\'' + data[j][0] + '\',' + data[j][1] + ',' + data[j][2] + ',' + data[j][3] + ',' + data[j][4] + ')'];
+                n++;
+              }
+            //   res.send('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;');
+              
+              connection.query('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function(err, result){
+                if (err) throw err;
+                console.log(result.insertId);
+                res.send('Done: INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData);
+              });
+              
             }
           }
         });
