@@ -235,6 +235,7 @@ angular.module('portfolioReport', [
         function getPortfolioSiteDataMonth(month) {
             dataFactory.getPortfolioSiteDataMonth(month)
                 .success(function (res) {
+                    $scope.portfolioActExpPredExpActPrPredPr = res;
                     portfolioSiteDataMonth.push(res[0]);
                     var actualGrouping = sites.map(function (i) {
                         return "aPS" + i;
@@ -275,6 +276,7 @@ angular.module('portfolioReport', [
         function getPortfolioSiteEsolMonth(month) {
             dataFactory.getPortfolioSiteEsolMonth(month)
                 .success(function (res) {
+                    $scope.portfolioEsol = res;
                     var actualGrouping = sites.map(function (i) {
                         return "aPS" + i;
                     });
@@ -678,5 +680,19 @@ angular.module('portfolioReport', [
         
 
 
-    }]);
+    }])
+    
+    .directive('varianceValue', function ($timeout) {
+    return {
+        restrict: 'A',
+        link: function (scope, el, attr) {
+          $timeout(function(){
+              $(el).toggleClass("text-red", parseInt($(el).text()) < 0);
+              $(el).toggleClass("text-green", parseInt($(el).text()) > 0);
+          },0);
+        },
+    }
+})
+    
+;
 
