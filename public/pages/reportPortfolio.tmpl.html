@@ -11,6 +11,10 @@
         <div class="col m12 s12">
             <table class="portfolioTable" id="portfolioTable">
                 <tr>
+                    <th></th>
+                    <th ng-repeat="site in portfolioSiteInfo[0]">PS{{site.id}}</th>
+                </tr>
+                <tr>
                     <th>Site</th>
                     <td ng-repeat="site in portfolioSiteInfo[0]">{{site.name}}</td>
                 </tr>
@@ -51,26 +55,26 @@
                 <tr>
                     <th>Actual MWh</th>
                     <td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioActExpPredExpActPrPredPr[0]["aPS"+a] | number:1 }}</td>
-                    <td>TBC</td>
+                    <td>{{ portfolioActExpPredExpActPrPredPr[0]["aPSAll"] | number:1 }}</td>
                 </tr>
                 <tr>
                     <th>Target MWh</th>
                     <td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["pPS"+a] | number:1 }}</td>
+                    <td>{{ portfolioActExpPredExpActPrPredPr[0]["pPSAll"] | number:1 }}</td>
+                </tr>
+                <tr>
+                    <th>PR - variance (actual)</th>
+                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioSiteDataMonth[0]["aPR"+a] - portfolioSiteDataMonth[0]["pPR"+a]) * 100 | number:1 }} ({{ (portfolioSiteDataMonth[0]["aPR"+a]) * 100 | number:1 }})%</td>
                     <td>TBC</td>
                 </tr>
                 <tr>
-                    <th>PR</th>
-                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioSiteDataMonth[0]["aPR"+a] - portfolioSiteDataMonth[0]["pPR"+a]) * 100 | number:1 }}%</td>
-                    <td>TBC</td>
+                    <th>Availability - variance (actual)</th>
+                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (availabilty[0]["PS"+a+"_Over0"] - 0.99) * 100 | number:1 }} ({{ (availabilty[0]["PS"+a+"_Over0"]) * 100 | number:1 }})%</td>
+                    <td></td>
                 </tr>
                 <tr>
-                    <th>Availability</th>
-                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["pPR"+a] * 100 | number:1 }}%</td>
-                    <td>{{ portfolioSiteDataMonth[0].pPRAll * 100 | number:1 }}%</td>
-                </tr>
-                <tr>
-                    <th>Insolation</th>
-                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioEsol[0]["aPS"+a] - portfolioEsol[0]["pPS"+a]) | number:1 }}</td>
+                    <th>Insolation - variance (actual)</th>
+                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioEsol[0]["aPS"+a] - portfolioEsol[0]["pPS"+a]) | number:1 }} ({{ (portfolioEsol[0]["aPS"+a]) | number:1 }})</td>
                     <td>TBC</td>
                 </tr>
             </table>
