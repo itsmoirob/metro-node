@@ -192,13 +192,6 @@ angular.module('portfolioReport', [
             yAxis: 0
         };
         
-        var monthAvailability = {
-            name: "Inverter availability",
-            type: 'line',
-            data: [],
-            yAxis: 1
-        };
-        
         var cumulativeGenerationAllActual = {
             name: "Actual export",
             type: 'column',
@@ -226,7 +219,7 @@ angular.module('portfolioReport', [
         function getPortfolioAllSiteMwp() {
             dataFactory.getPortfolioAllSiteMwp()
                 .success(function (res) {
-                    var portfolio = { "name": "Portfolio", "location": "", "tic_mwp": res[0].sumTic };
+                    var portfolio = { "id": "All", "name": "Portfolio", "location": "", "tic_mwp": res[0].sumTic };
                     portfolioSiteInfo[0].push(portfolio);
                 });
         }
@@ -328,19 +321,13 @@ angular.module('portfolioReport', [
                 });
         }
         
-        // getPortfolioAvailability(month);
-        // function getPortfolioAvailability(month) {
-        //     dataFactory.getPortfolioAvailability(month)
-        //         .success(function (res) {
-        //             var availabilityGrouping = sites.map(function (i) {
-        //                 return 'PS' + i + '_Over0';
-        //             });
-                    
-        //             angular.forEach(availabilityGrouping, function (value, key) {
-        //                 monthAvailability.data.push(res[0][value] * 100);
-        //             });
-        //         })
-        // }
+        getPortfolioAvailability(month);
+        function getPortfolioAvailability(month) {
+            dataFactory.getPortfolioAvailability(month)
+                .success(function (res) {
+                    $scope.availabilty = res;
+                })
+        }
         
         siteMonthSumGeneration(month);
         function siteMonthSumGeneration(month) {            
@@ -687,8 +674,8 @@ angular.module('portfolioReport', [
         restrict: 'A',
         link: function (scope, el, attr) {
           $timeout(function(){
-              $(el).toggleClass("text-red", parseInt($(el).text()) < 0);
-              $(el).toggleClass("text-green", parseInt($(el).text()) > 0);
+              $(el).toggleClass("text-red", parseFloat($(el).text()) < 0);
+              $(el).toggleClass("text-green", parseFloat($(el).text()) > 0);
           },0);
         },
     }
