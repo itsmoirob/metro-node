@@ -13,6 +13,7 @@
             <th>ESOL</th>
             <th>Theoretical kWh</th>
             <th>PR%</th>
+            <th>Pryo data used</th>
             <th>Comms availabilty</th>
             <th>Technical availabilty</th>
         </tr>
@@ -24,6 +25,7 @@
             <td>{{ report.esol | number:1 }}</td>
             <td>{{ report.theoretical | number:1 }}</td>
             <td>{{ report.pr * 100 | number:1 }}%</td>
+            <td>{{ report.type }}</td>
             <td>{{ report.commsAvailabilty * 100 | number:1 }}%</td>
             <td>{{ report.technicalAvailability * 100 | number:1 }}%</td>
         </tr>
