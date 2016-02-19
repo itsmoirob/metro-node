@@ -3,7 +3,7 @@ module.exports = function (app, connection) {
 
     // api for getting top level summary data of all sites
     app.get('/api/pickUp', function (req, res) {
-        connection.query('SELECT id, name, tic_mwp, primrose_company from top_table', function (err, rows) {
+        connection.query('SELECT id, name, tic_mwp, primrose_company from top_table where primrose_company > 0', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -163,7 +163,7 @@ module.exports = function (app, connection) {
 
     app.get('/api/reports/incidentLog/:id', function (req, res) {
         var id = req.params.id;
-        connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status,incident_report_number, last_updated_by, last_updated_dateTime from incident_log where id = ' + id + ';', function (err, rows) {
+        connection.query('select id, (select name from top_table where id = site) as name, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status,incident_report_number, last_updated_by, last_updated_dateTime from incident_log where id = ' + id + ';', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -315,7 +315,6 @@ module.exports = function (app, connection) {
     app.get('/api/displaySite/siteMonthSumGeneration/:id/:month', function (req, res) {
         var id = req.params.id;
         var month = req.params.month;
-        var year = req.params.month.substring(0, 4);
         connection.query('select m.date, ps' + id + ' as predicted, sum from monthlyPredictedGeneration m left join (select DATE_FORMAT(date, "%Y-%m") as date, sum(ps' + id + ') as sum from dailySumExport where DATE_FORMAT(date, "%Y-%m") <="' + month + '" group by year(date), month(date)) e on DATE_FORMAT(m.date, "%Y-%m") = e.date where (m.date between "' + month + '-01" - INTERVAL 11 MONTH  AND "' + month + '-01");', function (err, rows) {
             if (err) {
                 return res.json(err);
@@ -342,7 +341,7 @@ module.exports = function (app, connection) {
         var month = req.params.month;
         var year = req.params.month.substring(0, 4);
 
-        connection.query('select e.date as date, g.ps' + id + ' / (select tic_mwp * 1000 from top_table where id = ' + id + ') / e.ps' + id + ' * 100 as prPvsyst, prActual, (select pr_guaranteed from top_table where id = ' + id + ') as prGuarantee from monthlyPredictedEsol e left join (select g.date, sum(g.ps' + id + ') / (sum(e.ps' + id + ') * (select tic_mwp from top_table where id = ' + id + ') * 1000) * 100 as prActual from dailySumExport g join dailyEsol e on g.date = e.date where date_format(g.date, "%Y-%m") <= "' + month + '" group by date_format(g.date, "%Y-%m")) a on e.date = a.date left join monthlyPredictedGeneration g on e.date = g.date where year(e.date) = "' + year + '";', function (err, rows) {
+        connection.query('select e.date as date, g.ps' + id + ' / (select tic_mwp * 1000 from top_table where id = ' + id + ') / e.ps' + id + ' * 100 as prPvsyst, prActual, (select pr_guaranteed from top_table where id = ' + id + ') as prGuarantee from monthlyPredictedEsol e left join (select g.date, sum(g.ps' + id + ') / (sum(e.ps' + id + ') * (select tic_mwp from top_table where id = ' + id + ') * 1000) * 100 as prActual from dailySumExport g join dailyEsol e on g.date = e.date where date_format(g.date, "%Y-%m") <= "' + month + '" group by date_format(g.date, "%Y-%m")) a on e.date = a.date left join monthlyPredictedGeneration g on e.date = g.date where (e.date between "' + month + '-01" - INTERVAL 11 MONTH  AND "' + month + '-01");', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
