@@ -321,6 +321,27 @@ angular.module('portfolioReport', [
                 });
         }
         
+        // getPortfolioAllSiteDataYear(month);
+        // function getPortfolioAllSiteDataYear(month) {
+        //     dataFactory.portfolioAllSiteDataYear(month)
+        //         .success(function (res) {
+                    
+        //             $scope.getPortfolioAllSiteDataYear = res;
+                    
+        //             var newObj = _.reduce(res[0], function (accumulator, value, key) {
+        //                 var group = key;
+
+        //                 if (!accumulator[group]) accumulator[group] = {};
+        //                 if (!accumulator[group].site) accumulator[group].site = group;
+        //                 accumulator[group][property] = value;
+        //                 return accumulator;
+        //             }, {});
+
+        //             $scope.testPortfolioAllSiteDataYear = newObj;
+
+        //         });
+        // }
+        
         getPortfolioAvailability(month);
         function getPortfolioAvailability(month) {
             dataFactory.getPortfolioAvailability(month)

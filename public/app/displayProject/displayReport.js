@@ -28,6 +28,7 @@ angular.module('displayAllReport', [
         function getAllReports(startDate, endDate) {
             dataFactory.getAllReports(startDate, endDate)
                 .success(function (res) {
+                    $scope.testReports = res;
 
                     var newObj = _.reduce(res[0], function (accumulator, value, key) {
                         var group = key.substring(0, 4);

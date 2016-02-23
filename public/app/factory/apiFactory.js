@@ -123,6 +123,10 @@ angular.module('apiFactory', [])
             return $http.get(urlBase + 'displaySite/portfolioAvailability/' + month);
         };
 
+        dataFactory.portfolioAllSiteDataYear = function (month) {
+            return $http.get(urlBase + 'displaySite/portfolioAllSiteDataYear/' + month);
+        };
+
         return dataFactory;
     }])
 
