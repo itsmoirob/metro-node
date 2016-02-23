@@ -193,6 +193,19 @@ angular.module('routes', [
                     }
                 }
             })
+            .state('parent.yearReportPortfolio', { //list the main body of the 'admin' page
+                url: '/portfolio/yearReport',
+                views: {
+                    'display@': {
+                        controller: 'PortfolioReportCtrl',
+                        templateUrl: 'pages/reportPortfolioYear.tmpl.html'
+                    },
+                    'other@': {
+                        // controller: 'ListCtrl',
+                        // templateUrl: 'pages/displaySiteList.tmpl.html'
+                    }
+                }
+            })
         ;
         // $urlRouterProvider.otherwise('/index'); //take to front page
     })
