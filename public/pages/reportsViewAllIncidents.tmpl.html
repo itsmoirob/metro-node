@@ -2,32 +2,37 @@
   <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
     <a ui-sref=parent.reportsIncidentNew class="btn-large btn-flat btn-custom">Add new incident</a>
   </div>
-
-  <label>Show all or open</label>
-  <select class="browser-default" ng-model="search.status" required>
-    <option value="">All</option>
-    <option value="Open">Open only</option>
-  </select>
-  <table class="incidentTable" style="width:100%">
-    <tr>
-      <th>site</th>
-      <th>start</th>
-      <th>end</th>
-      <th>details</th>
-      <th>category</th>
-      <th>loss of generation</th>
-      <th>incident number</th>
-      <th>status</th>
-    </tr>
-    <tr ng-repeat="incident in incidentReportAll | filter:search">
-      <td><a ui-sref=parent.reportsIncidentSite({siteResult:incident.site})>PS{{ incident.site }}</a></td>
-      <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
-      <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
-      <td>{{ incident.details }}</td>
-      <td>{{ incident.category }}</td>
-      <td>{{ incident.loss_of_generation }}</td>
-      <td><a ui-sref=parent.reportIncident({incidentId:incident.id})>{{ incident.incident_report_number }}</a></td>
-      <td>{{ incident.status }}</td>
-    </tr>
-  </table>
+  <div>
+    <label>Show all or open</label>
+    <select class="browser-default" ng-model="search.status" required>
+        <option value="">All</option>
+        <option value="Open">Open only</option>
+    </select>
+    <br/>
+  </div>
+  <div>
+      
+    <table class="metroTable" style="width:100%">
+        <tr>
+        <th>site</th>
+        <th>start</th>
+        <th>end</th>
+        <th>details</th>
+        <th>category</th>
+        <th>loss of generation</th>
+        <th>incident number</th>
+        <th>status</th>
+        </tr>
+        <tr ng-repeat="incident in incidentReportAll | filter:search">
+        <td><a ui-sref=parent.reportsIncidentSite({siteResult:incident.site})>PS{{ incident.site }}</a></td>
+        <td>{{ incident.start_time | date:'dd/MM/yy HH:mm' }}</td>
+        <td>{{ incident.end_time | date:'dd/MM/yy HH:mm' }}</td>
+        <td>{{ incident.details }}</td>
+        <td>{{ incident.category }}</td>
+        <td>{{ incident.loss_of_generation }}</td>
+        <td><a ui-sref=parent.reportIncident({incidentId:incident.id})>{{ incident.incident_report_number }}</a></td>
+        <td>{{ incident.status }}</td>
+        </tr>
+    </table>
+  </div>
 </div>
