@@ -3,8 +3,9 @@
     <hr/>
     <a download="{{ currentDisplaySite[0].name }} PR.csv" href="" onclick="return ExcellentExport.csv(this, 'datatable');">Export to CSV</a>
     <br/>
-
-    <table id="datatable">
+    
+    <table class="metroTable" id="datatable">
+        <caption>Daily stats and PR</caption>
         <tr>
             <th>Date</th>
             <th>Export kWh</th>
@@ -22,7 +23,7 @@
             <td>{{ report.generation | number:1 }}</td>
             <td>{{ report.avgPyro | number:1 }}</td>
             <td>{{ report.opHours | number:1 }}</td>
-            <td>{{ report.esol | number:1 }}</td>
+            <td>{{ report.esol | number:2 }}</td>
             <td>{{ report.theoretical | number:1 }}</td>
             <td>{{ report.pr * 100 | number:1 }}%</td>
             <td>{{ report.type }}</td>
