@@ -29,6 +29,27 @@ html
 						a Hello #{user.name}
 					li
 						a(href='/users/logout') Logout
+			ul(class="right hide-on-large-only")
+				a(class="dropdown-button btn" data-activates="topNavDrop") Navigate
+				ul(id="topNavDrop" class="dropdown-content")
+					if !user	
+						li(class=(title == 'Login' ? 'active' : ''))
+							a(href='/users/login') Log In
+					if user
+						li
+							a(href="#") Home
+						li
+							a(href="/#/incidentsAll") Incidents
+						li
+							a(href="/#/portfolio/monthReport") Portfolio report
+						li
+							a(href="/#/reportsAll") All site report
+						li(class=(title == 'Register' ? 'active' : ''))
+							a(href='/users/register') Register
+						li 
+							a Hello #{user.name}
+						li
+							a(href='/users/logout') Logout
 			a(data-activates="slide-out", class="button-collapse")
 				i(class="mdi-navigation-menu")
 			ul(id="slide-out", class="side-nav fixed primroseYellow")
