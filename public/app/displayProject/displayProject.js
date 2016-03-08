@@ -22,7 +22,7 @@ angular.module('displayProject', [
       }).then(function(response) {
         $scope.forecast = response;
       });
-      $scope.map = { center: { latitude: res[0].latitude, longitude: res[0].longitude }, zoom: 16 }; //sets up gmaps
+      $scope.map = { center: { latitude: res[0].latitude, longitude: res[0].longitude }, zoom: 8 }; //sets up gmaps
       $scope.marker = { //sets up pin for gmaps
         id: $stateParams.siteResult,
         coords: {
