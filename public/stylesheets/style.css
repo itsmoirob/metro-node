@@ -107,10 +107,6 @@ ul.success li{
   margin-top: 50px;
 }
 
-.incidentTable td {
-  border: solid thin;
-}
-
 #wrapper {
   /*margin: 0 auto;*/
   /*font-size: 1.6em;*/
@@ -187,6 +183,37 @@ ul.success li{
 .text-black {
  color: black; 
 }
+
+.metroTable {
+    border-collapse: collapse;
+}
+
+.metroTable th {
+    color: white;
+    background-color: rgb(251, 161, 27);
+    padding: 0.3em;
+    border-radius: 0px;
+    text-align: center;
+}
+
+.metroTable td {
+    border-right: solid thin white;
+    text-align: center;
+    padding: 0.3em;
+    border-radius: 0px;
+}
+
+.metroTable tr:nth-child(odd) {
+    /*color: white;*/
+    background-color: rgb(251, 161, 27);
+}
+
+.metroTable tr:hover {
+    background-color: #c67803;
+    color: white;
+}
+
+
 
 
 /*#chartMonthGenerationPortfolio {
