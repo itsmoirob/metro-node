@@ -96,6 +96,48 @@ Ftp.keepAlive()
       });
     });
 
+ app.get('/api/mySQL/manualExportUpload/:id', function(req, res) {
+    var id = req.params.id-1;
+    var filePath = "./files/"+mpanList[id].mpan+".csv";
+    fs.readFile(filePath, {
+      encoding: 'utf-8'
+    }, function(err, csvData) {
+      if (err) {
+        console.log(err);
+      }
+      csvParse(csvData, {
+        separator: ',',
+        newline: '\n'
+      }, function(err, data) {
+        if (err) {
+          console.log(err);
+        } else {
+          var sqlInputData = [];
+          var n = 0;
+
+          for (j=8;j<data.length;j++){ // use this line only for histroical data
+            var day = moment(data[j][7], "DD/MM/YY").format("YYYY-MM-DD");
+            for (i = 8; i < data[j].length; i++) {
+              var hour = data[7][i];
+              if (data[j][i] === "-"){
+                data[j][i] = "NULL";
+              }
+              sqlInputData[n] = ["(NULL, '" + day + "','" + hour + "'," + data[j][i]+")"];
+              // hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
+              n++;
+            }
+          }
+          // res.send("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
+          connection.query("Start transaction; INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + mpanList[id].id + ") select date, sum(generation) from export_" + mpanList[id].id + " where date > NOW() - INTERVAL 90 DAY group by date order by date asc on duplicate key update PS" + mpanList[id].id + "=VALUES(PS" + mpanList[id].id + "); commit;", function(err, result){
+            if (err) throw err;
+            console.log(result.insertId);
+            res.send("Done: INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData);
+          });
+        }
+      });
+    });
+  });
+
 
     // upload pyro data.
     app.get('/api/mySQL/pyroUpload/:id', function(req,res){
@@ -357,7 +399,7 @@ Ftp.keepAlive()
                 n++;
               }
               
-              connection.query('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 10 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function(err, result){
+              connection.query('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 90 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function(err, result){
                 if (err) throw err;
                 console.log(result.insertId);
                 res.send('Done: INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData);
