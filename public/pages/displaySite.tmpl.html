@@ -21,7 +21,7 @@
     </div>
   </div>
   <div class="col s12 m12">
-    <h4>Location</h4>
+    <h4>Location {{ currentDisplaySite[0].postcode }}</h4>
     <ui-gmap-google-map center='map.center' zoom='map.zoom'>
       <ui-gmap-marker coords='marker.coords' idkey='marker.id'>
       </ui-gmap-marker>
