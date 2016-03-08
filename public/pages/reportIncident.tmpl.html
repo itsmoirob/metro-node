@@ -8,9 +8,9 @@
                 </p>
                 <hr>
                 <ul>
-                    <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date : 'dd/MM/yyyy HH:mm' : 'UTC' }}</li>
-                    <li><b>Start time: </b>{{ incidentReportLog.start_time | date: 'dd/MM/yyyy HH:mm' : 'UTC'  }}</li>
-                    <li><b>End time: </b>{{ incidentReportLog.end_time | date: 'dd/MM/yyyy HH:mm' : 'UTC'  }}</li>
+                    <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date : 'dd/MM/yyyy HH:mm' }}</li>
+                    <li><b>Start time: </b>{{ incidentReportLog.start_time | date: 'dd/MM/yyyy HH:mm' }}</li>
+                    <li><b>End time: </b>{{ incidentReportLog.end_time | date: 'dd/MM/yyyy HH:mm' }}</li>
                     <li><b>Reported by: </b>{{ incidentReportLog.reported_by_person }} ({{ incidentReportLog.reported_by_company
                         }})
                     </li>
@@ -31,7 +31,7 @@
                     </div>
                     <hr>
                     <ul>
-                        <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date: 'dd/MM/yyyy' : 'UTC'  }}</li>
+                        <li><b>Date logged: </b>{{ incidentReportLog.date_logged | date: 'dd/MM/yyyy' }}</li>
                     </ul>
                     <div class="row">
                         <div class="col s6 m6">
