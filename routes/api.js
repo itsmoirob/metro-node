@@ -15,7 +15,7 @@ module.exports = function (app, connection) {
     // api for getting summary of specific site
     app.get('/api/displaySite/site/:id', function (req, res) {
         var id = req.params.id;
-        connection.query('SELECT name, id, latitude, longitude, location, tic_mwp, dnc_mw, homes_powered, carbon_saved_tones, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export from top_table where id = ' + id + ';', function (err, rows) {
+        connection.query('SELECT name, id, latitude, longitude, location, tic_mwp, dnc_mw, homes_powered, carbon_saved_tones, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, postcode from top_table where id = ' + id + ';', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
@@ -429,7 +429,7 @@ module.exports = function (app, connection) {
          
          var month = req.params.month;
 
-        connection.query('SELECT pG.date, IFNULL(pG.ps1, 0) as pgPS1, IFNULL(pG.ps2, 0) as pgPS2, IFNULL(pG.ps3, 0) as pgPS3, IFNULL(pG.ps4, 0) as pgPS4, IFNULL(pG.ps5, 0) as pgPS5, IFNULL(pG.ps11, 0) as pgPS11, IFNULL(aG.ps1, 0) as agPS1, IFNULL(aG.ps2, 0) as agPS2, IFNULL(aG.ps3, 0) as agPS3, IFNULL(aG.ps4, 0) as agPS4, IFNULL(aG.ps5, 0) as agPS5, IFNULL(aG.ps11, 0) as agPS11 FROM monthlyPredictedGeneration pG JOIN (SELECT DATE_FORMAT(date, "%Y-%m") AS date, SUM(ps1) AS ps1, SUM(ps2) AS ps2, SUM(ps3) AS ps3, SUM(ps4) AS ps4, SUM(ps5) AS ps5, SUM(ps11) AS ps11 FROM dailySumExport GROUP BY DATE_FORMAT(date, "%Y-%m")) aG ON DATE_FORMAT(pG.date, "%Y-%m") = aG.date WHERE (pG.date BETWEEN "' + month + '-01" - INTERVAL 11 MONTH AND "' + month + '-01") GROUP BY DATE_FORMAT(pG.date, "%Y-%m");', function (err, rows) {
+        connection.query('SELECT pG.date, IFNULL(pG.ps1, 0) as pgPS1, IFNULL(pG.ps2, 0) as pgPS2, IFNULL(pG.ps3, 0) as pgPS3, IFNULL(pG.ps4, 0) as pgPS4, IFNULL(pG.ps5, 0) as pgPS5, IFNULL(pG.ps7, 0) as pgPS7, IFNULL(pG.ps8, 0) as pgPS8, IFNULL(pG.ps9, 0) as pgPS9, IFNULL(pG.ps10, 0) as pgPS10, IFNULL(pG.ps11, 0) as pgPS11, IFNULL(aG.ps1, 0) as agPS1, IFNULL(aG.ps2, 0) as agPS2, IFNULL(aG.ps3, 0) as agPS3, IFNULL(aG.ps4, 0) as agPS4, IFNULL(aG.ps5, 0) as agPS5, IFNULL(aG.ps7, 0) as agPS7, IFNULL(aG.ps8, 0) as agPS8, IFNULL(aG.ps9, 0) as agPS9, IFNULL(aG.ps10, 0) as agPS10, IFNULL(aG.ps11, 0) as agPS11 FROM monthlyPredictedGeneration pG JOIN (SELECT DATE_FORMAT(date, "%Y-%m") AS date, SUM(ps1) AS ps1, SUM(ps2) AS ps2, SUM(ps3) AS ps3, SUM(ps4) AS ps4, SUM(ps5) AS ps5, SUM(ps7) AS ps7, SUM(ps8) AS ps8, SUM(ps9) AS ps9, SUM(ps10) AS ps10, SUM(ps11) AS ps11 FROM dailySumExport GROUP BY DATE_FORMAT(date, "%Y-%m")) aG ON DATE_FORMAT(pG.date, "%Y-%m") = aG.date WHERE (pG.date BETWEEN "' + month + '-01" - INTERVAL 11 MONTH AND "' + month + '-01") GROUP BY DATE_FORMAT(pG.date, "%Y-%m");', function (err, rows) {
             if (err) {
                 return res.json(err);
             } else {
