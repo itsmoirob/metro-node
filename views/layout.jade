@@ -1,7 +1,7 @@
 doctype html
 html
 	head
-		title #{title}: Connecting Primrose
+		title #{title}: Primrose PV
 		meta(charset='utf-8')
 		meta(name="theme-color", content="#FBA11B")
 		meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
@@ -29,13 +29,12 @@ html
 						a Hello #{user.name}
 					li
 						a(href='/users/logout') Logout
-		
+			a(data-activates="slide-out", class="button-collapse")
+				i(class="mdi-navigation-menu")
 			ul(id="slide-out", class="side-nav fixed primroseYellow")
 				div(ui-view="other")
-					a(href="#", data-activates="slide-out", class="button-collapse")
-						i(class="mdi-navigation-menu")
 
-		.container(id="wrapper", class="container")
+		.container(class="container")
 			!= messages()
 			block content
 		.container(class="footer")
@@ -54,7 +53,7 @@ html
 		script(src="../app/routes.js")
 		script(src="../app/factory/apiFactory.js")
 		script(src="../app/displayProject/reportsIncidents.js")
-        
+		
 		script(src="../app/listSites/listSites.js")
 		script(src="../app/displayProject/displaySite.js")
 		script(src="../app/displayProject/displayProject.js")
