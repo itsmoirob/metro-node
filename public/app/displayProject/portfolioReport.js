@@ -19,48 +19,51 @@ angular.module('portfolioReport', [
         }
 
         var sites = [1, 2, 3, 4, 5, 11];
+        var allSites = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11];
         var nameGrouping = [];
         $scope.month = month;
 
         var portfolioSiteInfo = [];
         var portfolioSiteDataMonth = [];
 
-        var monthGenerationActual = {
-            name: "Actual export",
-            data: [],
-            dataLabels: {
-                enabled: true,
-                rotation: -90,
-                color: '#FFFFFF',
-                align: 'right',
-                format: '{point.y:.1f}', // one decimal
-                y: -50, // 10 pixels down from the top
-                style: {
-                    fontSize: '13px',
-                    fontFamily: 'Verdana, sans-serif'
-                }
-            },
-            color: '#FBA11B',
-            yAxis: 0,
-        };
+        // var monthGenerationActual = {
+        //     name: "Actual export",
+        //     data: [],
+        //     dataLabels: {
+        //         enabled: true,
+        //         rotation: -90,
+        //         color: '#FFFFFF',
+        //         align: 'right',
+        //         format: '{point.y:.1f}', // one decimal
+        //         y: -50, // 10 pixels down from the top
+        //         style: {
+        //             fontSize: '13px',
+        //             fontFamily: 'Verdana, sans-serif'
+        //         }
+        //     },
+        //     color: '#FBA11B',
+        //     yAxis: 0,
+        // };
         
-        var monthGenerationPredict = {
-            name: "Predicted export",
-            data: [],
-            dataLabels: {
-                enabled: true,
-                rotation: -90,
-                color: '#FFFFFF',
-                align: 'right',
-                format: '{point.y:.1f}', // one decimal
-                y: -50, // 10 pixels down from the top
-                style: {
-                    fontSize: '13px',
-                    fontFamily: 'Verdana, sans-serif'
-                }
-            },
-            yAxis: 0
-        };
+        // var monthGenerationPredict = {
+        //     name: "Predicted export",
+        //     data: [],
+        //     dataLabels: {
+        //         enabled: true,
+        //         rotation: -90,
+        //         color: '#FFFFFF',
+        //         align: 'right',
+        //         format: '{point.y:.1f}', // one decimal
+        //         y: -50, // 10 pixels down from the top
+        //         style: {
+        //             fontSize: '13px',
+        //             fontFamily: 'Verdana, sans-serif'
+        //         }
+        //     },
+        //     yAxis: 0
+        // };
+        
+        var allSumData = [];
         
         var monthActualPR = {
             name: "Actual PR",
@@ -246,13 +249,7 @@ angular.module('portfolioReport', [
                         nameGrouping.push("PS" + i);
                     });
                     
-                    angular.forEach(actualGrouping, function (value, key) {
-                        monthGenerationActual.data.push(res[0][value] / 1000);
-                    });
                     
-                    angular.forEach(predictGrouping, function (value, key) {
-                        monthGenerationPredict.data.push(res[0][value] / 1000);
-                    });
                     
                     angular.forEach(aPRGrouping, function (value, key) {
                         monthActualPR.data.push(res[0][value] * 100);
@@ -321,26 +318,44 @@ angular.module('portfolioReport', [
                 });
         }
         
-        // getPortfolioAllSiteDataYear(month);
-        // function getPortfolioAllSiteDataYear(month) {
-        //     dataFactory.portfolioAllSiteDataYear(month)
-        //         .success(function (res) {
+        getPortfolioAllSiteDataYear(month);
+        function getPortfolioAllSiteDataYear(month) {
+            dataFactory.portfolioAllSiteDataYear(month)
+                .success(function (res) {
                     
-        //             $scope.getPortfolioAllSiteDataYear = res;
+                    $scope.getPortfolioAllSiteDataYear = res;
+
                     
-        //             var newObj = _.reduce(res[0], function (accumulator, value, key) {
-        //                 var group = key;
+                    var actualGrouping = allSites.map(function (i) {
+                        return "agPS" + i;
+                    });
+                    var predictGrouping = allSites.map(function (i) {
+                        return "pgPS" + i;
+                    });
+                    $scope.predictGrouping = predictGrouping;
+                    
+                    actualGrouping.forEach(function (deviceName) {
+                        
+                        var dataForOneDevice = res.map(function (item) {
+                            return item[deviceName]/1000;
+                        });
+                        
+                        allSumData.push({name: deviceName.substring(2,deviceName.length), data:dataForOneDevice, stack: 'Actual'});
+                    });
+                    
+                    predictGrouping.forEach(function (deviceName) {
+                        
+                        var dataForOneDevice = res.map(function (item) {
+                            return item[deviceName]/1000;
+                        });
+                        
+                        allSumData.push({name: deviceName.substring(2,deviceName.length), data:dataForOneDevice, stack: 'Predict', showInLegend: false});
+                    });
+                    
 
-        //                 if (!accumulator[group]) accumulator[group] = {};
-        //                 if (!accumulator[group].site) accumulator[group].site = group;
-        //                 accumulator[group][property] = value;
-        //                 return accumulator;
-        //             }, {});
-
-        //             $scope.testPortfolioAllSiteDataYear = newObj;
-
-        //         });
-        // }
+                });
+        }
+        $scope.allSumData = allSumData;
         
         getPortfolioAvailability(month);
         function getPortfolioAvailability(month) {
@@ -396,44 +411,87 @@ angular.module('portfolioReport', [
             credits: {
                 enabled: false
             },
-            options: {
-                chart: {
-                    type: 'column'
-                },
-                tooltip: {
-                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.2f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    valueSuffix: ' kWH',
-                    shared: true,
-                    useHTML: true
-                },
-            },
             title: {
                 text: 'Monthly export - ' + titleMonth
             },
-            xAxis: {categories: nameGrouping,
+            xAxis: {
+                categories: chartDate,
                 title: {
                     text: null
                 }
             },
-            yAxis: [{
-               title: {
-                   text: 'Export MWh'
-               },
-               opposite: false,
-               lineWidth: 2,
-               min: 0
-           }],
-           legend: {
-               layout: 'vertical',
-               align: 'right',
-               verticalAlign: 'middle',
-               borderWidth: 0
+            
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Export MWh'
+                },
+                stackLabels: {
+                    rotation: -90,
+                    verticalAlign: 'top',
+                    enabled: true,
+                    formatter: function() {
+                        return this.stack.substring(0,1) + '; ' + Highcharts.numberFormat(this.total, 1, ".", ",");
+                    },
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                    }
+                }
             },
-            series: [],
-            loading: false
+            options: {
+                chart: {
+                    type: 'column'
+                },
+                legend: {
+                    align: 'right',
+                    x: -70,
+                    verticalAlign: 'top',
+                    y: 20,
+                    floating: true,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                    borderColor: '#CCC',
+                    borderWidth: 1,
+                    shadow: true,
+                    labelFormatter: function() {
+                    return '<div style="text-align: left; width:130px;float:left;">' + this.name + '</div>';
+				}
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ Highcharts.numberFormat(this.y, 1) +'<br/>'+
+                        'Total: '+ Highcharts.numberFormat(this.point.stackTotal, 1);
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        // dataLabels: {
+                        //     enabled: true,
+                        //     format: '{point.y:,.1f}',
+                        //     color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        //     style: {
+                        //         textShadow: '0 0 3px black, 0 0 3px black'
+                        //     }
+                        // }
+                    },
+                    series: {
+                events: {
+                    legendItemClick: function(event){
+                        event.preventDefault();
+                        var name = this.name;
+                        $(this.chart.series).each(function(i,e){
+                            if(e.name === name){
+                                e.visible ? e.hide() : e.show();
+                            }
+                        })
+                    }
+                }
+            }
+            }},
+
+            series: allSumData
         };
         
         //  Chart for export generation
@@ -672,8 +730,8 @@ angular.module('portfolioReport', [
             loading: false
         };
         
-        $scope.chartMonthGeneration.series.push(monthGenerationActual);
-        $scope.chartMonthGeneration.series.push(monthGenerationPredict);
+        // $scope.chartMonthGeneration.series.push(allSumData);
+        // $scope.chartMonthGeneration.series.push(monthGenerationPredict);
         $scope.chartMonthPR.series.push(monthActualPR);
         $scope.chartMonthPR.series.push(monthPredictPR);
         // $scope.chartMonthPR.series.push(monthAvailability);
