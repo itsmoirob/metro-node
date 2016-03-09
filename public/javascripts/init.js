@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
 	$(".button-collapse").sideNav({
-		closeOnClick: true
+		// closeOnClick: true
 	});
 	$('select').material_select();
 });
