@@ -113,7 +113,7 @@ ul.success li{
 }
 
 .btn-custom:hover{
-  background-color: rgb(251, 161, 27);
+  background-color: #3d5afe;
 }
 
 #formBorder {
@@ -213,7 +213,9 @@ ul.success li{
     color: white;
 }
 
-
+#topNavDrop a {
+    color: #3d5afe;
+}
 
 
 /*#chartMonthGenerationPortfolio {
