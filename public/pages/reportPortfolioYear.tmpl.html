@@ -1,84 +1,84 @@
 <div class="row">
-    <h4>You are viewing {{ month }}.</h4>
-    <div class="col s6 m6">
-        <label for="selectStartDate">Select month: </label>
-        <input type="month" name="selectStartDate" ng-model="selectStartDate" required>
-        <button class="btn waves-effect waves-light" ui-sref="parent.monthReportPortfolio({month:convertDateMonth(selectStartDate)})">Go to month</button>
-    </div>
+	<h4>You are viewing {{ month }}.</h4>
+	<div class="col s6 m6">
+		<label for="selectStartDate">Select month: </label>
+		<input type="month" name="selectStartDate" ng-model="selectStartDate" required>
+		<button class="btn waves-effect waves-light" ui-sref="parent.monthReportPortfolio({month:convertDateMonth(selectStartDate)})">Go to month</button>
+	</div>
 </div>
 <div class="section-to-print">
-    <div class="row">
-        <div class="col m12 s12">
-            <table class="portfolioTable" id="portfolioTable">
-                <tr>
-                    <th></th>
-                    <th ng-repeat="site in portfolioSiteInfo[0]">PS{{site.id}}</th>
-                </tr>
-                <tr>
-                    <th>Site</th>
-                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.name}}</td>
-                </tr>
-                <tr>
-                    <th>Location</th>
-                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.location}}</td>
-                </tr>
-                <tr>
-                    <th>TIC (MW)</th>
-                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.tic_mwp | number:1 }}</td>
-                </tr>
-                <tr>
-                    <th>Subsidy regime</th>
-                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.rocs}}</td>
-                </tr>
-                <tr>
-                    <th>Status</th>
-                    <td ng-repeat="site in portfolioSiteInfo[0]">{{site.status}}</td>
-                </tr>
-                <tr>
-                    <th>Actual Month PR</th>
-                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["aPR"+a] * 100 | number:1 }}%</td>
-                    <td>{{ portfolioSiteDataMonth[0].aPRAll * 100 | number:1 }}%</td>
-                </tr>
-                <tr>
-                    <th>Target Month PR</th>
-                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["pPR"+a] * 100 | number:1 }}%</td>
-                    <td>{{ portfolioSiteDataMonth[0].pPRAll * 100 | number:1 }}%</td>
-                </tr>
-                <!--<tr>
-                    <th>Milestone PR</th>
-                    <td>Some%</td>
-                </tr>-->
-                <tr>
-                    <th colspan="12">Monthly Production Variance Analysis</th>
-                </tr>
+	<div class="row">
+		<div class="col m12 s12">
+			<table class="portfolioTable" id="portfolioTable">
+				<tr>
+					<th></th>
+					<th ng-repeat="site in portfolioSiteInfo[0]">PS{{site.id}}</th>
+				</tr>
+				<tr>
+					<th>Site</th>
+					<td ng-repeat="site in portfolioSiteInfo[0]">{{site.name}}</td>
+				</tr>
+				<tr>
+					<th>Location</th>
+					<td ng-repeat="site in portfolioSiteInfo[0]">{{site.location}}</td>
+				</tr>
+				<tr>
+					<th>TIC (MW)</th>
+					<td ng-repeat="site in portfolioSiteInfo[0]">{{site.tic_mwp | number:1 }}</td>
+				</tr>
+				<tr>
+					<th>Subsidy regime</th>
+					<td ng-repeat="site in portfolioSiteInfo[0]">{{site.rocs}}</td>
+				</tr>
+				<tr>
+					<th>Status</th>
+					<td ng-repeat="site in portfolioSiteInfo[0]">{{site.status}}</td>
+				</tr>
+				<tr>
+					<th>Actual Month PR</th>
+					<td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["aPR"+a] * 100 | number:1 }}%</td>
+					<td>{{ portfolioSiteDataMonth[0].aPRAll * 100 | number:1 }}%</td>
+				</tr>
+				<tr>
+					<th>Target Month PR</th>
+					<td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["pPR"+a] * 100 | number:1 }}%</td>
+					<td>{{ portfolioSiteDataMonth[0].pPRAll * 100 | number:1 }}%</td>
+				</tr>
+				<!--<tr>
+					<th>Milestone PR</th>
+					<td>Some%</td>
+				</tr>-->
+				<tr>
+					<th colspan="12">Monthly Production Variance Analysis</th>
+				</tr>
 
-                <tr>
-                    <th>Actual MWh</th>
-                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioActExpPredExpActPrPredPr[0]["aPS"+a] | number:1 }}</td>
-                    <td>{{ portfolioActExpPredExpActPrPredPr[0]["aPSAll"] | number:1 }}</td>
-                </tr>
-                <tr>
-                    <th>Target MWh</th>
-                    <td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["pPS"+a] | number:1 }}</td>
-                    <td>{{ portfolioActExpPredExpActPrPredPr[0]["pPSAll"] | number:1 }}</td>
-                </tr>
-                <tr>
-                    <th>PR - variance (actual)</th>
-                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioSiteDataMonth[0]["aPR"+a] - portfolioSiteDataMonth[0]["pPR"+a]) * 100 | number:1 }} ({{ (portfolioSiteDataMonth[0]["aPR"+a]) * 100 | number:1 }})%</td>
-                    <td>TBC</td>
-                </tr>
-                <tr>
-                    <th>Availability - variance (actual)</th>
-                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (availabilty[0]["PS"+a+"_Over0"] - 0.99) * 100 | number:1 }} ({{ (availabilty[0]["PS"+a+"_Over0"]) * 100 | number:1 }})%</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th>Insolation - variance (actual)</th>
-                    <td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioEsol[0]["aPS"+a] - portfolioEsol[0]["pPS"+a]) | number:1 }} ({{ (portfolioEsol[0]["aPS"+a]) | number:1 }})</td>
-                    <td>TBC</td>
-                </tr>
-            </table>
-            <p>Overview</p>
-            <textarea name="overview" id="overview" cols="30" rows="10"></textarea>
-        </div>
-    </div>
+				<tr>
+					<th>Actual MWh</th>
+					<td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioActExpPredExpActPrPredPr[0]["aPS"+a] | number:1 }}</td>
+					<td>{{ portfolioActExpPredExpActPrPredPr[0]["aPSAll"] | number:1 }}</td>
+				</tr>
+				<tr>
+					<th>Target MWh</th>
+					<td ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ portfolioSiteDataMonth[0]["pPS"+a] | number:1 }}</td>
+					<td>{{ portfolioActExpPredExpActPrPredPr[0]["pPSAll"] | number:1 }}</td>
+				</tr>
+				<tr>
+					<th>PR - variance (actual)</th>
+					<td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioSiteDataMonth[0]["aPR"+a] - portfolioSiteDataMonth[0]["pPR"+a]) * 100 | number:1 }} ({{ (portfolioSiteDataMonth[0]["aPR"+a]) * 100 | number:1 }})%</td>
+					<td>TBC</td>
+				</tr>
+				<tr>
+					<th>Availability - variance (actual)</th>
+					<td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (availabilty[0]["PS"+a+"_Over0"] - 0.99) * 100 | number:1 }} ({{ (availabilty[0]["PS"+a+"_Over0"]) * 100 | number:1 }})%</td>
+					<td></td>
+				</tr>
+				<tr>
+					<th>Insolation - variance (actual)</th>
+					<td variance-value ng-repeat="a in [1,2,3,4,5,11,12,13,14,15]">{{ (portfolioEsol[0]["aPS"+a] - portfolioEsol[0]["pPS"+a]) | number:1 }} ({{ (portfolioEsol[0]["aPS"+a]) | number:1 }})</td>
+					<td>TBC</td>
+				</tr>
+			</table>
+			<p>Overview</p>
+			<textarea name="overview" id="overview" cols="30" rows="10"></textarea>
+		</div>
+	</div>

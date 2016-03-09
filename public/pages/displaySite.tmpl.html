@@ -1,30 +1,31 @@
 <div class="row">
-  <h3>You are viewing {{ currentDisplaySite[0].name }}</h3>
-    <hr/>
-  <div class="col s12 m6">
-    <h4>Summary</h4>
-    <p>TIC {{ currentDisplaySite[0].tic_mwp | number:1  }} MWp</p>
-    <p>Co2 savings {{ currentDisplaySite[0].carbon_saved_tones | number:1 }} tonnes</p>
-    <p>Power {{ currentDisplaySite[0].homes_powered }} homes</p>
-  </div>
-  <h4>
-    Weather
+	<h3>You are viewing {{ currentDisplaySite[0].name }}</h3>
+	<hr/>
+	<div class="col s12 m6">
+		<h4>Summary</h4>
+		<p>TIC {{ currentDisplaySite[0].tic_mwp | number:1 }} MWp</p>
+		<p>Co2 savings {{ currentDisplaySite[0].carbon_saved_tones | number:1 }} tonnes</p>
+		<p>Power {{ currentDisplaySite[0].homes_powered }} homes</p>
+	</div>
+	<h4>
+	Weather
   </h4>
-  <div class="col s12 m6">
-    <div ng-repeat="weather in forecast.data.list" class="card-panel">
-      <span class="card-title">
-        {{forecast.data.list[$index].dt * 1000 | date:'dd/MM/yyyy' }}
-      </span>
-        <p>
-          {{forecast.data.list[$index].temp.day }}°C //  {{forecast.data.list[$index].weather[0].main }}: {{forecast.data.list[$index].weather[0].description }}
-        </p>
-    </div>
-  </div>
-  <div class="col s12 m12">
-    <h4>Location {{ currentDisplaySite[0].postcode }}</h4>
-    <ui-gmap-google-map center='map.center' zoom='map.zoom'>
-      <ui-gmap-marker coords='marker.coords' idkey='marker.id'>
-      </ui-gmap-marker>
-    </ui-gmap-google-map>
-  </div>
+	<div class="col s12 m6">
+		<div ng-repeat="weather in forecast.data.list" class="card-panel">
+			<span class="card-title">
+		{{forecast.data.list[$index].dt * 1000 | date:'dd/MM/yyyy' }}
+	  </span>
+			<p>
+				{{forecast.data.list[$index].temp.day }}°C // {{forecast.data.list[$index].weather[0].main }}: {{forecast.data.list[$index].weather[0].description
+				}}
+			</p>
+		</div>
+	</div>
+	<div class="col s12 m12">
+		<h4>Location {{ currentDisplaySite[0].postcode }}</h4>
+		<ui-gmap-google-map center='map.center' zoom='map.zoom'>
+			<ui-gmap-marker coords='marker.coords' idkey='marker.id'>
+			</ui-gmap-marker>
+		</ui-gmap-google-map>
+	</div>
 </div>

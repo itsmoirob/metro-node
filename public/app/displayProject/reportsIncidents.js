@@ -1,74 +1,74 @@
 angular.module('displayReportsIncidents', [
-    'ui.router',
-    'ngAnimate',
-    'listSites',
-    'apiFactory'
+	'ui.router',
+	'ngAnimate',
+	'listSites',
+	'apiFactory'
 ])
 
-    .constant('_', window._)
+	.constant('_', window._)
 
 
-    .controller('ReportIncidentsCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', '$filter', function ($scope, $stateParams, $http, $log, $state, dataFactory, $filter) {
+	.controller('ReportIncidentsCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', '$filter', function ($scope, $stateParams, $http, $log, $state, dataFactory, $filter) {
 
-        var SP = $stateParams.siteResult;
-        var startDate = $stateParams.startDate;
-        var endDate = $stateParams.endDate;
+		var SP = $stateParams.siteResult;
+		var startDate = $stateParams.startDate;
+		var endDate = $stateParams.endDate;
 
-        $scope.chosenStartDate = $stateParams.startDate;
-        $scope.chosenEndDate = $stateParams.endDate;
-
-
-        getIncidentReportAll();
-        function getIncidentReportAll() {
-            dataFactory.getIncidentReportAll()
-                .success(function (res) {
-                    $scope.incidentReportAll = res;
-                });
-        }
-
-        getIncidentReportSite(SP);
-        function getIncidentReportSite(SP) {
-            dataFactory.getIncidentReportSite(SP)
-                .success(function (res) {
-                    $scope.incidentReportSite = res;
-                });
-        }
-
-        getOpenIncidentSite(SP);
-        function getOpenIncidentSite(SP) {
-            dataFactory.getOpenIncidentSite(SP)
-                .success(function (res) {
-                    $scope.openIncidentSite = res;
-                });
-        }
-
-        getSiteSummary(SP); //gets summary array of site
-        function getSiteSummary(SP) {
-            dataFactory.getSiteSummary(SP)
-                .success(function (res) {
-                    $scope.currentDisplaySite = res;
-                });
-        }
-
-        $scope.convertDate = function (date) {
-            return $filter('date')(date, 'yyyy-MM-dd')
-        }
-
-        getIncidentSiteName(SP); //gets summary array of site
-        function getIncidentSiteName(SP) {
-            dataFactory.getIncidentSiteName(SP)
-                .success(function (res) {
-                    $scope.incidentSiteName = res;
-                });
-        }
-
-        getIncidentCategory(SP); //gets summary array of site
-        function getIncidentCategory(SP) {
-            dataFactory.getIncidentCategory(SP)
-                .success(function (res) {
-                    $scope.incidentCategory = res;
-                });
-        }
+		$scope.chosenStartDate = $stateParams.startDate;
+		$scope.chosenEndDate = $stateParams.endDate;
 
 
-    }]);
+		getIncidentReportAll();
+		function getIncidentReportAll() {
+			dataFactory.getIncidentReportAll()
+				.success(function (res) {
+					$scope.incidentReportAll = res;
+				});
+		}
+
+		getIncidentReportSite(SP);
+		function getIncidentReportSite(SP) {
+			dataFactory.getIncidentReportSite(SP)
+				.success(function (res) {
+					$scope.incidentReportSite = res;
+				});
+		}
+
+		getOpenIncidentSite(SP);
+		function getOpenIncidentSite(SP) {
+			dataFactory.getOpenIncidentSite(SP)
+				.success(function (res) {
+					$scope.openIncidentSite = res;
+				});
+		}
+
+		getSiteSummary(SP); //gets summary array of site
+		function getSiteSummary(SP) {
+			dataFactory.getSiteSummary(SP)
+				.success(function (res) {
+					$scope.currentDisplaySite = res;
+				});
+		}
+
+		$scope.convertDate = function (date) {
+			return $filter('date')(date, 'yyyy-MM-dd')
+		}
+
+		getIncidentSiteName(SP); //gets summary array of site
+		function getIncidentSiteName(SP) {
+			dataFactory.getIncidentSiteName(SP)
+				.success(function (res) {
+					$scope.incidentSiteName = res;
+				});
+		}
+
+		getIncidentCategory(SP); //gets summary array of site
+		function getIncidentCategory(SP) {
+			dataFactory.getIncidentCategory(SP)
+				.success(function (res) {
+					$scope.incidentCategory = res;
+				});
+		}
+
+
+	}]);
