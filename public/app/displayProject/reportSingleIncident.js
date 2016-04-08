@@ -64,12 +64,12 @@ angular.module('displaySingleReportsIncident', [
 
 					$scope.editStartDate = new Date(
 						($filter('date')(res[0].start_time, 'yyyy')),
-						($filter('date')(res[0].start_time, 'MM')),
+						($filter('date')(res[0].start_time, 'MM')-1),
 						($filter('date')(res[0].start_time, 'dd'))
 					);
 					$scope.editStartTime = new Date(
 						($filter('date')(res[0].start_time, 'yyyy')),
-						($filter('date')(res[0].start_time, 'MM')),
+						($filter('date')(res[0].start_time, 'MM')-1),
 						($filter('date')(res[0].start_time, 'dd')),
 						($filter('date')(res[0].start_time, 'HH')),
 						($filter('date')(res[0].start_time, 'mm'))
@@ -77,12 +77,12 @@ angular.module('displaySingleReportsIncident', [
 					if (res[0].end_time) {
 						$scope.editEndDate = new Date(
 							($filter('date')(res[0].end_time, 'yyyy')),
-							($filter('date')(res[0].end_time, 'MM')),
+							($filter('date')(res[0].end_time, 'MM')-1),
 							($filter('date')(res[0].end_time, 'dd'))
 						);
 						$scope.editEndTime = new Date(
 							($filter('date')(res[0].end_time, 'yyyy')),
-							($filter('date')(res[0].end_time, 'MM')),
+							($filter('date')(res[0].end_time, 'MM')-1),
 							($filter('date')(res[0].end_time, 'dd')),
 							($filter('date')(res[0].end_time, 'HH')),
 							($filter('date')(res[0].end_time, 'mm'))

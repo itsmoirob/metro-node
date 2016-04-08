@@ -1,3 +1,4 @@
+</div>
 <div class="row">
 	<p>
 		This is <span class="metro">Metro</span>, connecting all sites of Primrose Solar.
@@ -26,7 +27,7 @@
 	<button class="btn waves-effect waves-light">Submit</button>
   </div> -->
 </div>
-<div class="row">
+<!--<div class="row">
 	<hr>
 	<div class="col s12 m12">
 
@@ -57,4 +58,13 @@
 			<h5>There are curently no open incidents.</h5>
 		</div>
 	</div>
+</div>-->
+<div class="row">
+	<ui-gmap-google-map draggable="true" center='map.center' zoom='map.zoom'>
+		<ui-gmap-marker ng-repeat="marker in markers" coords='marker.coords' idkey='marker.id'>
+			<ui-gmap-window>
+				<div>{{marker.window.title}} has today exported <b>{{siteLatest["ps"+marker.id]/1000 | number:1}}</b>MWh</div>
+			</ui-gmap-window>
+		</ui-gmap-marker>
+	</ui-gmap-google-map>
 </div>

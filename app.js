@@ -25,27 +25,27 @@ var moment = require('moment');
 var config = require('./config');
 
 // connect to mongoLabDb
-mongoose.connect(config.mongodb.database, function (err) {
-    if (err) console.log(err);
-    console.log('Connected to database.');
+mongoose.connect(config.mongodb.database, function(err) {
+	if (err) console.log(err);
+	console.log('Connected to database.');
 });
 
 // Connect mysql
 var connection = mysql.createConnection({
-    host: config.mysql.host,
-    user: config.mysql.user,
-    password: config.mysql.password,
-    database: config.mysql.database,
-    multipleStatements: true
+	host: config.mysql.host,
+	user: config.mysql.user,
+	password: config.mysql.password,
+	database: config.mysql.database,
+	multipleStatements: true
 });
 
 var pool = mysql.createPool({
-    connectionLimit: 100,
-    host: config.mysql.host,
-    user: config.mysql.user,
-    password: config.mysql.password,
-    database: config.mysql.database,
-    multipleStatements: true
+	connectionLimit: 100,
+	host: config.mysql.host,
+	user: config.mysql.user,
+	password: config.mysql.password,
+	database: config.mysql.database,
+	multipleStatements: true
 });
 
 var app = express();
@@ -71,9 +71,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //Handle Express Sessions
 app.use(session({
-    secret: 'secret',
-    saveUninitialized: true,
-    resave: true
+	secret: 'secret',
+	saveUninitialized: true,
+	resave: true
 }));
 
 // Passport
@@ -82,44 +82,44 @@ app.use(passport.session());
 
 // Validator
 app.use(expressValidator({
-    errorFormatter: function (param, msg, value) {
-        var namespace = param.split('.'),
-            root = namespace.shift(),
-            formParam = root;
+	errorFormatter: function(param, msg, value) {
+		var namespace = param.split('.'),
+			root = namespace.shift(),
+			formParam = root;
 
-        while (namespace.length) {
-            formParam += '[' + namespace.shift() + ']';
-        }
-        return {
-            param: formParam,
-            msg: msg,
-            value: value
-        };
-    }
+		while (namespace.length) {
+			formParam += '[' + namespace.shift() + ']';
+		}
+		return {
+			param: formParam,
+			msg: msg,
+			value: value
+		};
+	}
 }));
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(flash());
-app.use(function (req, res, next) {
-    res.locals.messages = require('express-messages')(req, res);
-    next();
+app.use(function(req, res, next) {
+	res.locals.messages = require('express-messages')(req, res);
+	next();
 });
 
-app.get('*', function (req, res, next) {
-    res.locals.user = req.user || null;
-    next();
+app.get('*', function(req, res, next) {
+	res.locals.user = req.user || null;
+	next();
 });
 
 app.use('/', routes);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+app.use(function(req, res, next) {
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
 });
 
 // error handlers
@@ -127,132 +127,132 @@ app.use(function (req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function (err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('error', {
+			message: err.message,
+			error: err
+		});
+	});
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+app.use(function(err, req, res, next) {
+	res.status(err.status || 500);
+	res.render('error', {
+		message: err.message,
+		error: {}
+	});
 });
 
-// var liveSites = [1, 2, 3, 4, 5, 11, 12, 13, 15];
-// liveSites.map(function (site) {
-//     new CronJob('59 */30 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
-//         var postData = querystring.stringify({
-//             'msg': 'Hello World!'
-//         });
+// var liveSites = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16];
+// liveSites.map(function(site) {
+// 	new CronJob('59 */30 * * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
+// 		var postData = querystring.stringify({
+// 			'msg': 'Hello World!'
+// 		});
 
-//         var options = {
-//             hostname: 'primrose-metro.elasticbeanstalk.com',
-//             // port: 3000,
-//             path: '/api/mySQL/exportUpload/' + site,
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded',
-//                 'Content-Length': postData.length
-//             }
-//         };
+// 		var options = {
+// 			hostname: 'primrose-metro.elasticbeanstalk.com',
+// 			// port: 3000,
+// 			path: '/api/mySQL/exportUpload/' + site,
+// 			method: 'GET',
+// 			headers: {
+// 				'Content-Type': 'application/x-www-form-urlencoded',
+// 				'Content-Length': postData.length
+// 			}
+// 		};
 
-//         var req = http.request(options, function (res) {
-//             console.log('STATUS: ' + res.statusCode);
-//             console.log('HEADERS: ' + JSON.stringify(res.headers));
-//             res.setEncoding('utf8');
-//             res.on('data', function (chunk) {
-//                 console.log('BODY: ' + chunk);
-//             });
-//             res.on('end', function () {
-//                 console.log('No more data in response.')
-//             })
-//         });
+// 		var req = http.request(options, function(res) {
+// 			console.log('STATUS: ' + res.statusCode);
+// 			console.log('HEADERS: ' + JSON.stringify(res.headers));
+// 			res.setEncoding('utf8');
+// 			res.on('data', function(chunk) {
+// 				console.log('BODY: ' + chunk);
+// 			});
+// 			res.on('end', function() {
+// 				console.log('No more data in response.')
+// 			})
+// 		});
 
-//         req.on('error', function (e) {
-//             console.log('problem with request: ' + e.message);
-//         });
+// 		req.on('error', function(e) {
+// 			console.log('problem with request: ' + e.message);
+// 		});
 
-//         // write data to request body
-//         req.write(postData);
-//         req.end();
-//     }, null, true, 'UTC');
+// 		// write data to request body
+// 		req.write(postData);
+// 		req.end();
+// 	}, null, true, 'UTC');
 // });
 
 
-// new CronJob('0 */30 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
-//     var postData = querystring.stringify({
-//         'msg': 'Hello World!'
-//     });
-//     var options = {
-//         hostname: 'primrose-metro.elasticbeanstalk.com',
-//         // port: 3000,
-//         path: '/api/ftp/HH',
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/x-www-form-urlencoded',
-//             'Content-Length': postData.length
-//         }
-//     };
-//     var req = http.request(options, function (res) {
-//         console.log('STATUS: ' + res.statusCode);
-//         console.log('HEADERS: ' + JSON.stringify(res.headers));
-//         res.setEncoding('utf8');
-//         res.on('data', function (chunk) {
-//             console.log('BODY: ' + chunk);
-//         });
-//         res.on('end', function () {
-//             console.log('No more data in response.')
-//         })
-//     });
+// new CronJob('0 */30 * * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
+// 	var postData = querystring.stringify({
+// 		'msg': 'Hello World!'
+// 	});
+// 	var options = {
+// 		hostname: 'primrose-metro.elasticbeanstalk.com',
+// 		// port: 3000,
+// 		path: '/api/ftp/HH',
+// 		method: 'GET',
+// 		headers: {
+// 			'Content-Type': 'application/x-www-form-urlencoded',
+// 			'Content-Length': postData.length
+// 		}
+// 	};
+// 	var req = http.request(options, function(res) {
+// 		console.log('STATUS: ' + res.statusCode);
+// 		console.log('HEADERS: ' + JSON.stringify(res.headers));
+// 		res.setEncoding('utf8');
+// 		res.on('data', function(chunk) {
+// 			console.log('BODY: ' + chunk);
+// 		});
+// 		res.on('end', function() {
+// 			console.log('No more data in response.')
+// 		})
+// 	});
 
-//     req.on('error', function (e) {
-//         console.log('problem with request: ' + e.message);
-//     });
-//     // write data to request body
-//     req.write(postData);
-//     req.end();
+// 	req.on('error', function(e) {
+// 		console.log('problem with request: ' + e.message);
+// 	});
+// 	// write data to request body
+// 	req.write(postData);
+// 	req.end();
 // }, null, true, 'UTC');
 
-// new CronJob('10 */30 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
-//     var postData = querystring.stringify({
-//         'msg': 'Hello World!'
-//     });
-//     var options = {
-//         hostname: 'primrose-metro.elasticbeanstalk.com',
-//         // port: 3000,
-//         path: '/api/ftp/NonHH',
-//         method: 'GET',
-//         headers: {
-//             'Content-Type': 'application/x-www-form-urlencoded',
-//             'Content-Length': postData.length
-//         }
-//     };
-//     var req = http.request(options, function (res) {
-//         console.log('STATUS: ' + res.statusCode);
-//         console.log('HEADERS: ' + JSON.stringify(res.headers));
-//         res.setEncoding('utf8');
-//         res.on('data', function (chunk) {
-//             console.log('BODY: ' + chunk);
-//         });
-//         res.on('end', function () {
-//             console.log('No more data in response.')
-//         })
-//     });
+// new CronJob('10 */30 * * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
+// 	var postData = querystring.stringify({
+// 		'msg': 'Hello World!'
+// 	});
+// 	var options = {
+// 		hostname: 'primrose-metro.elasticbeanstalk.com',
+// 		// port: 3000,
+// 		path: '/api/ftp/NonHH',
+// 		method: 'GET',
+// 		headers: {
+// 			'Content-Type': 'application/x-www-form-urlencoded',
+// 			'Content-Length': postData.length
+// 		}
+// 	};
+// 	var req = http.request(options, function(res) {
+// 		console.log('STATUS: ' + res.statusCode);
+// 		console.log('HEADERS: ' + JSON.stringify(res.headers));
+// 		res.setEncoding('utf8');
+// 		res.on('data', function(chunk) {
+// 			console.log('BODY: ' + chunk);
+// 		});
+// 		res.on('end', function() {
+// 			console.log('No more data in response.')
+// 		})
+// 	});
 
-//     req.on('error', function (e) {
-//         console.log('problem with request: ' + e.message);
-//     });
-//     // write data to request body
-//     req.write(postData);
-//     req.end();
+// 	req.on('error', function(e) {
+// 		console.log('problem with request: ' + e.message);
+// 	});
+// 	// write data to request body
+// 	req.write(postData);
+// 	req.end();
 // }, null, true, 'UTC');
 
 

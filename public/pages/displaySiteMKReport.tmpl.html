@@ -3,6 +3,9 @@
 	<hr/>
 	<a download="{{ currentDisplaySite[0].name }} PR.csv" href="" onclick="return ExcellentExport.csv(this, 'datatable');">Export to CSV</a>
 	<br/>
+	
+	<button ng-click="order()">Order</button>
+	<span id="symbol" ng-class="{reverse:reverse}"></span>
 
 	<table class="metroTable" id="datatable">
 		<caption>Daily stats and PR</caption>
@@ -18,7 +21,7 @@
 			<th>Comms availabilty</th>
 			<th>Technical availabilty</th>
 		</tr>
-		<tr ng-repeat="report in MKReport">
+		<tr ng-repeat="report in MKReport | orderBy:'date':reverse">
 			<td>{{ report.date | date:'dd/MM/yyyy' }}</td>
 			<td>{{ report.generation | number:1 }}</td>
 			<td>{{ report.avgPyro | number:1 }}</td>

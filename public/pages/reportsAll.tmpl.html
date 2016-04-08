@@ -10,10 +10,11 @@
 	<button class="btn waves-effect waves-light indigo accent-3" ui-sref="parent.reportsAll({startDate:convertDate(selectStartDate), endDate:convertDate(selectEndDate)})">Submit</button>
 </div>
 <div class="row">
-	<p>You are looking at the report between {{startDate}} and {{endDate}}.</p>
-	<a download="Report all.csv" href="" onclick="return ExcellentExport.csv(this, 'incidentTable');">Export to CSV</a>
+	
+	
 	<br/>
 	<table class="metroTable" id="incidentTable" style="width:100%">
+		<caption>Report for days between {{startDate}} and {{endDate}}. <a download="Report all.csv" href="" onclick="return ExcellentExport.csv(this, 'incidentTable');">Export to CSV</a></caption>
 		<tr>
 			<th>Site</th>
 			<th>Comms availabilty</th>
@@ -27,6 +28,64 @@
 			<td>{{site.Over0 * 100 | number:1 }}%</td>
 			<td>{{site.PR * 100 | number:1 }}%</td>
 			<td>{{site.export | number:1 }}</td>
+		</tr>
+	</table>
+</div>
+<hr>
+<div class="row">
+	<br/>
+	<table class="metroTable" id="dailyProductionReportTable" style="width:100%">
+		<caption>Production report for {{yesterdaysDate}}. <a download="Daily Production {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
+		<tr>
+			<th>Site</th>
+			<th>MWp</th>
+			<th>Export</th>
+			<th>Expected</th>
+			<th>Deviation</th>
+			<th>Irridiation</th>
+			<th>SolarGis</th>
+			<th>Irr PR</th>
+			<th>SG PR</th>
+		</tr>
+		<tr ng-repeat="site in dailyProductionReport">
+			<td>{{sitesInfo[$index].name }}</td>
+			<td>{{sitesInfo[$index].tic_mwp | number:1 }}</td>
+			<td>{{site.Day | number:0 }}</td>
+			<td>{{site.PredictDay | number:0 }}</td>
+			<td>{{(site.Day-site.PredictDay)/site.PredictDay*100 | number:2 }}</td>
+			<td>{{site.DailyEsol | number:2 }}</td>
+			<td>{{site.DailySolarGis | number:2 }}</td>
+			<td>{{site.PR*100 | number:2 }}%</td>
+			<td>{{site.PRSolarGis*100 | number:2 }}%</td>
+		</tr>
+	</table>
+</div>
+
+<div class="row">
+	<br/>
+	<table class="metroTable" id="sumProductionReportTable" style="width:100%">
+		<caption>Production report for five previous days. <a download="Daily Production {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
+		<tr>
+			<th>Site</th>
+			<th>MWp</th>
+			<th>Export</th>
+			<th>Expected</th>
+			<th>Deviation</th>
+			<th>Irridiation</th>
+			<th>SolarGis</th>
+			<th>Irr PR</th>
+			<th>SG PR</th>
+		</tr>
+		<tr ng-repeat="site in dailyProductionReport">
+			<td>{{sitesInfo[$index].name }}</td>
+			<td>{{sitesInfo[$index].tic_mwp | number:1 }}</td>
+			<td>{{site.Group | number:0 }}</td>
+			<td>{{site.PredictDay*5 | number:0 }}</td>
+			<td>{{(site.Group-(site.PredictDay*5))/(site.PredictDay*5)*100 | number:2 }}</td>
+			<td>{{site.GroupEsol | number:2 }}</td>
+			<td>{{site.GroupSolarGis | number:2 }}</td>
+			<td>{{site.GroupPR*100 | number:2 }}%</td>
+			<td>{{site.GroupPRSolarGis*100 | number:2 }}%</td>
 		</tr>
 	</table>
 </div>

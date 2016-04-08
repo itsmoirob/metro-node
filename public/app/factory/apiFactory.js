@@ -126,6 +126,14 @@ angular.module('apiFactory', [])
 		dataFactory.portfolioAllSiteDataYear = function (month) {
 			return $http.get(urlBase + 'displaySite/portfolioAllSiteDataYear/' + month);
 		};
+		
+		dataFactory.getAllSiteCoords = function () {
+			return $http.get(urlBase + 'displaySite/allSiteCoords');
+		};
+		
+		dataFactory.dailyProductionReport = function() {
+			return $http.get(urlBase + 'reports/dailyProductionReport');
+		};
 
 		return dataFactory;
 	}])

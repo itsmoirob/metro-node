@@ -1,80 +1,80 @@
 angular.module('displayExport', [
-  'ui.router',
-  'listSites',
-  'apiFactory'
+	'ui.router',
+	'listSites',
+	'apiFactory'
 ])
 
-.controller('ExportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state','dataFactory', function($scope,$stateParams,$http,$log,$state,dataFactory){
+	.controller('ExportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', function($scope, $stateParams, $http, $log, $state, dataFactory) {
 
-  var SP = $stateParams.siteResult;
-  var highChartsData = {
-	name: "Export",
-	data : [],
-	yAxis: 0
-  };
-  var highChartsPyro = {
-	name: "Pyro mean",
-	data: [],
-	yAxis: 1
-  };
+		var SP = $stateParams.siteResult;
+		var highChartsData = {
+			name: "Export",
+			data: [],
+			yAxis: 0
+		};
+		var highChartsPyro = {
+			name: "Pyro mean",
+			data: [],
+			yAxis: 1
+		};
 
-  getChartExportGeneration(SP);
-  function getChartExportGeneration(SP){
-	dataFactory.getSiteExportGeneration(SP)
-	.success(function(res){
-	  angular.forEach(res, function(res) {
-		highChartsData.data.push([res.timeU,res.generation]);
-	  });
-	});
-  }
-  
-  getChartMeanPyro(SP);
-  function getChartMeanPyro(SP){
-	dataFactory.getChartPyro(SP)
-	.success(function(res){
-	  angular.forEach(res, function(res) {
-		highChartsPyro.data.push([res.timeU,res.avgPyro]);
-	  });
-	});
-  }
-  $scope.result = highChartsPyro;
+		getChartExportGeneration(SP);
+		function getChartExportGeneration(SP) {
+			dataFactory.getSiteExportGeneration(SP)
+				.success(function(res) {
+					angular.forEach(res, function(res) {
+						highChartsData.data.push([res.timeU, res.generation]);
+					});
+				});
+		}
 
-  //  Chart for export generation
-  $scope.chartExport = {
-	options: {
-	  chart: {
-		zoomType: 'x'
-	  },
-	  rangeSelector: {
-		allButtonsEnabled: true,
-		enabled: true
-	  },
-	  navigator: {
-		enabled: true
-	  }
-	},
-	yAxis: [{
-			   title: {
-				   text: 'Export'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0
-		   }, {
-			   title: {
-				   text: 'Pyro'
-			   },
-			   opposite: true,
-			   min: 0
-		   }],
-	series: [],
-	title: {
-	  text: 'Generation at export'
-	},
-	useHighStocks: true
-  };
+		getChartMeanPyro(SP);
+		function getChartMeanPyro(SP) {
+			dataFactory.getChartPyro(SP)
+				.success(function(res) {
+					angular.forEach(res, function(res) {
+						highChartsPyro.data.push([res.timeU, res.avgPyro]);
+					});
+				});
+		}
+		$scope.result = highChartsPyro;
 
-  $scope.chartExport.series.push(highChartsData);
-  $scope.chartExport.series.push(highChartsPyro);
+		//  Chart for export generation
+		$scope.chartExport = {
+			options: {
+				chart: {
+					zoomType: 'x'
+				},
+				rangeSelector: {
+					allButtonsEnabled: true,
+					enabled: true
+				},
+				navigator: {
+					enabled: true
+				}
+			},
+			yAxis: [{
+				title: {
+					text: 'Export'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0
+			}, {
+					title: {
+						text: 'Pyro'
+					},
+					opposite: true,
+					min: 0
+				}],
+			series: [],
+			title: {
+				text: 'Generation at export'
+			},
+			useHighStocks: true
+		};
 
-}]);
+		$scope.chartExport.series.push(highChartsData);
+		$scope.chartExport.series.push(highChartsPyro);
+
+	}]);

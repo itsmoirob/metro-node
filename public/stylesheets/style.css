@@ -217,6 +217,12 @@ ul.success li{
     color: #3d5afe;
 }
 
+#symbol:after {
+  content: '\25b2';
+}
+#symbol.reverse:after {
+  content: '\25bc';
+}
 
 /*#chartMonthGenerationPortfolio {
     height: 250px;

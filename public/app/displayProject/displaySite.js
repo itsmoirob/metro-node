@@ -1,7 +1,8 @@
 angular.module('displaySite', [
 	'ui.router',
 	'ngAnimate',
-	'apiFactory'
+	'apiFactory',
+	'uiGmapgoogle-maps'
 ],
 	function config($httpProvider) {
 		$httpProvider.interceptors.push('AuthInterceptor');
@@ -24,8 +25,8 @@ angular.module('displaySite', [
 
 		var groupingSwitch = 1;
 
-		var groupedGroupings = [{ id: 1, sites: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15] },
-			{ id: 2, sites: [1, 2, 3, 4, 5, 11, 12, 13, 15] }];
+		var groupedGroupings = [{ id: 1, sites: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+			{ id: 2, sites: [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16] }];
 
 		var selectedGrouping = groupedGroupings[groupingSwitch].sites;
 
@@ -48,6 +49,7 @@ angular.module('displaySite', [
 					angular.forEach(res, function(entry) {
 						chartDate.push(moment(entry.date).format("MMM Do"));
 					});
+					$scope.siteLatest = res[res.length-1];
 				});
 		}
 
@@ -191,6 +193,42 @@ angular.module('displaySite', [
 			series: allDailyEsol,
 			loading: false
 		};
+
+		mapAllSiteCoords();
+		function mapAllSiteCoords() {
+			dataFactory.getAllSiteCoords()
+				.success(function(res) {
+					$scope.res = res;
+					var latMin = Math.min.apply(null, res.map(function(item) {
+						return item.latitude;
+					}))
+					var latMax = Math.max.apply(null, res.map(function(item) {
+						return item.latitude;
+					}))
+					var mapLat = (latMin + latMax) / 2;
+					var longMin = Math.min.apply(null, res.map(function(item) {
+						return item.longitude;
+					}))
+					var longMax = Math.max.apply(null, res.map(function(item) {
+						return item.longitude;
+					}))
+					var mapLong = (longMin + longMax) / 2;
+					$scope.map = { center: { latitude: mapLat, longitude: mapLong }, zoom: 6 };
+					$scope.markers = [];
+					angular.forEach(res, function(res) {
+						$scope.markers.push({
+							id: res.id,
+							coords: {
+								latitude: res.latitude,
+								longitude: res.longitude
+							},
+							window: {
+								title: res.name
+							}
+						});
+					});;
+				});
+		}
 
 		UserFactory.getUser().then(function success(response) {
 			$scope.user = response.data;
