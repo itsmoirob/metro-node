@@ -58,6 +58,17 @@
 			<td>{{site.PR*100 | number:2 }}%</td>
 			<td>{{site.PRSolarGis*100 | number:2 }}%</td>
 		</tr>
+		<tr>
+			<th>Total</th>
+			<th>{{totalMWp | number : 1}}</th>
+			<th>{{totalDailyExport | number : 0}}</th>
+			<th>{{expectedExport | number : 0}}</th>
+			<th>{{(totalDailyExport-expectedExport)/expectedExport*100 | number:2 }}</th>
+			<th>Irridiation</th>
+			<th>SolarGis</th>
+			<th>Irr PR</th>
+			<th>SG PR</th>
+		</tr>
 	</table>
 </div>
 
@@ -87,5 +98,22 @@
 			<td>{{site.GroupPR*100 | number:2 }}%</td>
 			<td>{{site.GroupPRSolarGis*100 | number:2 }}%</td>
 		</tr>
+		<tr>
+			<th>Total</th>
+			<th>{{totalMWp | number : 1}}</th>
+			<th>{{totalGroupExport | number : 0}}</th>
+			<th>{{expectedExport | number : 0}}</th>
+			<th>{{(totalGroupExport-(expectedExport*5))/(expectedExport*5)*100 | number:2 }}</th>
+			<th>Irridiation</th>
+			<th>SolarGis</th>
+			<th>Irr PR</th>
+			<th>SG PR</th>
+		</tr>
 	</table>
 </div>
+
+de: {{totalDailyExport}}
+ge: {{totalGroupExport}}
+ee: {{expectedExport}}
+<hr>
+{{dailyProductionReport}}

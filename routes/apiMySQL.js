@@ -225,7 +225,7 @@ Ftp.keepAlive()
 					 connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function(err, result) {
 						 if (err) throw err;
 						 console.log(result.insertId);
-						 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
+						 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData[0]);
 					 });
 				 } else if (id == 7) {
 
@@ -363,7 +363,7 @@ Ftp.keepAlive()
 					 connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end)))/60000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function(err, result) {
 						 if (err) throw err;
 						 console.log(result.insertId);
-						 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
+						 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData[0]);
 					 }
 					 );
 
@@ -406,10 +406,39 @@ Ftp.keepAlive()
 					 connection.query('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function(err, result) {
 						 if (err) throw err;
 						 console.log(result.insertId);
-						 res.send('Done: INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData);
+						 res.send('Done: INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData[0]);
 					 });
 
-				 } else if (id = 16) {
+				 } else if (id == 14 ) {
+					 for (j = 1; j < data.length; j++) { // if site is 1 to 4
+						 data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
+						 data[j][1] = parseFloat(data[j][1]);
+						 data[j][2] = parseFloat(data[j][2]);
+						 if (isNaN(data[j][1])) {
+							 data[j][1] = "NULL";
+						 }
+						 if (data[j][1] < 0) {
+							 data[j][1] = 0;
+						 }
+						 if (isNaN(data[j][2])) {
+							 data[j][2] = "NULL";
+						 }
+						 if (data[j][2] < 0) {
+							 data[j][2] = 0;
+						 }
+						 sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
+						 n++;
+					 }
+
+					//  res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
+
+					 connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end)))/4000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function(err, result) {
+						 if (err) throw err;
+						 console.log(result.insertId);
+						 res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData[1]);
+					 });
+
+				 } else if (id == 16) {
 					 for (j = 1; j < data.length; j++) {
 
 						 data[j][0] = moment(data[j][0], 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
@@ -559,7 +588,7 @@ Ftp.keepAlive()
 							res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
 						});
 
-					} else if (id == 5) {
+					} else if (id == 5 || id == 16) {
 						for (j = 1; j < data.length; j++) {
 							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 							sqlInputData.push("('" + data[j][0] + "'");
@@ -580,7 +609,7 @@ Ftp.keepAlive()
 						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result) {
 							if (err) throw err;
 							console.log(result.insertId);
-							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
+							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
 						});
 
 					} else if (id == 11 || id == 13) {

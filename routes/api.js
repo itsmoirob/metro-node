@@ -117,6 +117,20 @@ module.exports = function(app, connection) {
 		});
 
 	});
+	
+	// 	app.get('/api/displaySite/report/:id', function(req, res) {
+	// 	var id = req.params.id;
+
+	// 	// res.send('SELECT dg.date, dg.ps' + id + ' AS Day, mp.ps' + id + ' / DAY(LAST_DAY(NOW() - INTERVAL 1 DAY)) AS PredictDay, de.ps' + id + ' AS DailyEsol, dg.ps' + id + ' / (de.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ')*1000) AS PR, ds.ps' + id + ' AS DailySolarGis, dg.ps' + id + ' / (ds.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ')*1000) AS PRSolarGis FROM dailySumExport dg JOIN (SELECT date, ps' + id + ' FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(date) AND MONTH(date) = MONTH(date)) mp JOIN dailyEsol de on dg.date = de.date LEFT JOIN dailySolarGis ds on dg.date = ds.date where (dg.date between "2016-01-01" and "2016-04-20");');
+	// 	connection.query('SELECT dg.date, dg.ps' + id + ' AS Day, mp.ps' + id + ' / DAY(LAST_DAY(dg.date)) AS PredictDay, de.ps' + id + ' AS DailyEsol, dg.ps' + id + ' / (de.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ')*1000) AS PR, ds.ps' + id + ' AS DailySolarGis, dg.ps' + id + ' / (ds.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ')*1000) AS PRSolarGis FROM dailySumExport dg JOIN monthlyPredictedGeneration mp on DATE_FORMAT(dg.date, \'%Y-%m\') = DATE_FORMAT(mp.date, \'%Y-%m\') JOIN dailyEsol de on dg.date = de.date LEFT JOIN dailySolarGis ds on dg.date = ds.date where (dg.date between \'2016-01-01\' and \'2016-04-20\');', function(err, rows) {
+	// 		if (err) {
+	// 			return res.json(err);
+	// 		} else {
+	// 			return res.json(rows);
+	// 		}
+	// 	});
+
+	// });
 
 	app.get('/api/reports/incidents', function(req, res) {
 		connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, incident_report_number from incident_log where status = 1 and end_time > now() order by start_time asc;', function(err, rows) {
