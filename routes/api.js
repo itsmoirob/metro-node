@@ -118,6 +118,8 @@ module.exports = function(app, connection) {
 
 	});
 	
+	
+	// One off report for Giles
 	// 	app.get('/api/displaySite/report/:id', function(req, res) {
 	// 	var id = req.params.id;
 
@@ -494,6 +496,8 @@ module.exports = function(app, connection) {
 		requestText = requestText.slice(0,-1);
 		sumText = sumText.slice(0,-1);
 		singleText = singleText.slice(0,-1);
+		
+		// res.send('SELECT ' + requestText + ' FROM dailySumExport dg JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailySumExport WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) gg ON dg.date = gg.date JOIN (SELECT date, ' + singleText + ' FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de on dg.date = de.date JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailyEsol WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) ge ON dg.date = ge.date JOIN dailySolarGis ds on dg.date = ds.date JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailySolarGis WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) gs ON dg.date = gs.date WHERE dg.date = DATE(NOW() - INTERVAL 1 DAY);');
 		
 		connection.query('SELECT ' + requestText + ' FROM dailySumExport dg JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailySumExport WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) gg ON dg.date = gg.date JOIN (SELECT date, ' + singleText + ' FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de on dg.date = de.date JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailyEsol WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) ge ON dg.date = ge.date JOIN dailySolarGis ds on dg.date = ds.date JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailySolarGis WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) gs ON dg.date = gs.date WHERE dg.date = DATE(NOW() - INTERVAL 1 DAY);', function (err, rows) {
 			if (err) {
