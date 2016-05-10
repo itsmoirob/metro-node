@@ -3,24 +3,24 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 	//   var request = require('request');
 
 
-  var mpanList = [
-		{ "id": 1, "mpan": "2100041172109", "solarGis": "SolarGIS_min15_6_Cowbridge_"}, 
-		{ "id": 2, "mpan": "2000055901355", "solarGis": "SolarGIS_min15_4_Poole_"}, 
-		{ "id": 3, "mpan": "2000055901300", "solarGis": "SolarGIS_min15_5_Lytchett_Minster_"}, 
-		{ "id": 4, "mpan": "1050000588215", "solarGis": "SolarGIS_min15_2_West_Caister_"}, 
-		{ "id": 5, "mpan": "2200042384200", "solarGis": "SolarGIS_min15_8_Canworthy_"}, 
-		{ "id": 6, "mpan": null }, 
-		{ "id": 7, "mpan": "2000056147387"}, 
-		{ "id": 8, "mpan": "1900091171276"}, 
-		{ "id": 9, "mpan": "1900091178963"}, 
-		{ "id": 10, "mpan": "1900091183411"}, 
-		{ "id": 11, "mpan": "2200042480656", "solarGis": "SolarGIS_min15_9_Wilton_"}, 
-		{ "id": 12, "mpan": "2000056366930", "solarGis": "SolarGIS_min15_4_Poole_"}, 
-		{ "id": 13, "mpan": "2000056456265", "solarGis": "SolarGIS_min15_10_Merston_"}, 
-		{ "id": 14, "mpan": "1170000610807", "solarGis": "SolarGIS_min15_11_Ashby_"}, 
-		{ "id": 15, "mpan": "1640000523609", "solarGis": "SolarGIS_min15_7_Morecambe_"}, 
-		{ "id": 16, "mpan": "2000056474812", "solarGis": "SolarGIS_min15_12_Eveley_"}
-		];
+	var mpanList = [
+		{ "id": 1, "mpan": "2100041172109", "solarGis": "SolarGIS_min15_6_Cowbridge_" },
+		{ "id": 2, "mpan": "2000055901355", "solarGis": "SolarGIS_min15_4_Poole_" },
+		{ "id": 3, "mpan": "2000055901300", "solarGis": "SolarGIS_min15_5_Lytchett_Minster_" },
+		{ "id": 4, "mpan": "1050000588215", "solarGis": "SolarGIS_min15_2_West_Caister_" },
+		{ "id": 5, "mpan": "2200042384200", "solarGis": "SolarGIS_min15_8_Canworthy_" },
+		{ "id": 6, "mpan": null },
+		{ "id": 7, "mpan": "2000056147387" },
+		{ "id": 8, "mpan": "1900091171276" },
+		{ "id": 9, "mpan": "1900091178963" },
+		{ "id": 10, "mpan": "1900091183411" },
+		{ "id": 11, "mpan": "2200042480656", "solarGis": "SolarGIS_min15_9_Wilton_" },
+		{ "id": 12, "mpan": "2000056366930", "solarGis": "SolarGIS_min15_4_Poole_" },
+		{ "id": 13, "mpan": "2000056456265", "solarGis": "SolarGIS_min15_10_Merston_" },
+		{ "id": 14, "mpan": "1170000610807", "solarGis": "SolarGIS_min15_11_Ashby_" },
+		{ "id": 15, "mpan": "1640000523609", "solarGis": "SolarGIS_min15_7_Morecambe_" },
+		{ "id": 16, "mpan": "2000056474812", "solarGis": "SolarGIS_min15_12_Eveley_" }
+	];
 
 	// connect ftp
 	var starkFtp = new JSFtp({
@@ -30,7 +30,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 		pass: config.starkFtp.pass
 	});
 	starkFtp.keepAlive()
-	
+
 	var solarGisFtp = new JSFtp({
 		host: config.solarGisFtp.host,
 		// port: 3331, // defaults to 21
@@ -39,7 +39,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 	});
 	solarGisFtp.keepAlive()
 
-  app.get('/api/ftp/:id', function (req, res) {
+	app.get('/api/ftp/:id', function (req, res) {
 		var id = req.params.id;
 		if (id === 'NonHH') {
 			var fileName = 'Primrose Solar Limited NonHH.csv';
@@ -55,35 +55,34 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 				res.send('File ' + fileName + ' has been downloaded');
 			}
 		});
-  });
-	
+	});
+
 	app.get('/api/solarGisFtp/:id', function (req, res) {
 		var id = req.params.id;
-		id = id -1;
-		// var day = data[j][0] = moment().subtract(1, 'days').format(YYYYMMDD);
-		// var fileName = '/CLIMDATA/' + mpanList;
-		// res.send('./files' + fileName + day + '.csv');
-		res.send('fileName' + mpanList);
-		// res.send('hello ' + id);
-		// solarGisFtp.get(fileName, './files' + fileName + day + '.csv', function (hadErr) {
-		// 	if (hadErr) {
-		// 		console.error('There was an error retrieving the file.' + hadErr);
-		// 		res.send('There was an error retrieving the file.' + hadErr);
-		// 	} else {
-		// 		console.log('File copied successfully!');
-		// 		res.send('File ' + fileName + ' has been downloaded');
-		// 	}
-		// });
-  });
+		id = id - 1;
+
+		var day = moment().subtract(1, 'days').format('YYYYMMDD');
+		var fileName = mpanList[id].solarGis + day + '.csv';
+
+		solarGisFtp.get('/CLIMDATA/' + fileName, './files/' + fileName, function (hadErr) {
+			if (hadErr) {
+				console.error('There was an error retrieving the file.' + hadErr);
+				res.send('There was an error retrieving the file.' + hadErr);
+			} else {
+				console.log('File copied successfully!');
+				res.send('File ' + fileName + ' has been downloaded');
+			}
+		});
+	});
 
 	// upload export to database tables export_# and dailySumExport
-  app.get('/api/mySQL/exportUpload/:id', function (req, res) {
+	app.get('/api/mySQL/exportUpload/:id', function (req, res) {
 
 		var id = req.params.id;
 		id = id - 1;
 		var filePath = "./files/Primrose Solar Limited.csv";
 		var startIndex = 3;
-		
+
 		fs.readFile(filePath, {
 			encoding: 'utf-8'
 		}, function (err, csvData) {
@@ -138,6 +137,43 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 		});
 	});
 
+	// upload solargis data to database tables export_# and dailySumExport
+	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
+
+		var id = req.params.id;
+		id = id - 1;
+		var day = moment().subtract(1, 'days').format('YYYYMMDD');
+		var mySQLDay = moment(day).format('YYYY-MM-DD');
+		var fileName = './files/' + mpanList[id].solarGis + day + '.csv';
+
+		fs.readFile(fileName, {
+			encoding: 'utf-8'
+		}, function (err, csvData) {
+			if (err) {
+				console.log(err);
+			}
+			csvParse(csvData, { comment: '#', delimiter: ';' }, function (err, data) {
+				if (err) {
+					console.log(err);
+				} else {
+					var solarGisSum = 0;
+					for (var j = 1; j < data.length; j++) {
+
+						solarGisSum = solarGisSum + parseInt(data[j][4]);
+					}
+					solarGisSum = solarGisSum / 4000;
+
+					// connection.query('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';', function (err, result) {
+						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; Commit', function (err, result) {
+						if (err) throw err;
+						console.log(result);
+						res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');
+					});
+				}
+			});
+		});
+	});
+
 	app.get('/api/mySQL/manualExportUpload/:id', function (req, res) {
 		var id = req.params.id - 1;
 		var filePath = "./files/" + mpanList[id].mpan + ".csv";
@@ -178,7 +214,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 				}
 			});
 		});
-  });
+	});
 
 
 	// upload pyro data.
