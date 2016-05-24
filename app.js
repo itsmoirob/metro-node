@@ -155,6 +155,7 @@ liveSites.map(function(site) {
 
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
+			// hostname: 'localhost',
 			// port: 3000,
 			path: '/api/mySQL/exportUpload/' + site,
 			method: 'GET',
@@ -175,7 +176,6 @@ liveSites.map(function(site) {
 				console.log('No more data in response.')
 			})
 		});
-
 		req.on('error', function(e) {
 			console.log('problem with request: ' + e.message);
 		});
@@ -193,6 +193,7 @@ new CronJob('0 */30 * * * *', function() { //https://nodejs.org/api/http.html#ht
 	});
 	var options = {
 		hostname: 'primrose-metro.elasticbeanstalk.com',
+		// hostname: 'localhost',
 		// port: 3000,
 		path: '/api/ftp/HH',
 		method: 'GET',
@@ -221,14 +222,15 @@ new CronJob('0 */30 * * * *', function() { //https://nodejs.org/api/http.html#ht
 	req.end();
 }, null, true, 'UTC');
 
-liveSites.map(function(site) {
-	new CronJob('0 10 8,9,10,14,15 * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
+liveSites.map(function(site, index) {
+	new CronJob('0 ' + index + ' 8,9,14,15 * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
 		var postData = querystring.stringify({
 			'msg': 'Hello World!'
 		});
 
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
+			// hostname: 'localhost',
 			// port: 3000,
 			path: '/api/solarGisFtp/' + site,
 			method: 'GET',
@@ -240,7 +242,7 @@ liveSites.map(function(site) {
 
 		var req = http.request(options, function(res) {
 			console.log('STATUS: ' + res.statusCode);
-			console.log('HEADERS: ' + JSON.stringify(res.headers));
+			console.log('HEADERS(' + site + '): ' + JSON.stringify(res.headers));
 			res.setEncoding('utf8');
 			res.on('data', function(chunk) {
 				console.log('BODY: ' + chunk);
@@ -261,7 +263,7 @@ liveSites.map(function(site) {
 });
 
 liveSites.map(function(site) {
-	new CronJob('0 40 8,9,10,14,15 * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
+	new CronJob('0 40 8,9,14,15 * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
 		var postData = querystring.stringify({
 			'msg': 'Hello World!'
 		});

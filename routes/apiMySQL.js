@@ -126,10 +126,10 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 						}
 					}
 
-					connection.query("Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;", function (err, result) {
+					connection.query("INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation);", function (err, result) {
 						if (err) throw err;
 						//   console.log(result);
-						res.send("COMPLETE: Start transaction; INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from export_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;" + result.message);
+						res.send("COMPLETE: INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation);" + result.message);
 					});
 
 				}
@@ -164,7 +164,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 					solarGisSum = solarGisSum / 4000;
 
 					// connection.query('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';', function (err, result) {
-						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; Commit', function (err, result) {
+						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` is null, \'' + solarGisSum + '\', `ps' + mpanList[id].id + '`); Commit', function (err, result) {
 						if (err) throw err;
 						console.log(result);
 						res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');

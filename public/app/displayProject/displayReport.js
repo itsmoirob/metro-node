@@ -112,6 +112,7 @@ angular.module('displayAllReport', [
 		$scope.convertDate = function (date) {
 			return $filter('date')(date, 'yyyy-MM-dd')
 		}
-
+		
+		
 
 	}]);

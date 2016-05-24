@@ -35,8 +35,8 @@
 <div class="row">
 	<br/>
 	<table class="metroTable" id="dailyProductionReportTable" style="width:100%">
-		<caption>Production report for {{yesterdaysDate}}. <a download="Daily Production {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
-		<tr>
+		<caption>Production report for {{yesterdaysDate}}. <a download="1 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
+		<tr ng-init="aveDailyEsol = 0">
 			<th>Site</th>
 			<th>MWp</th>
 			<th>Export</th>
@@ -53,7 +53,7 @@
 			<td>{{site.Day | number:0 }}</td>
 			<td>{{site.PredictDay | number:0 }}</td>
 			<td>{{(site.Day-site.PredictDay)/site.PredictDay*100 | number:2 }}</td>
-			<td>{{site.DailyEsol | number:2 }}</td>
+			<td ng-init="$parent.aveDailyEsol = $parent.aveDailyEsol + site.DailyEsol" >{{site.DailyEsol | number:2 }}</td>
 			<td>{{site.DailySolarGis | number:2 }}</td>
 			<td>{{site.PR*100 | number:2 }}%</td>
 			<td>{{site.PRSolarGis*100 | number:2 }}%</td>
@@ -64,18 +64,18 @@
 			<th>{{totalDailyExport | number : 0}}</th>
 			<th>{{expectedExport | number : 0}}</th>
 			<th>{{(totalDailyExport-expectedExport)/expectedExport*100 | number:2 }}</th>
-			<th>Irridiation</th>
+			<th>{{aveDailyEsol}}</th>
 			<th>SolarGis</th>
 			<th>Irr PR</th>
 			<th>SG PR</th>
 		</tr>
+
 	</table>
 </div>
-
 <div class="row">
 	<br/>
 	<table class="metroTable" id="sumProductionReportTable" style="width:100%">
-		<caption>Production report for five previous days. <a download="Daily Production {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
+		<caption>Production report for five previous days. <a download="5 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
 		<tr>
 			<th>Site</th>
 			<th>MWp</th>
