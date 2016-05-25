@@ -14,6 +14,7 @@ var mongoose = require('mongoose');
 var http = require('http');
 var querystring = require('querystring');
 var CronJob = require('cron').CronJob;
+var exec = require('child_process').exec;
 
 // From metro
 var mysql = require('mysql');
@@ -25,7 +26,7 @@ var moment = require('moment');
 var config = require('./config');
 
 // connect to mongoLabDb
-mongoose.connect(config.mongodb.database, function(err) {
+mongoose.connect(config.mongodb.database, function (err) {
 	if (err) console.log(err);
 	console.log('Connected to database.');
 });
@@ -82,7 +83,7 @@ app.use(passport.session());
 
 // Validator
 app.use(expressValidator({
-	errorFormatter: function(param, msg, value) {
+	errorFormatter: function (param, msg, value) {
 		var namespace = param.split('.'),
 			root = namespace.shift(),
 			formParam = root;
@@ -102,12 +103,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(flash());
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
 	res.locals.messages = require('express-messages')(req, res);
 	next();
 });
 
-app.get('*', function(req, res, next) {
+app.get('*', function (req, res, next) {
 	res.locals.user = req.user || null;
 	next();
 });
@@ -116,7 +117,7 @@ app.use('/', routes);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
 	var err = new Error('Not Found');
 	err.status = 404;
 	next(err);
@@ -127,7 +128,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-	app.use(function(err, req, res, next) {
+	app.use(function (err, req, res, next) {
 		res.status(err.status || 500);
 		res.render('error', {
 			message: err.message,
@@ -138,7 +139,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('error', {
 		message: err.message,
@@ -149,10 +150,6 @@ app.use(function(err, req, res, next) {
 var liveSites = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16];
 liveSites.map(function(site) {
 	new CronJob('59 */30 * * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
-		var postData = querystring.stringify({
-			'msg': 'Hello World!'
-		});
-
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
 			// hostname: 'localhost',
@@ -160,11 +157,9 @@ liveSites.map(function(site) {
 			path: '/api/mySQL/exportUpload/' + site,
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'Content-Length': postData.length
+				'Content-Type': 'application/x-www-form-urlencoded'
 			}
 		};
-
 		var req = http.request(options, function(res) {
 			console.log('STATUS: ' + res.statusCode);
 			console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -179,18 +174,12 @@ liveSites.map(function(site) {
 		req.on('error', function(e) {
 			console.log('problem with request: ' + e.message);
 		});
-
-		// write data to request body
-		req.write(postData);
 		req.end();
 	}, null, true, 'UTC');
 });
 
 
-new CronJob('0 */30 * * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
-	var postData = querystring.stringify({
-		'msg': 'Hello World!'
-	});
+new CronJob('0 */30 * * * *', function() {
 	var options = {
 		hostname: 'primrose-metro.elasticbeanstalk.com',
 		// hostname: 'localhost',
@@ -198,8 +187,7 @@ new CronJob('0 */30 * * * *', function() { //https://nodejs.org/api/http.html#ht
 		path: '/api/ftp/HH',
 		method: 'GET',
 		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'Content-Length': postData.length
+			'Content-Type': 'application/x-www-form-urlencoded'
 		}
 	};
 	var req = http.request(options, function(res) {
@@ -213,21 +201,14 @@ new CronJob('0 */30 * * * *', function() { //https://nodejs.org/api/http.html#ht
 			console.log('No more data in response.')
 		})
 	});
-
 	req.on('error', function(e) {
 		console.log('problem with request: ' + e.message);
 	});
-	// write data to request body
-	req.write(postData);
 	req.end();
 }, null, true, 'UTC');
 
 liveSites.map(function(site, index) {
-	new CronJob('0 ' + index + ' 8,9,14,15 * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
-		var postData = querystring.stringify({
-			'msg': 'Hello World!'
-		});
-
+	new CronJob('0 ' + (parseInt(index) + 10) + ' 8,9,14,15 * * *', function() {
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
 			// hostname: 'localhost',
@@ -235,11 +216,9 @@ liveSites.map(function(site, index) {
 			path: '/api/solarGisFtp/' + site,
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'Content-Length': postData.length
+				'Content-Type': 'application/x-www-form-urlencoded'
 			}
 		};
-
 		var req = http.request(options, function(res) {
 			console.log('STATUS: ' + res.statusCode);
 			console.log('HEADERS(' + site + '): ' + JSON.stringify(res.headers));
@@ -251,23 +230,15 @@ liveSites.map(function(site, index) {
 				console.log('No more data in response.')
 			})
 		});
-
 		req.on('error', function(e) {
 			console.log('problem with request: ' + e.message);
 		});
-
-		// write data to request body
-		req.write(postData);
 		req.end();
 	}, null, true, 'UTC');
 });
 
 liveSites.map(function(site) {
-	new CronJob('0 40 8,9,14,15 * * *', function() { //https://nodejs.org/api/http.html#http_http_request_options_callback
-		var postData = querystring.stringify({
-			'msg': 'Hello World!'
-		});
-
+	new CronJob('0 35 8,9,14,15 * * *', function() {
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
 			// hostname: 'localhost',
@@ -275,11 +246,9 @@ liveSites.map(function(site) {
 			path: '/api/mySQL/solarGisUpload/' + site,
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'Content-Length': postData.length
+				'Content-Type': 'application/x-www-form-urlencoded'
 			}
 		};
-
 		var req = http.request(options, function(res) {
 			console.log('STATUS: ' + res.statusCode);
 			console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -291,16 +260,24 @@ liveSites.map(function(site) {
 				console.log('No more data in response.')
 			})
 		});
-
 		req.on('error', function(e) {
 			console.log('problem with request: ' + e.message);
 		});
-
-		// write data to request body
-		req.write(postData);
 		req.end();
 	}, null, true, 'UTC');
 });
+
+// new CronJob('0 */1 * * * *', function () {
+// 	exec('rm /files/ *.csv', (error, stdout, stderr) => {
+// 		if (error) {
+// 			console.error(`exec error: ${error}`);
+// 			return;
+// 		}
+// 		console.log(`stdout: ${stdout}`);
+// 		console.log(`stderr: ${stderr}`);
+// 	});
+// }, null, true, 'UTC');
+
 
 
 module.exports = app;
