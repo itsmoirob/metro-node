@@ -208,7 +208,7 @@ new CronJob('0 */30 * * * *', function() {
 }, null, true, 'UTC');
 
 liveSites.map(function(site, index) {
-	new CronJob('0 ' + (parseInt(index) + 10) + ' 8,9,14,15 * * *', function() {
+	new CronJob('0 ' + (parseInt(index) + 10) + ' 7,8,9,13,14 * * *', function() {
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
 			// hostname: 'localhost',
@@ -238,7 +238,7 @@ liveSites.map(function(site, index) {
 });
 
 liveSites.map(function(site) {
-	new CronJob('0 35 8,9,14,15 * * *', function() {
+	new CronJob('0 35 7,8,9,13,14 * * *', function() {
 		var options = {
 			hostname: 'primrose-metro.elasticbeanstalk.com',
 			// hostname: 'localhost',
