@@ -1,4 +1,4 @@
-module.exports = function (app, connection, csvParse, fs, moment, pool, config) {
+module.exports = function (app, connection, csvParse, fs, moment, pool, config, http) {
 	var JSFtp = require("jsftp");
 	//   var request = require('request');
 
@@ -164,7 +164,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 					solarGisSum = solarGisSum / 4000;
 
 					// res.send('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` > 0.000009, `ps' + mpanList[id].id + '`, \'' + solarGisSum + '\'); Commit;');
-						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` > 0.000009, `ps' + mpanList[id].id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
+					connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` > 0.000009, `ps' + mpanList[id].id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
 						if (err) throw err;
 						console.log(result);
 						res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');
@@ -267,44 +267,26 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 						});
 
 					} else if (id == 5) {
-						for (j = 1; j < data.length; j++) {
+						for (j = 1; j < data.length - 1; j++) {
 							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 							data[j][1] = parseFloat(data[j][1]);
-							data[j][2] = parseFloat(data[j][2]);
-							data[j][3] = parseFloat(data[j][3]);
-							data[j][4] = parseFloat(data[j][4]);
+
 							if (isNaN(data[j][1])) {
 								data[j][1] = "NULL";
 							}
 							if (data[j][1] < 0) {
 								data[j][1] = 0;
 							}
-							if (isNaN(data[j][2])) {
-								data[j][2] = "NULL";
-							}
-							if (data[j][2] < 0) {
-								data[j][2] = 0;
-							}
-							if (isNaN(data[j][3])) {
-								data[j][3] = "NULL";
-							}
-							if (data[j][3] < 0) {
-								data[j][3] = 0;
-							}
-							if (isNaN(data[j][4])) {
-								data[j][4] = "NULL";
-							}
-							if (data[j][4] < 0) {
-								data[j][4] = 0;
-							}
-							sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + "," + data[j][3] + "," + data[j][4] + ")"];
+
+							sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + ")"];
 							n++;
 						}
-						connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function (err, result) {
+						connection.query('Start transaction; INSERT INTO pyro_site_' + id + ' (dateTime, pyro_' + data[0][1] + ') VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_' + data[0][1] + '= VALUES(pyro_' + data[0][1] + '); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function (err, result) {
 							if (err) throw err;
 							console.log(result.insertId);
-							res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData[0]);
+							res.send('Done: INSERT INTO pyro_site_' + id + ' (dateTime, pyro_' + data[0][1] + ') VALUES ' + sqlInputData[0]);
 						});
+
 					} else if (id == 7) {
 
 						for (j = 1; j < data.length; j++) {
@@ -595,55 +577,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 					console.log(err);
 				} else {
 					var sqlInputData = [];
-					// var n = 1;
-
-					if (id >= 8 && id <= 10) {
-						for (var j = 2; j < data.length; j++) {
-							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-							sqlInputData.push("('" + data[j][0] + "'");
-							for (var i = 1; i <= data[j].length - 1; i++) {
-								data[j][i] = parseFloat(data[j][i]);
-								if (isNaN(data[j][i])) {
-									data[j][i] = "NULL";
-								}
-								if (i == data[j].length - 1) {
-									sqlInputData.push(i + "," + data[j][i] + ")");
-								} else {
-									sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
-								}
-							}
-						}
-						// res.send("INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
-						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
-							if (err) throw err;
-							console.log(result);
-							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
-						});
-
-					} else if (id <= 4) {
-
-
-						// for (j=1;j<data.length;j++){
-						//   data[j][3] = moment(data[j][3], "DD/MM/YYYY").format("YYYY-MM-DD");
-						//
-						//   sqlInputData.push("('" + data[j][3] + " " + data[j][4] + "'");
-						//
-						//   data[j][5] = parseFloat(data[j][5])/1000;
-						//   if (isNaN(data[j][5])) {
-						//     data[j][5] = "NULL";
-						//   }
-						//
-						//   sqlInputData.push(data[j][1] + "," + data[j][2] + "," + data[j][5] + ")");
-						// }
-						// // res.send("INSERT INTO inverter_generation_" + id + "_" + data[1][0] + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation);");
-						// connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_T0" + data[1][0] + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_T0" + data[1][0] + " where generation is null; Commit;", function(err, result){
-						//   if (err) throw err;
-						//   console.log(result.insertId);
-						//   res.send("Done: INSERT INTO inverter_generation_" + id + "_T0" + data[1][0] + sqlInputData);
-						// });
-
-
-
+					if (id <= 4) {
 						for (j = 1; j < data.length; j++) {
 							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 							sqlInputData.push("('" + data[j][0] + "'");
@@ -659,14 +593,12 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 								}
 							}
 						}
-
 						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " where generation is null; Commit;", function (err, result) {
 							if (err) throw err;
 							console.log(result.insertId);
 							res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
 						});
-
-					} else if (id == 5 || id == 16) {
+					} else {
 						for (j = 1; j < data.length; j++) {
 							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 							sqlInputData.push("('" + data[j][0] + "'");
@@ -682,71 +614,169 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config) 
 								}
 							}
 						}
-
 						// res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
 						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
 							if (err) throw err;
 							console.log(result.insertId);
 							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
 						});
-
-					} else if (id == 11 || id == 13) {
-						for (j = 1; j < data.length; j++) {
-							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-							sqlInputData.push("('" + data[j][0] + "'");
-							for (i = 1; i <= data[j].length - 1; i++) {
-								data[j][i] = parseFloat(data[j][i]);
-								if (data[j][i] < 0.01) {
-									data[j][i] = 0;
-								}
-								if (isNaN(data[j][i])) {
-									data[j][i] = "NULL";
-								}
-								if (i == data[j].length - 1) {
-									sqlInputData.push(data[0][i] + "," + data[j][i] + ")");
-								} else {
-									sqlInputData.push(data[0][i] + "," + data[j][i] + "),('" + data[j][0] + "'");
-								}
-							}
-						}
-						// res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
-							if (err) throw err;
-							console.log(result);
-							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
-						});
-
-					} else {
-
-						for (j = 1; j < data.length; j++) {
-							for (i = 1; i < 2; i++) {
-								data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-								data[j][i] = parseFloat(data[j][i]);
-								if (isNaN(data[j][i])) {
-									data[j][i] = "NULL";
-								}
-								if (data[j][i] < 0.6) {
-									data[j][i] = 0;
-								}
-								sqlInputData.push("('" + data[j][0] + "'");
-								for (var k = 1; k <= data[j].length - 1; k++) {
-									if (k == data[j].length - 1) {
-										sqlInputData.push("17," + data[j][k] + ")");
-									} else {
-										sqlInputData.push("17," + data[j][k]);
-									}
-								}
-							}
-						}
-						res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
-						// connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function(err, result){
-						//   if (err) throw err;
-						//   console.log(result.insertId);
-						//   res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData);
-						// });
 					}
 				}
 			});
 		});
 	});
+
+
+
+	app.get('/api/mySQL/invUpload/:id', function (req, res) {
+		var id = req.params.id;
+		var filePath = "./files/PS" + id + " Inv.csv";
+
+		fs.readFile(filePath, {
+			encoding: 'utf-8'
+		}, function (err, csvData) {
+			if (err) {
+				console.log(err);
+			}
+			csvParse(csvData, {
+				separator: ',',
+				newline: '\n'
+			}, function (err, data) {
+				if (err) {
+					console.log(err);
+				} else {
+					var sqlInputData = [];
+					if (id <= 4) {
+						for (j = 1; j < data.length; j++) {
+							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+							sqlInputData.push("('" + data[j][0] + "'");
+							for (i = 1; i <= data[j].length - 1; i++) {
+								data[j][i] = parseFloat(data[j][i]);
+								if (isNaN(data[j][i])) {
+									data[j][i] = "NULL";
+								}
+								if (i == data[j].length - 1) {
+									sqlInputData.push(data[0][i].substring(7, 9) + "," + data[0][i].substring(13, 15) + "," + data[j][i] + ")");
+								} else {
+									sqlInputData.push(data[0][i].substring(7, 9) + "," + data[0][i].substring(13, 15) + "," + data[j][i] + "),('" + data[j][0] + "'");
+								}
+							}
+						}
+						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " where generation is null; Commit;", function (err, result) {
+							if (err) throw err;
+							console.log(result.insertId);
+							res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
+						});
+					} else {
+						for (j = 1; j < data.length; j++) {
+							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+							sqlInputData.push("('" + data[j][0] + "'");
+							for (i = 1; i <= data[j].length - 1; i++) {
+								data[j][i] = parseFloat(data[j][i]);
+								if (isNaN(data[j][i])) {
+									data[j][i] = "NULL";
+								}
+								if (i == data[j].length - 1) {
+									sqlInputData.push(i + "," + data[j][i] + ")");
+								} else {
+									sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
+								}
+							}
+						}
+						// res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
+						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
+							if (err) throw err;
+							console.log(result.insertId);
+							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
+						});
+					}
+				}
+			});
+		});
+	});
+
+
+
+	// https://docs.nodejitsu.com/articles/HTTP/clients/how-to-create-a-HTTP-request/
+	app.get('/api/mySQL/autopyroUpload/:id', function (req, res) {
+
+		var id = req.params.id;
+
+		if (id == 5) {
+
+			var end = moment().subtract(211, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+
+			var options = {
+				hostname: 'host.webdom.es',
+				port: 8090,
+				// path: '/WDService/WBService.svc/GetInfoInvertersJSON/1/1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21/POWER_AC/2016-07-0114:45:00/2016-07-0114:49:00',
+				path: '/WDService/WBService.svc/GetInfoMeteorologyJSON/1/2;3;5/IRRADIANCE/' + start + '/' + end,
+				method: 'GET'
+			};
+			console.log(options.hostname + ':' + options.port + options.path);
+
+			var req = http.request(options, function (res) {
+				var data = '';
+				var sqlInputData1 = [];
+				var sqlInputData2 = [];
+				var sqlInputData3 = [];
+				var sqlInputData4 = [];
+				var sqlInputText1 = '';
+				var sqlInputText2 = '';
+				var sqlInputText3 = '';
+				var sqlInputText4 = '';
+				res.setEncoding('utf8');
+				res.on('data', function (chunk) {
+					data += chunk;
+				});
+
+				res.on('end', function () {
+					console.log('No more data in response.')
+					var parseArr = JSON.parse(data);
+
+					for (i = 1; i <= parseArr.length - 1; i++) {
+						var number = (parseArr[i].Value).replace('.', '').replace(',', '.');
+						if (parseArr[i].PyraID == '2') {
+							sqlInputData1.push('("' + parseArr[i].Timestamp + '",' + number + ')');
+						} else if (parseArr[i].PyraID == '3') {
+							sqlInputData2.push('("' + parseArr[i].Timestamp + '",' + number + ')');
+						} else if (parseArr[i].PyraID == '5') {
+							sqlInputData3.push('("' + parseArr[i].Timestamp + '",' + number + ')');
+						} else if (parseArr[i].PyraID == '6') {
+							sqlInputData4.push('("' + parseArr[i].Timestamp + '",' + number + ')');
+						}
+					}
+
+					if (sqlInputData1[0]) {
+						sqlInputText1 = 'Insert into pyro_site_5(dateTime, pyro_1) values ' + sqlInputData1 + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1);';
+					}
+					if (sqlInputData2[0]) {
+						sqlInputText2 = 'Insert into pyro_site_5(dateTime, pyro_2) values ' + sqlInputData2 + ' ON DUPLICATE KEY UPDATE pyro_2=VALUES(pyro_2);';
+					}
+					if (sqlInputData3[0]) {
+						sqlInputText3 = 'Insert into pyro_site_5(dateTime, pyro_3) values ' + sqlInputData3 + ' ON DUPLICATE KEY UPDATE pyro_3=VALUES(pyro_3);';
+					}
+					if (sqlInputData4[0]) {
+						sqlInputText2 = 'Insert into pyro_site_5(dateTime, pyro_4) values ' + sqlInputData4 + ' ON DUPLICATE KEY UPDATE pyro_4=VALUES(pyro_4);';
+					}
+
+					// console.log('Start transaction;' + sqlInputText1 + sqlInputText2 + sqlInputText3 + sqlInputText4 + 'Commit;')
+
+					connection.query('Start transaction;' + sqlInputText1 + sqlInputText2 + sqlInputText3 + sqlInputText4 + ' insert into dailyEsol (date, PS5) select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_5 where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS5 = values(PS5); Commit;', function (err, result) {
+						if (err) throw err;
+						console.log(result);
+					});
+				})
+			});
+
+			req.on('error', function (e) {
+				console.log('problem with request: ' + e.message);
+			});
+
+			req.end();
+		}
+	});
+
+
 };
