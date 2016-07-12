@@ -11,6 +11,7 @@ angular.module('metro', [
 	'displayReportsIncidents',
 	'displaySingleReportsIncident',
 	'monthReport',
-	'portfolioReport'
+	'portfolioReport',
+	'eveleyOwn'
 ])
 	;
