@@ -278,6 +278,8 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								data[j][1] = 0;
 							}
 
+
+
 							sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + ")"];
 							n++;
 						}
@@ -627,78 +629,8 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	});
 
 
-
-	app.get('/api/mySQL/invUpload/:id', function (req, res) {
-		var id = req.params.id;
-		var filePath = "./files/PS" + id + " Inv.csv";
-
-		fs.readFile(filePath, {
-			encoding: 'utf-8'
-		}, function (err, csvData) {
-			if (err) {
-				console.log(err);
-			}
-			csvParse(csvData, {
-				separator: ',',
-				newline: '\n'
-			}, function (err, data) {
-				if (err) {
-					console.log(err);
-				} else {
-					var sqlInputData = [];
-					if (id <= 4) {
-						for (j = 1; j < data.length; j++) {
-							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-							sqlInputData.push("('" + data[j][0] + "'");
-							for (i = 1; i <= data[j].length - 1; i++) {
-								data[j][i] = parseFloat(data[j][i]);
-								if (isNaN(data[j][i])) {
-									data[j][i] = "NULL";
-								}
-								if (i == data[j].length - 1) {
-									sqlInputData.push(data[0][i].substring(7, 9) + "," + data[0][i].substring(13, 15) + "," + data[j][i] + ")");
-								} else {
-									sqlInputData.push(data[0][i].substring(7, 9) + "," + data[0][i].substring(13, 15) + "," + data[j][i] + "),('" + data[j][0] + "'");
-								}
-							}
-						}
-						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " where generation is null; Commit;", function (err, result) {
-							if (err) throw err;
-							console.log(result.insertId);
-							res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
-						});
-					} else {
-						for (j = 1; j < data.length; j++) {
-							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-							sqlInputData.push("('" + data[j][0] + "'");
-							for (i = 1; i <= data[j].length - 1; i++) {
-								data[j][i] = parseFloat(data[j][i]);
-								if (isNaN(data[j][i])) {
-									data[j][i] = "NULL";
-								}
-								if (i == data[j].length - 1) {
-									sqlInputData.push(i + "," + data[j][i] + ")");
-								} else {
-									sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
-								}
-							}
-						}
-						// res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
-						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
-							if (err) throw err;
-							console.log(result.insertId);
-							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
-						});
-					}
-				}
-			});
-		});
-	});
-
-
-
 	// https://docs.nodejitsu.com/articles/HTTP/clients/how-to-create-a-HTTP-request/
-	app.get('/api/mySQL/autopyroUpload/:id', function (req, res) {
+	app.get('/api/mySQL/autoPyroUpload/:id', function (req, res) {
 
 		var id = req.params.id;
 
@@ -711,7 +643,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				hostname: 'host.webdom.es',
 				port: 8090,
 				// path: '/WDService/WBService.svc/GetInfoInvertersJSON/1/1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21/POWER_AC/2016-07-0114:45:00/2016-07-0114:49:00',
-				path: '/WDService/WBService.svc/GetInfoMeteorologyJSON/1/2;3;5/IRRADIANCE/' + start + '/' + end,
+				path: '/WDService/WBService.svc/GetInfoMeteorologyJSON/1/2;3;5/IRRADIANCE/' + end + '/' + start,
 				method: 'GET'
 			};
 			console.log(options.hostname + ':' + options.port + options.path);
@@ -736,7 +668,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					var parseArr = JSON.parse(data);
 
 					for (i = 1; i <= parseArr.length - 1; i++) {
-						var number = (parseArr[i].Value).replace('.', '').replace(',', '.');
+						var number = (parseArr[i].Value).replace(/\./g, '').replace(/\,/g, '.');
 						if (parseArr[i].PyraID == '2') {
 							sqlInputData1.push('("' + parseArr[i].Timestamp + '",' + number + ')');
 						} else if (parseArr[i].PyraID == '3') {
@@ -775,6 +707,63 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 			});
 
 			req.end();
+		}
+	});
+
+
+	// https://docs.nodejitsu.com/articles/HTTP/clients/how-to-create-a-HTTP-request/
+	app.get('/api/mySQL/autoInvUpload/:id', function (req, res) {
+
+		var id = req.params.id;
+
+		if (id == 5) {
+
+			var end = moment().subtract(211, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+
+			var options = {
+				hostname: 'host.webdom.es',
+				port: 8090,
+				path: '/WDService/WBService.svc/GetInfoInvertersJSON/1/1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21/POWER_AC/' + end + '/' + start,
+				// path: '/WDService/WBService.svc/GetInfoMeteorologyJSON/1/2;3;5/IRRADIANCE/' + end + '/' + start,
+				method: 'GET'
+			};
+			console.log(options.hostname + ':' + options.port + options.path);
+
+			var req = http.request(options, function (res) {
+				var data = '';
+				var sqlInputData = [];
+
+
+				res.setEncoding('utf8');
+				res.on('data', function (chunk) {
+					data += chunk;
+				});
+
+				res.on('end', function () {
+					console.log('No more data in response.')
+					var parseArr = JSON.parse(data);
+
+					for (i = 1; i <= parseArr.length - 1; i++) {
+						var number = (parseArr[i].Value).replace(/\./g, '').replace(/\,/g, '.')/1000;
+
+						sqlInputData.push('("' + parseArr[i].Timestamp + '",' + parseArr[i].InverterID + ',' + number + ')');
+					}
+
+					// console.log('INSERT INTO inverter_generation_5 VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation = VALUES(generation);');
+
+					connection.query('INSERT INTO inverter_generation_5 VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation = VALUES(generation);', function (err, result) {
+						if (err) throw err;
+						console.log(result);
+					});
+				})
+			});
+
+			req.on('error', function (e) {
+				console.log('problem with request: ' + e.message);
+			});
+			req.end();
+			res.send('done');
 		}
 	});
 
