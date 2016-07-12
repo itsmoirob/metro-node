@@ -11,31 +11,18 @@ html
 	body(ng-app="metro")
 		nav(class="primroseYellow")
 			ul(class="right hide-on-med-and-down")
-				if !user	
+				if !user
 					li(class=(title == 'Login' ? 'active' : ''))
 						a(href='/users/login') Log In
 				if user
-					li
-						a(href="#") Home
-					// li
-					// 	a(href="/#/incidentsAll") Incidents
-					li
-						a(href="/#/portfolio/monthReport") Portfolio report
-					li
-						a(href="/#/reportsAll") All site report
-					li(class=(title == 'Register' ? 'active' : ''))
-						a(href='/users/register') Register
-					li 
-						a Hello #{user.name}
-					li
-						a(href='/users/logout') Logout
-			ul(class="right hide-on-large-only")
-				a(class="dropdown-button btn indigo accent-3" data-activates="topNavDrop") Navigate
-				ul(id="topNavDrop" class="dropdown-content")
-					if !user	
-						li(class=(title == 'Login' ? 'active' : ''))
-							a(href='/users/login') Log In
-					if user
+					if user.username == 'db'
+						li
+							a(href="#") Home
+						li 
+							a Hello #{user.name}
+						li
+							a(href='/users/logout') Logout
+					else
 						li
 							a(href="#") Home
 						// li
@@ -50,10 +37,45 @@ html
 							a Hello #{user.name}
 						li
 							a(href='/users/logout') Logout
+			ul(class="right hide-on-large-only")
+				a(class="dropdown-button btn indigo accent-3" data-activates="topNavDrop") Navigate
+				ul(id="topNavDrop" class="dropdown-content")
+					if !user	
+						li(class=(title == 'Login' ? 'active' : ''))
+							a(href='/users/login') Log In
+					if user
+						if user.username == 'db'
+							li
+								a(href="#") Home
+							li 
+								a Hello #{user.name}
+							li
+								a(href='/users/logout') Logout
+						else
+							li
+								a(href="#") Home
+							// li
+							// 	a(href="/#/incidentsAll") Incidents
+							li
+								a(href="/#/portfolio/monthReport") Portfolio report
+							li
+								a(href="/#/reportsAll") All site report
+							li(class=(title == 'Register' ? 'active' : ''))
+								a(href='/users/register') Register
+							li 
+								a Hello #{user.name}
+							li
+								a(href='/users/logout') Logout
 			a(data-activates="slide-out", class="button-collapse")
 				i(class="mdi-navigation-menu")
-			ul(id="slide-out", class="side-nav fixed primroseYellow")
-				div(ui-view="other")
+			if !user
+				ul(id="slide-out", class="side-nav fixed primroseYellow")
+			if user
+				if user.username == 'db'
+					ul(id="slide-out", class="side-nav fixed primroseYellow")
+				else
+					ul(id="slide-out", class="side-nav fixed primroseYellow")
+						div(ui-view="other")
 
 		.container(class="container")
 			!= messages()
@@ -83,6 +105,7 @@ html
 		script(src="../app/displayProject/reportSingleIncident.js")
 		script(src="../app/displayProject/monthReport.js")
 		script(src="../app/displayProject/portfolioReport.js")
+		script(src="../app/displayProject/eveleyOwn.js")
 
 		script(src="//maps.googleapis.com/maps/api/js?sensor=false")
 		script(src="../javascripts/angular-google-maps.js")
