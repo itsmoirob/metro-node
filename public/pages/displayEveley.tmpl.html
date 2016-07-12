@@ -1,0 +1,31 @@
+<div>
+	<a download="Eveley stats.csv" href="" onclick="return ExcellentExport.csv(this, 'datatable');">Export to CSV</a>
+	<br/>
+	
+	<button ng-click="order()">Order</button>
+	<span id="symbol" ng-class="{reverse:reverse}"></span>
+
+	<table class="metroTable" id="datatable">
+		<caption>Daily stats and PR</caption>
+		<tr>
+			<th>Date</th>
+			<th>Export kWh</th>
+			<th>Pyro mean Wh</th>
+			<th>OP Hours</th>
+			<th>ESOL</th>
+			<th>Theoretical kWh</th>
+			<th>PR%</th>
+			<th>Pryo data used</th>
+		</tr>
+		<tr ng-repeat="report in MKReport | orderBy:'date':reverse">
+			<td>{{ report.date | date:'dd/MM/yyyy' }}</td>
+			<td>{{ report.generation | number:1 }}</td>
+			<td>{{ report.avgPyro | number:1 }}</td>
+			<td>{{ report.opHours | number:1 }}</td>
+			<td>{{ report.esol | number:2 }}</td>
+			<td>{{ report.theoretical | number:1 }}</td>
+			<td>{{ report.pr * 100 | number:1 }}%</td>
+			<td>{{ report.type }}</td>
+		</tr>
+	</table>
+</div>
