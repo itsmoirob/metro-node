@@ -3,8 +3,7 @@
 	<p>
 		This is <span class="metro">Metro</span>, connecting all sites of Primrose Solar.
 	</p>
-	A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> project board on what I am working on and suggesting
-	features/reports
+	A <a href="https://trello.com/b/D83zSck5/metro" target="_blank">TRELLO</a> project board on what I am working on and suggesting features/reports
 	<hr />
 	<div>
 		<highchart id="chartSumSites" config="chartSumSites"></highchart>
@@ -61,10 +60,12 @@
 </div>-->
 <div class="row">
 	<ui-gmap-google-map draggable="true" center='map.center' zoom='map.zoom'>
-		<ui-gmap-marker ng-repeat="marker in markers" coords='marker.coords' idkey='marker.id'>
-			<ui-gmap-window>
-				<div>{{marker.window.title}} has today exported <b>{{siteLatest["ps"+marker.id]/1000 | number:1}}</b>MWh</div>
-			</ui-gmap-window>
-		</ui-gmap-marker>
+		<div ng-repeat="marker in markers">
+			<ui-gmap-marker coords='marker.coords' idkey='marker.id'>
+				<ui-gmap-window>
+					<div>{{marker.window.title}} has today exported <b>{{siteLatest["ps"+marker.id]/1000 | number:1}}</b>MWh</div>
+				</ui-gmap-window>
+			</ui-gmap-marker>
+		</div>
 	</ui-gmap-google-map>
 </div>
