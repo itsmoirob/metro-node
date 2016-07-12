@@ -16,6 +16,10 @@ angular.module('routes', [
 						controller: 'SiteCtrl',
 						templateUrl: 'pages/select.tmpl.html'
 					},
+					'altDisplay@': {
+						controller: 'EveleyCtrl',
+						templateUrl: 'pages/displayEveley.tmpl.html'
+					},
 					'other@': {
 						controller: 'ListCtrl',
 						templateUrl: 'pages/selectList.tmpl.html'
@@ -206,7 +210,20 @@ angular.module('routes', [
 					}
 				}
 			})
-		;
+			.state('parent.displayEveleyDB', { //list the main body of the 'summary' page
+				url: '/welcomeToEveley',
+				views: {
+					'altDisplay@': {
+						controller: 'EveleyCtrl',
+						templateUrl: 'pages/displayEveley.tmpl.html'
+					},
+					'other@': {
+						// controller: 'ListCtrl',
+						// templateUrl: 'pages/displaySiteList.tmpl.html'
+					}
+				}
+			})
+			;
 		// $urlRouterProvider.otherwise('/index'); //take to front page
 	})
-;
+	;
