@@ -4,22 +4,22 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 
 	var mpanList = [
-		{ "id": 1, "mpan": "2100041172109", "solarGis": "SolarGIS_min15_6_Cowbridge_" },
-		{ "id": 2, "mpan": "2000055901355", "solarGis": "SolarGIS_min15_4_Poole_" },
-		{ "id": 3, "mpan": "2000055901300", "solarGis": "SolarGIS_min15_5_Lytchett_Minster_" },
-		{ "id": 4, "mpan": "1050000588215", "solarGis": "SolarGIS_min15_2_West_Caister_" },
-		{ "id": 5, "mpan": "2200042384200", "solarGis": "SolarGIS_min15_8_Canworthy_" },
+		{ "id": 1, "mpan": "2100041172109", "solarGis": "SolarGIS_min15_6_Cowbridge_", "exportMpan": "2100041172093"},
+		{ "id": 2, "mpan": "2000055901355", "solarGis": "SolarGIS_min15_4_Poole_", "exportMpan": "2000055901346" },
+		{ "id": 3, "mpan": "2000055901300", "solarGis": "SolarGIS_min15_5_Lytchett_Minster_", "exportMpan": "2000055901285" },
+		{ "id": 4, "mpan": "1050000588215", "solarGis": "SolarGIS_min15_2_West_Caister_", "exportMpan": "1050000588206" },
+		{ "id": 5, "mpan": "2200042384200", "solarGis": "SolarGIS_min15_8_Canworthy_", "exportMpan": "2200042384194" },
 		{ "id": 6, "mpan": null },
 		{ "id": 7, "mpan": "2000056147387" },
 		{ "id": 8, "mpan": "1900091171276" },
 		{ "id": 9, "mpan": "1900091178963" },
 		{ "id": 10, "mpan": "1900091183411" },
-		{ "id": 11, "mpan": "2200042480656", "solarGis": "SolarGIS_min15_9_Wilton_" },
-		{ "id": 12, "mpan": "2000056366930", "solarGis": "SolarGIS_min15_4_Poole_" },
-		{ "id": 13, "mpan": "2000056456265", "solarGis": "SolarGIS_min15_10_Merston_" },
-		{ "id": 14, "mpan": "1170000610807", "solarGis": "SolarGIS_min15_11_Ashby_" },
-		{ "id": 15, "mpan": "1640000523609", "solarGis": "SolarGIS_min15_7_Morecambe_" },
-		{ "id": 16, "mpan": "2000056474812", "solarGis": "SolarGIS_min15_12_Eveley_" }
+		{ "id": 11, "mpan": "2200042480656", "solarGis": "SolarGIS_min15_9_Wilton_", "exportMpan": "2200042480610" },
+		{ "id": 12, "mpan": "2000056366930", "solarGis": "SolarGIS_min15_4_Poole_", "exportMpan": "2000056366860" },
+		{ "id": 13, "mpan": "2000056456265", "solarGis": "SolarGIS_min15_10_Merston_", "exportMpan": "2000056456256" },
+		{ "id": 14, "mpan": "1170000610807", "solarGis": "SolarGIS_min15_11_Ashby_", "exportMpan": "1170000610791" },
+		{ "id": 15, "mpan": "1640000523609", "solarGis": "SolarGIS_min15_7_Morecambe_", "exportMpan": "1640000523593" },
+		{ "id": 16, "mpan": "2000056474812", "solarGis": "SolarGIS_min15_12_Eveley_", "exportMpan": "2000056474803" }
 	];
 
 	// connect ftp
@@ -137,6 +137,68 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		});
 	});
 
+		// upload export to database tables export_# and dailySumExport
+	app.get('/api/mySQL/importUpload/:id', function (req, res) {
+
+		var id = req.params.id;
+		id = id - 1;
+		var filePath = "./files/Primrose Solar Limited.csv";
+		var startIndex = 3;
+
+		fs.readFile(filePath, {
+			encoding: 'utf-8'
+		}, function (err, csvData) {
+			if (err) {
+				console.log(err);
+			}
+			csvParse(csvData, {
+				separator: ',',
+				newline: '\n'
+			}, function (err, data) {
+				if (err) {
+					console.log(err);
+				} else {
+
+					var readingsForExport = mpanList.map(function (mpan) {
+						var readingsForOneExport = data.filter(function (item) {
+							return item[0] === mpan.exportMpan;
+						});
+						return {
+							id: mpan.id,
+							data: readingsForOneExport
+						};
+					});
+
+
+					var sqlInputData = [];
+					var n = 0;
+
+					for (var j = 0; j < readingsForExport[id].data.length; j++) { // use this line only for histroical data
+						var day = moment(readingsForExport[id].data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
+						var hour = moment("00:00", "HH:mm").format("HH:mm");
+						for (var i = startIndex; i < readingsForExport[id].data[j].length; i++) {
+
+							if (readingsForExport[id].data[j][i] === "-") {
+								readingsForExport[id].data[j][i] = "NULL";
+							}
+
+							sqlInputData[n] = ["('" + day + "','" + hour + "'," + readingsForExport[id].data[j][i] + ")"];
+							hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
+							n++;
+						}
+					}
+
+					connection.query("Start transaction; INSERT INTO import_" + readingsForExport[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS" + readingsForExport[id].id + ") select date, sum(generation) from import_" + readingsForExport[id].id + " where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS" + readingsForExport[id].id + "=VALUES(PS" + readingsForExport[id].id + "); commit;", function (err, result) {
+						if (err) throw err;
+						console.log(result);
+						res.send("COMPLETE: INSERT INTO export_" + readingsForExport[id].id + " VALUES " + sqlInputData[0] + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation);" + result.message);
+					});
+
+				}
+			});
+		});
+	});
+
 	// upload solargis data to database tables export_# and dailySumExport
 	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
 
@@ -168,6 +230,48 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						if (err) throw err;
 						console.log(result);
 						res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');
+					});
+				}
+			});
+		});
+	});
+
+		app.get('/api/mySQL/manualImportUpload/:id', function (req, res) {
+		var id = req.params.id - 1;
+		var filePath = "./files/" + mpanList[id].exportMpan + ".csv";
+		fs.readFile(filePath, {
+			encoding: 'utf-8'
+		}, function (err, csvData) {
+			if (err) {
+				console.log(err);
+			}
+			csvParse(csvData, {
+				separator: ',',
+				newline: '\n'
+			}, function (err, data) {
+				if (err) {
+					console.log(err);
+				} else {
+					var sqlInputData = [];
+					var n = 0;
+
+					for (j = 8; j < data.length; j++) { // use this line only for histroical data
+						var day = moment(data[j][7], "DD/MM/YY").format("YYYY-MM-DD");
+						for (i = 8; i < data[j].length; i++) {
+							var hour = data[7][i];
+							if (data[j][i] === "-") {
+								data[j][i] = "NULL";
+							}
+							sqlInputData[n] = ["('" + day + "','" + hour + "'," + data[j][i] + ")"];
+							// hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
+							n++;
+						}
+					}
+					// res.send("INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation)");
+					connection.query("Start transaction; INSERT INTO import_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS" + mpanList[id].id + ") select date, sum(generation) from import_" + mpanList[id].id + " where date > NOW() - INTERVAL 600 DAY group by date order by date asc on duplicate key update PS" + mpanList[id].id + "=VALUES(PS" + mpanList[id].id + "); commit;", function (err, result) {
+						if (err) throw err;
+						console.log(result.insertId);
+						res.send("Done: INSERT INTO import_" + mpanList[id].id + " VALUES " + sqlInputData);
 					});
 				}
 			});
