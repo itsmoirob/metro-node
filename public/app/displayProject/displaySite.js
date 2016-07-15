@@ -98,7 +98,7 @@ angular.module('displaySite', [
 		$scope.chartSumSites = {
 			options: {
 				chart: {
-					type: 'line'
+					type: 'spline'
 				},
 				tooltip: {
 					headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
@@ -132,7 +132,7 @@ angular.module('displaySite', [
 		$scope.chartSumMWpSites = {
 			options: {
 				chart: {
-					type: 'line'
+					type: 'spline'
 				},
 				tooltip: {
 					headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
@@ -165,7 +165,7 @@ angular.module('displaySite', [
 		$scope.chartEsolSites = {
 			options: {
 				chart: {
-					type: 'line'
+					type: 'spline'
 				},
 				tooltip: {
 					headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
