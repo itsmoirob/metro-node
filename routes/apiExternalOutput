@@ -25,7 +25,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		user: config.metFtp.user,
 		pass: config.metFtp.pass
 	});
-	// metOfficeFtp.keepAlive();
+	metOfficeFtp.keepAlive();
 
 	// get export generation
 	app.get('/api/mysql/metExport/:id', function (req, res) {
@@ -33,7 +33,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		var site = mpanList.filter(function (site) { return site.id == id })[0];
 		var inserts = ['export_' + id];
 		var filePath = (site.id < 10 ? '0' : '') + site.id + ' Site ' + site.name + '.csv';
-		connection.query('SELECT  date_format(date, "%d/%m/%Y") as date, time, generation FROM ?? where date > NOW() - INTERVAL 7 DAY order by date asc;', inserts, function (err, rows) {
+		connection.query('SELECT  date_format(date, "%d/%m/%Y") AS date, time, generation FROM ?? where date > NOW() - INTERVAL 7 DAY ORDER BY date DESC;', inserts, function (err, rows) {
 			if (err) {
 				return res.json(err);
 			} else {
