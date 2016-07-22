@@ -41,6 +41,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	app.get('/api/ftp/:id', function (req, res) {
 		var id = req.params.id;
+		var site = mpanList.filter(function (site) { return site.id == id })[0];
 		if (id === 'NonHH') {
 			var fileName = 'Primrose Solar Limited NonHH.csv';
 		} else {
@@ -57,85 +58,111 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		});
 	});
 
-	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
+	app.get('/api/solarGisFtp/:id', function (req, res) {
 		var id = req.params.id;
-		id = id - 1;
-		var day = moment().subtract(1, 'days').format('YYYYMMDD');
-		var mySQLDay = moment(day).format('YYYY-MM-DD');
-		var filePath = './files/solarGis/' + mpanList[id].solarGis + day + '.csv';
+		var site = mpanList.filter(function (site) { return site.id == id })[0];;
 
 		var day = moment().subtract(1, 'days').format('YYYYMMDD');
-		var filePath = mpanList[id].solarGis + day + '.csv';
+		var fileName = site.solarGis + day + '.csv';
 
-		solarGisFtp.get('/CLIMDATA/' + filePath, './files/solarGis/' + filePath, function (hadErr) {
+		solarGisFtp.get('/CLIMDATA/' + fileName, './files/solarGis/' + site.id + '_' + fileName, function (hadErr) {
 			if (hadErr) {
 				console.error('There was an error retrieving the file.' + hadErr);
 				res.send('There was an error retrieving the file.' + hadErr);
 			} else {
-				fs.readFile('./files/solarGis/' + filePath, {
-					encoding: 'utf-8'
-				}, function (err, csvData) {
-					if (err) {
-						console.log(err);
-					}
-					csvParse(csvData, { comment: '#', delimiter: ';' }, function (err, data) {
-						if (err) {
-							console.log(err);
-						} else {
-							var solarGisSum = 0;
-							for (var j = 1; j < data.length; j++) {
-								solarGisSum = solarGisSum + parseInt(data[j][4]);
-							}
-							solarGisSum = solarGisSum / 4000;
-							connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` > 0.000009, `ps' + mpanList[id].id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
-								if (err) throw err;
-								console.log(result);
-								res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');
-							});
-						}
-					});
-					fs.unlinkSync('./files/solarGis/' + filePath);
-				});
 				console.log('File copied successfully!');
-				// res.send('File ' + fileName + ' has been downloaded');
+				res.send('File ' + fileName + ' has been downloaded');
 			}
 		});
 	});
 
-	// 	// upload solargis data to database tables export_# and dailySumExport
 	// app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
-
 	// 	var id = req.params.id;
-	// id = id - 1;
-	// var day = moment().subtract(1, 'days').format('YYYYMMDD');
-	// var mySQLDay = moment(day).format('YYYY-MM-DD');
-	// var filePath = './files/solarGis/' + mpanList[id].solarGis + day + '.csv';
+	// 	id = id - 1;
+	// 	var day = moment().subtract(1, 'days').format('YYYYMMDD');
+	// 	var mySQLDay = moment(day).format('YYYY-MM-DD');
+	// 	var filePath = './files/solarGis/' + mpanList[id].solarGis + day + '.csv';
 
-	// 	fs.readFile(filePath, {
-	// 		encoding: 'utf-8'
-	// 	}, function (err, csvData) {
-	// 		if (err) {
-	// 			console.log(err);
-	// 		}
-	// 		csvParse(csvData, { comment: '#', delimiter: ';' }, function (err, data) {
-	// 			if (err) {
-	// 				console.log(err);
-	// 			} else {
-	// 				var solarGisSum = 0;
-	// 				for (var j = 1; j < data.length; j++) {
-	// 					solarGisSum = solarGisSum + parseInt(data[j][4]);
+	// 	var day = moment().subtract(1, 'days').format('YYYYMMDD');
+	// 	var filePath = mpanList[id].solarGis + day + '.csv';
+
+	// 	solarGisFtp.get('/CLIMDATA/' + filePath, './files/solarGis/' + filePath, function (hadErr) {
+	// 		if (hadErr) {
+	// 			console.error('There was an error retrieving the file.' + hadErr);
+	// 			res.send('There was an error retrieving the file.' + hadErr);
+	// 		} else {
+	// 			fs.readFile('./files/solarGis/' + filePath, {
+	// 				encoding: 'utf-8'
+	// 			}, function (err, csvData) {
+	// 				if (err) {
+	// 					console.log(err);
 	// 				}
-	// 				solarGisSum = solarGisSum / 4000;
-	// 				connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` > 0.000009, `ps' + mpanList[id].id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
-	// 					if (err) throw err;
-	// 					console.log(result);
-	// 					res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');
+	// 				csvParse(csvData, { comment: '#', delimiter: ';' }, function (err, data) {
+	// 					if (err) {
+	// 						console.log(err);
+	// 					} else {
+	// 						var solarGisSum = 0;
+	// 						for (var j = 1; j < data.length; j++) {
+	// 							solarGisSum = solarGisSum + parseInt(data[j][4]);
+	// 						}
+	// 						solarGisSum = solarGisSum / 4000;
+	// 						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = if(`ps' + mpanList[id].id + '` > 0.000009, `ps' + mpanList[id].id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
+	// 							if (err) throw err;
+	// 							console.log(result);
+	// 							res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + mpanList[id].id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + mpanList[id].id + '` = \'' + solarGisSum + '\';');
+	// 						});
+	// 					}
 	// 				});
-	// 			}
-	// 		});
-	// 		fs.unlinkSync(filePath);
+	// 				fs.unlinkSync('./files/solarGis/' + filePath);
+	// 			});
+	// 			console.log('File copied successfully!');
+	// 			// res.send('File ' + fileName + ' has been downloaded');
+	// 		}
 	// 	});
 	// });
+
+	// upload solargis data to database tables export_# and dailySumExport
+	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
+
+		var id = req.params.id;
+		var site = mpanList.filter(function (site) { return site.id == id })[0];;
+		var day = moment().subtract(1, 'days').format('YYYYMMDD');
+		var mySQLDay = moment(day).format('YYYY-MM-DD');
+		var filePath = './files/solarGis/' + site.id + '_' + site.solarGis + day + '.csv';
+
+		try {
+			fs.readFile(filePath, {
+				encoding: 'utf-8'
+			}, function (err, csvData) {
+				if (err) {
+					console.log(err);
+				}
+				csvParse(csvData, { comment: '#', delimiter: ';' }, function (err, data) {
+					if (err) {
+						console.log(err);
+					} else {
+						var solarGisSum = 0;
+						for (var j = 1; j < data.length; j++) {
+							solarGisSum = solarGisSum + parseInt(data[j][4]);
+						}
+						solarGisSum = solarGisSum / 4000;
+						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + site.id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + site.id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + site.id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + site.id + '` = if(`ps' + site.id + '` > 0.000009, `ps' + site.id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
+							if (err) throw err;
+							console.log(result);
+							res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + site.id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + site.id + '` = \'' + solarGisSum + '\';');
+						});
+					}
+				});
+				try {
+					fs.unlinkSync(filePath);
+				} catch (err) {
+					console.log('fs.unlinkSync(filePath) did not work for ' + filePath);
+				}
+			});
+		} catch(err) {
+			console.log('fs.readFile(filePath) ' + filePath);
+		}
+	});
 
 	// upload export to database tables export_# and dailySumExport
 	app.get('/api/mySQL/exportUpload/:id', function (req, res) {
