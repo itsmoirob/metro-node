@@ -50,7 +50,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							} catch (err) {
 								console.log('error while deleting ./files/metCsv/' + filePath);
 							}
-					});
+						});
 						console.log('The file was saved! ' + filePath);
 
 					})
