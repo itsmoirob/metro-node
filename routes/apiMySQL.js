@@ -205,7 +205,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								site.data[j][i] = "NULL";
 							}
 
-							sqlInputData[n] = ["(NULL, '" + day + "','" + hour + "'," + site.data[j][i] + ")"];
+							sqlInputData[n] = ["('" + day + "','" + hour + "'," + site.data[j][i] + ")"];
 							hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
 							n++;
 						}
@@ -226,61 +226,75 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	});
 
 	// upload export to database tables export_# and dailySumExport
-	app.get('/api/mySQL/importUpload/:id', function (req, res) {
-
+	app.get('/api/mySQL/upload/:table/:id', function (req, res) {
 		var id = req.params.id;
-		// id = id-1;
-		var filePath = "./files/Primrose Solar Limited.csv";
-		var startIndex = 3;
-		fs.readFile(filePath, {
-			encoding: 'utf-8'
-		}, function (err, csvData) {
-			if (err) {
-				console.log(err);
-			}
-			csvParse(csvData, {
-				separator: ',',
-				newline: '\n'
-			}, function (err, data) {
-				if (err) {
-					console.log(err);
-				} else {
-					var readingsForExport = mpanList.map(function (mpan) {
-						var readingsForOneExport = data.filter(function (item) {
-							return item[0] === mpan.importMpan;
-						});
-						return {
-							id: mpan.id,
-							data: readingsForOneExport
-						};
-					});
-					var site = readingsForExport.filter(function (site) { return site.id == id })[0];
-					var sqlInputData = [];
-					var n = 0;
-					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
-						var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
-						var hour = moment("00:00", "HH:mm").format("HH:mm");
-						for (var i = startIndex; i < site.data[j].length; i++) {
-							if (site.data[j][i] === "-") {
-								site.data[j][i] = "NULL";
-							}
-							sqlInputData[n] = ["('" + day + "','" + hour + "'," + site.data[j][i] + ")"];
-							hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
-							n++;
-						}
+		var table = req.params.table;
+		var siteIdCheck = mpanList.filter(function (site) { return site.id == id });
+		if (table == 'import' || table == 'export') {
+			if (!isNaN(parseInt(id))) {
+				var filePath = "./files/Primrose Solar Limited.csv";
+				var startIndex = 3;
+				fs.readFile(filePath, {
+					encoding: 'utf-8'
+				}, function (err, csvData) {
+					if (err) {
+						console.log(err);
 					}
-					connection.query('INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' where date > NOW() - INTERVAL 100 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
+					csvParse(csvData, {
+						separator: ',',
+						newline: '\n'
+					}, function (err, data) {
 						if (err) {
-							console.log('Error auto import upload file ' + site.id + ' : ' + err);
-							res.send('ERROR file ' + site.id + ' : INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData);
+							console.log(err);
 						} else {
-							console.log('Site: ' + site.id + '; ImportHHSQL: ' + result[0].message + '; ImportDailySumSQL: ' + result[1].message);
-							res.send('COMPLETE: INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ImportHHSQL: ' + result[0].message + '; ImportDailySumSQL: ' + result[1].message);
+							var readingsForExport = mpanList.map(function (mpan) {
+								var readingsForOneExport = data.filter(function (item) {
+									if(table == 'export') {
+										return item[0] === mpan.mpan;
+									} else {
+										return item[0] === mpan.importMpan;
+									} 
+
+								});
+								return {
+									id: mpan.id,
+									data: readingsForOneExport
+								};
+							});
+							var site = readingsForExport.filter(function (site) { return site.id == id })[0];
+							var sqlInputData = [];
+							var n = 0;
+							for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
+								var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
+								var hour = moment("00:00", "HH:mm").format("HH:mm");
+								for (var i = startIndex; i < site.data[j].length; i++) {
+									if (site.data[j][i] === "-") {
+										site.data[j][i] = "NULL";
+									}
+									sqlInputData[n] = ["('" + day + "','" + hour + "'," + site.data[j][i] + ")"];
+									hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
+									n++;
+								}
+							}
+							res.send('INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySum' + table[0].toUpperCase() + table.substring(1) + '(date,PS' + site.id + ') select date, sum(generation) from ' + table + '_' + site.id + ' where date > NOW() - INTERVAL 14 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');');
+							// connection.query('INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySum' + table[0].toUpperCase() + table.substring(1) + '(date,PS' + site.id + ') select date, sum(generation) from ' + table + '_' + site.id + ' where date > NOW() - INTERVAL 14 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
+							// 	if (err) {
+							// 		console.log('Error auto ' + table + ' upload file ' + site.id + ' : ' + err);
+							// 		res.send('ERROR file ' + site.id + ' : INSERT INTO ' + table + 't_' + site.id + ' VALUES ' + sqlInputData);
+							// 	} else {
+							// 		console.log('Site: ' + site.id + '; ' + table + 'HHSQL: ' + result[0].message + '; ' + table + 'DailySumSQL: ' + result[1].message);
+							// 		res.send('COMPLETE: INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ' + table + 'HHSQL: ' + result[0].message + '; ' + table + 'DailySumSQL: ' + result[1].message);
+							// 	}
+							// });
 						}
 					});
-				}
-			});
-		});
+				});
+			} else {
+				res.send('Error; site id ' + id + ' does not exist')
+			}
+		} else {
+			res.send('Error; table ' + table + ' does not exist.');
+		}
 	});
 
 
@@ -357,7 +371,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							if (data[j][i] === "-") {
 								data[j][i] = "NULL";
 							}
-							sqlInputData[n] = ["(NULL, '" + day + "','" + hour + "'," + data[j][i] + ")"];
+							sqlInputData[n] = ["('" + day + "','" + hour + "'," + data[j][i] + ")"];
 							// hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
 							n++;
 						}
