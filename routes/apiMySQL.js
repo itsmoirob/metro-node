@@ -249,11 +249,11 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						} else {
 							var readingsForExport = mpanList.map(function (mpan) {
 								var readingsForOneExport = data.filter(function (item) {
-									if(table == 'export') {
+									if (table == 'export') {
 										return item[0] === mpan.mpan;
 									} else {
 										return item[0] === mpan.importMpan;
-									} 
+									}
 
 								});
 								return {
@@ -276,16 +276,16 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 									n++;
 								}
 							}
-							res.send('INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySum' + table[0].toUpperCase() + table.substring(1) + '(date,PS' + site.id + ') select date, sum(generation) from ' + table + '_' + site.id + ' where date > NOW() - INTERVAL 14 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');');
-							// connection.query('INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySum' + table[0].toUpperCase() + table.substring(1) + '(date,PS' + site.id + ') select date, sum(generation) from ' + table + '_' + site.id + ' where date > NOW() - INTERVAL 14 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
-							// 	if (err) {
-							// 		console.log('Error auto ' + table + ' upload file ' + site.id + ' : ' + err);
-							// 		res.send('ERROR file ' + site.id + ' : INSERT INTO ' + table + 't_' + site.id + ' VALUES ' + sqlInputData);
-							// 	} else {
-							// 		console.log('Site: ' + site.id + '; ' + table + 'HHSQL: ' + result[0].message + '; ' + table + 'DailySumSQL: ' + result[1].message);
-							// 		res.send('COMPLETE: INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ' + table + 'HHSQL: ' + result[0].message + '; ' + table + 'DailySumSQL: ' + result[1].message);
-							// 	}
-							// });
+							// res.send('INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySum' + table[0].toUpperCase() + table.substring(1) + '(date,PS' + site.id + ') select date, sum(generation) from ' + table + '_' + site.id + ' where date > NOW() - INTERVAL 14 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');');
+							connection.query('INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySum' + table[0].toUpperCase() + table.substring(1) + '(date,PS' + site.id + ') select date, sum(generation) from ' + table + '_' + site.id + ' where date > NOW() - INTERVAL 14 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
+								if (err) {
+									console.log('Error auto ' + table + ' upload file ' + site.id + ' : ' + err);
+									res.send('ERROR file ' + site.id + ' : INSERT INTO ' + table + 't_' + site.id + ' VALUES ' + sqlInputData);
+								} else {
+									console.log('Site: ' + site.id + '; ' + table + 'HHSQL: ' + result[0].message + '; ' + table + 'DailySumSQL: ' + result[1].message);
+									res.send('COMPLETE: INSERT INTO ' + table + '_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ' + table + 'HHSQL: ' + result[0].message + '; ' + table + 'DailySumSQL: ' + result[1].message);
+								}
+							});
 						}
 					});
 				});
@@ -296,8 +296,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 			res.send('Error; table ' + table + ' does not exist.');
 		}
 	});
-
-
 
 	app.get('/api/mySQL/manualImportUpload/:id', function (req, res) {
 		var id = req.params.id;
@@ -427,9 +425,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							sqlInputData[n] = ["('" + data[j][0] + "'," + data[j][1] + "," + data[j][2] + ")"];
 							n++;
 						}
-
-						// res.send("Done: INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData);
-
 						connection.query("Start transaction; INSERT INTO pyro_site_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2); insert into dailyEsol (date, PS" + id + ") select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end)))/60000 from pyro_site_" + id + " where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS" + id + " = values(PS" + id + "); Commit;", function (err, result) {
 							if (err) throw err;
 							console.log(result);
@@ -801,14 +796,10 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	// https://docs.nodejitsu.com/articles/HTTP/clients/how-to-create-a-HTTP-request/
 	app.get('/api/mySQL/autoPyroUpload/:id', function (req, res) {
-
 		var id = req.params.id;
-
 		if (id == 5) {
-
 			var end = moment().subtract(211, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
-
 			var options = {
 				hostname: 'host.webdom.es',
 				port: 8090,
@@ -817,7 +808,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				method: 'GET'
 			};
 			console.log(options.hostname + ':' + options.port + options.path);
-
 			var req = http.request(options, function (res) {
 				var data = '';
 				var sqlInputData1 = [];
@@ -832,11 +822,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				res.on('data', function (chunk) {
 					data += chunk;
 				});
-
 				res.on('end', function () {
 					console.log('No more data in response.')
 					var parseArr = JSON.parse(data);
-
 					for (i = 1; i <= parseArr.length - 1; i++) {
 						var number = (parseArr[i].Value).replace(/\./g, '').replace(/\,/g, '.');
 						if (parseArr[i].PyraID == '2') {
@@ -849,7 +837,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							sqlInputData4.push('("' + parseArr[i].Timestamp + '",' + number + ')');
 						}
 					}
-
 					if (sqlInputData1[0]) {
 						sqlInputText1 = 'Insert into pyro_site_5(dateTime, pyro_1) values ' + sqlInputData1 + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1);';
 					}
@@ -862,20 +849,15 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					if (sqlInputData4[0]) {
 						sqlInputText2 = 'Insert into pyro_site_5(dateTime, pyro_4) values ' + sqlInputData4 + ' ON DUPLICATE KEY UPDATE pyro_4=VALUES(pyro_4);';
 					}
-
-					// console.log('Start transaction;' + sqlInputText1 + sqlInputText2 + sqlInputText3 + sqlInputText4 + 'Commit;')
-
 					connection.query('Start transaction;' + sqlInputText1 + sqlInputText2 + sqlInputText3 + sqlInputText4 + ' insert into dailyEsol (date, PS5) select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_5 where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS5 = values(PS5); Commit;', function (err, result) {
 						if (err) throw err;
 						console.log(result);
 					});
 				})
 			});
-
 			req.on('error', function (e) {
 				console.log('problem with request: ' + e.message);
 			});
-
 			req.end();
 		}
 	});
@@ -883,14 +865,11 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	// https://docs.nodejitsu.com/articles/HTTP/clients/how-to-create-a-HTTP-request/
 	app.get('/api/mySQL/autoInvUpload/:id', function (req, res) {
-
 		var id = req.params.id;
-
 		if (id == 5) {
-
-			var end = moment().subtract(1471, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+			// var end = moment().subtract(1471, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
-
+			var end = '2016-08-0100:00:00';
 			var options = {
 				hostname: 'host.webdom.es',
 				port: 8090,
@@ -899,36 +878,26 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				method: 'GET'
 			};
 			console.log(options.hostname + ':' + options.port + options.path);
-
 			var req = http.request(options, function (res) {
 				var data = '';
 				var sqlInputData = [];
-
-
 				res.setEncoding('utf8');
 				res.on('data', function (chunk) {
 					data += chunk;
 				});
-
 				res.on('end', function () {
 					console.log('No more data in response.')
 					var parseArr = JSON.parse(data);
-
 					for (i = 1; i <= parseArr.length - 1; i++) {
 						var number = (parseArr[i].Value).replace(/\./g, '').replace(/\,/g, '.') / 1000;
-
 						sqlInputData.push('("' + parseArr[i].Timestamp + '",' + parseArr[i].InverterID + ',' + number + ')');
 					}
-
-					// console.log('INSERT INTO inverter_generation_5 VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation = VALUES(generation);');
-
 					connection.query('INSERT INTO inverter_generation_5 VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation = VALUES(generation);', function (err, result) {
 						if (err) throw err;
 						console.log(result);
 					});
 				})
 			});
-
 			req.on('error', function (e) {
 				console.log('problem with request: ' + e.message);
 			});
@@ -936,6 +905,4 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 			res.send('done');
 		}
 	});
-
-
 };
