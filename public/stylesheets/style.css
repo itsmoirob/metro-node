@@ -1,249 +1,260 @@
-header, body, footer {
-  padding-left: 240px;
+header,
+body,
+footer {
+	padding-left: 240px;
 }
 
-@media only screen and (max-width : 992px) {
-  header, body, footer {
-    padding-left: 0;
-  }
+@media only screen and (max-width: 992px) {
+	header,
+	body,
+	footer {
+		padding-left: 0;
+	}
 }
 
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  .section-to-print, .section-to-print * {
-    visibility: visible;
-  }
-  .section-to-print {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
+	body * {
+		visibility: hidden;
+	}
+
+	#section-to-print,
+	#section-to-print * {
+		visibility: visible;
+	}
+	#section-to-print {
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
 }
 
 body {
-  /*padding-top: 50px;*/
-  /*background-color: #fcfcfc;*/
-  margin: 0;
-  margin: 0 auto;
-  /*font-size: 0.8em;*/
-  
+	/*padding-top: 50px;*/
+	/*background-color: #fcfcfc;*/
+	margin: 0;
+	margin: 0 auto;
+	/*font-size: 0.8em;*/
 }
 
 a {
-  color: #00B7FF;
+	color: #00B7FF;
 }
 
-ul.success li, ul.info li, ul.error li{
-  margin:20px 0 20px 0;
-  padding:15px;
-  border:1px solid transparent;
-  border-radius:5px;
-  list-style: none;
+ul.success li,
+ul.info li,
+ul.error li {
+	margin: 20px 0 20px 0;
+	padding: 15px;
+	border: 1px solid transparent;
+	border-radius: 5px;
+	list-style: none;
 }
 
-ul.success li{
-  color:#3c763d;
-  background:#dff0d8;
-  border-color:#d6e9c6;
+ul.success li {
+	color: #3c763d;
+	background: #dff0d8;
+	border-color: #d6e9c6;
 }
 
-ul.info li{
-  color: #31708f;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
+ul.info li {
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
 }
 
-ul.success li{
-  color: #3c763d;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
+ul.success li {
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
 }
 
 .letter {
-  width: 21cm;
-  height: 29.7cm;
-  padding-left: 1cm;
-  padding-right: 1cm;
-  padding-top: 5mm;
-  page-break-after: always;
-  page-break-inside: avoid;
-  font-size: 9pt;
-  position:relative;
-  font-family: "Helvetica Neue", sans-serif;
-  /*background-color: white;*/
+	width: 21cm;
+	height: 29.7cm;
+	padding-left: 1cm;
+	padding-right: 1cm;
+	padding-top: 5mm;
+	page-break-after: always;
+	page-break-inside: avoid;
+	font-size: 9pt;
+	position: relative;
+	font-family: "Helvetica Neue", sans-serif;
+	/*background-color: white;*/
 }
 
-
-
 @media screen {
-  .letter {
-    border: 1px solid black;
-    box-shadow: 7px 7px 7px #666;
-    margin:2em auto;
-    line-height: 1;
-  }
+	.letter {
+		border: 1px solid black;
+		box-shadow: 7px 7px 7px #666;
+		margin: 2em auto;
+		line-height: 1;
+	}
 }
 
 .primroseYellow {
-  background-color: rgb(251, 161, 27);
+	background-color: rgb(251, 161, 27);
 }
-
 
 .brand-logo {
-  height: inherit;
+	height: inherit;
 }
 
-.angular-google-map-container { height: 400px; }
+.angular-google-map-container {
+	height: 400px;
+}
 
 .metro {
-  background-color: #751056;
-  color: white;
+	background-color: #751056;
+	color: white;
 }
 
 .formSubmit {
-  margin-bottom: 50px;
-  margin-top: 50px;
+	margin-bottom: 50px;
+	margin-top: 50px;
 }
 
 #wrapper {
-  /*margin: 0 auto;*/
-  /*font-size: 1.6em;*/
+	/*margin: 0 auto;*/
+	/*font-size: 1.6em;*/
 }
 
-.btn-custom:hover{
-  background-color: #3d5afe;
+.btn-custom:hover {
+	background-color: #3d5afe;
 }
 
 #formBorder {
-  border: solid thin;
+	border: solid thin;
 }
 
-.monthReport th,td {
-    text-align: left;
-    padding: 0px;
+.monthReport th,
+td {
+	text-align: left;
+	padding: 0px;
 }
 
-.monthReport tr:nth-child(even){background-color: #f2f2f2}
+.monthReport tr:nth-child(even) {
+	background-color: #f2f2f2
+}
 
 .monthReport th {
-    background-color: rgb(251, 161, 27);
-    color: white;
-    border-left: 1px solid white ;
-    border-right: 1px solid white ;
-    border-bottom: 1px solid white ;
-    text-align: center;
+	background-color: rgb(251, 161, 27);
+	color: white;
+	border-left: 1px solid white;
+	border-right: 1px solid white;
+	border-bottom: 1px solid white;
+	text-align: center;
 }
 
 .monthReportCol .row .col {
-    padding: 0 !important;
+	padding: 0 !important;
 }
 
 .logo {
-    text-align: right;
+	text-align: right;
 }
 
 .tableTitle {
-    background-color: rgb(251, 161, 27);
-    color: white;
-    text-align: center;
-    margin: 0px;
+	background-color: rgb(251, 161, 27);
+	color: white;
+	text-align: center;
+	margin: 0px;
 }
 
 #chartMonthGeneration {
-    height: 300px;
-    width: 100%;
+	height: 300px;
+	width: 100%;
 }
 
 #chartMonthSumGeneration {
-    height: 250px;
-    width: 50%;
-    float: left;
+	height: 250px;
+	width: 50%;
+	float: left;
 }
 
 #chartMonthPR {
-    height: 250px;
-    width: 50%;
-    float: right;
+	height: 250px;
+	width: 50%;
+	float: right;
 }
 
 .portfolioTable td {
-    border: 1px solid black;
+	border: 1px solid black;
 }
 
 .text-red {
- color: red; 
+	color: red;
 }
 
 .text-green {
- color: green; 
+	color: green;
 }
 
 .text-black {
- color: black; 
+	color: black;
 }
 
 .metroTable {
-    border-collapse: collapse;
+	border-collapse: collapse;
 }
 
 .metroTable th {
-    color: white;
-    background-color: rgb(251, 161, 27);
-    padding: 0.3em;
-    border-radius: 0px;
-    text-align: center;
+	color: white;
+	background-color: rgb(251, 161, 27);
+	padding: 0.3em;
+	border-radius: 0px;
+	text-align: center;
 }
 
 .metroTable td {
-    border-right: solid thin white;
-    text-align: center;
-    padding: 0.3em;
-    border-radius: 0px;
+	border-right: solid thin white;
+	text-align: center;
+	padding: 0.3em;
+	border-radius: 0px;
 }
 
 .metroTable tr:nth-child(odd) {
-    /*color: white;*/
-    background-color: rgb(251, 161, 27);
+	/*color: white;*/
+	background-color: rgb(251, 161, 27);
 }
 
 .metroTable tr:hover {
-    background-color: #c67803;
-    color: white;
+	background-color: #c67803;
+	color: white;
 }
 
 #topNavDrop a {
-    color: #3d5afe;
+	color: #3d5afe;
 }
 
 #symbol:after {
-  content: '\25b2';
-}
-#symbol.reverse:after {
-  content: '\25bc';
+	content: '\25b2';
 }
 
+#symbol.reverse:after {
+	content: '\25bc';
+}
+
+
 /*#chartMonthGenerationPortfolio {
-    height: 250px;
-    width: 50%;
-    float: left;
+		height: 250px;
+		width: 50%;
+		float: left;
 }
 
 #chartMonthPRPortfolio {
-    height: 250px;
-    width: 50%;
-    float: right;
+		height: 250px;
+		width: 50%;
+		float: right;
 }
 
 #chartMonthEsolPortfolio {
-    height: 250px;
-    width: 50%;
-    float: left;
+		height: 250px;
+		width: 50%;
+		float: left;
 }
 
 #chartYearGenerationPortfolio {
-    height: 250px;
-    width: 50%;
-    float: right;
+		height: 250px;
+		width: 50%;
+		float: right;
 }*/
