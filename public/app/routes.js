@@ -105,65 +105,12 @@ angular.module('routes', [
 					}
 				}
 			})
-			.state('parent.reportsIncidentsAll', { //list the main body of the 'admin' page
-				url: '/incidentsAll',
-				views: {
-					'display@': {
-						controller: 'ReportIncidentsCtrl',
-						templateUrl: 'pages/reportsViewAllIncidents.tmpl.html'
-					},
-					'other@': {
-						controller: 'ListCtrl',
-						templateUrl: 'pages/selectList.tmpl.html'
-					}
-				}
-			})
-			.state('parent.reportsIncidentNew', { //list the main body of the 'admin' page
-				url: '/incidentNew',
-				views: {
-					'display@': {
-						controller: 'ReportIncidentsCtrl',
-						templateUrl: 'pages/reportsNewIncident.tmpl.html'
-					},
-					'other@': {
-						controller: 'ListCtrl',
-						templateUrl: 'pages/selectList.tmpl.html'
-					}
-				}
-			})
-			.state('parent.reportsIncidentSite', { //list the main body of the 'admin' page
-				url: '/incidents?siteResult',
-				views: {
-					'display@': {
-						controller: 'ReportIncidentsCtrl',
-						templateUrl: 'pages/reportsViewSiteIncidents.tmpl.html'
-					},
-					'other@': {
-						controller: 'ListCtrl',
-						templateUrl: 'pages/displaySiteList.tmpl.html'
-					}
-				}
-			})
 			.state('parent.reportsAll', { //list the main body of the 'admin' page
 				url: '/reportsAll?startDate&endDate',
 				views: {
 					'display@': {
 						controller: 'ReportCtrl',
 						templateUrl: 'pages/reportsAll.tmpl.html'
-					},
-					'other@': {
-						controller: 'ListCtrl',
-						templateUrl: 'pages/selectList.tmpl.html'
-					}
-				}
-			})
-
-			.state('parent.reportIncident', { //list the main body of the 'admin' page
-				url: '/report/incident?incidentId',
-				views: {
-					'display@': {
-						controller: 'ReportSingleIncidentCtrl',
-						templateUrl: 'pages/reportIncident.tmpl.html'
 					},
 					'other@': {
 						controller: 'ListCtrl',
