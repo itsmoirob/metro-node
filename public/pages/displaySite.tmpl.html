@@ -7,17 +7,14 @@
 		<p>Co2 savings {{ currentDisplaySite[0].carbon_saved_tones | number:1 }} tonnes</p>
 		<p>Power {{ currentDisplaySite[0].homes_powered }} homes</p>
 	</div>
-	<h4>
-	Weather
-  </h4>
 	<div class="col s12 m6">
+		<h4>Weather</h4>
 		<div ng-repeat="weather in forecast.data.list" class="card-panel">
 			<span class="card-title">
 		{{forecast.data.list[$index].dt * 1000 | date:'dd/MM/yyyy' }}
 	  </span>
 			<p>
-				{{forecast.data.list[$index].temp.day }}°C // {{forecast.data.list[$index].weather[0].main }}: {{forecast.data.list[$index].weather[0].description
-				}}
+				{{forecast.data.list[$index].temp.day }}°C // {{forecast.data.list[$index].weather[0].main }}: {{forecast.data.list[$index].weather[0].description }}
 			</p>
 		</div>
 	</div>
