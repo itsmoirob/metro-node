@@ -867,9 +867,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/mySQL/autoInvUpload/:id', function (req, res) {
 		var id = req.params.id;
 		if (id == 5) {
-			// var end = moment().subtract(1471, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+			var end = moment().subtract(1471, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
-			var end = '2016-08-0100:00:00';
+			// var end = '2016-08-0100:00:00';
 			var options = {
 				hostname: 'host.webdom.es',
 				port: 8090,
