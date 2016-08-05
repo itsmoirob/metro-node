@@ -8,8 +8,6 @@ angular.module('metro', [
 	'displayExport',
 	'apiFactory',
 	'displayAllReport',
-	'displayReportsIncidents',
-	'displaySingleReportsIncident',
 	'monthReport',
 	'portfolioReport',
 	'eveleyOwn'
