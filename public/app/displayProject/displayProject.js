@@ -40,6 +40,14 @@ angular.module('displayProject', [
 					$scope.MKReport = res;
 				});
 		}
+
+		getSiteInstallInfo(SP);
+		function getSiteInstallInfo(SP) {
+			dataFactory.getSiteInstallInfo(SP)
+				.success(function(res) {
+					$scope.siteInstallInfo = res;
+				});
+		}
 		
 		$scope.reverse = true;
 		$scope.order = function() {

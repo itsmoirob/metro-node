@@ -1,2 +1,18 @@
-<h3>You are viewing {{ currentDisplaySite[0].name }}</h3>
-<hr/>
+<div class="row">
+
+	<h3>You are viewing {{ currentDisplaySite[0].name }}</h3>
+	<hr/> 
+
+	<div class="col s12 m6">
+		<div class="card-panel">
+			<span class="card-title">Panels</span>
+			<p>There are {{siteInstallInfo[0][0].panel_number}} {{siteInstallInfo[0][0].panel_name}} panels.</p>
+		</div>
+	</div>
+	<div class="col s12 m6">
+		<div class="card-panel">
+			<span class="card-title">Inverters</span>
+			<p>There are {{siteInstallInfo[1][0].inverter_number}} {{siteInstallInfo[1][0].inverter_name}} inverters.</p>
+		</div>
+	</div>
+</div>

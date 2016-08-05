@@ -43,6 +43,10 @@ angular.module('apiFactory', [])
 			return $http.get(urlBase + 'displaySite/report/' + id);
 		};
 
+		dataFactory.getSiteInstallInfo = function (id) {
+			return $http.get(urlBase + 'displaySite/install/' + id);
+		};
+
 		dataFactory.allSiteDaily = function (id) {
 			return $http.get(urlBase + 'displaySite/allSiteDaily');
 		};
