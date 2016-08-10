@@ -12,26 +12,26 @@ angular.module('monthReport', [
 
 		var SP = $stateParams.siteResult;
 		var month = moment().format('YYYY-MM');
-		var titleMonth = moment().format('MMMM'); 
-		if ($stateParams.month){
+		var titleMonth = moment().format('MMMM');
+		if ($stateParams.month) {
 			month = $stateParams.month;
-			titleMonth = moment($stateParams.month,'YYYY-MM').format('MMMM');
+			titleMonth = moment($stateParams.month, 'YYYY-MM').format('MMMM');
 		}
 		$scope.month = moment(month).format('MMMM YYYY');
 		var chartDate = [];
 		var sumChartDate = [];
-		
+
 		$scope.convertDateMonth = function (date) {
 			return $filter('date')(date, 'yyyy-MM')
 		}
-		
+
 		var monthGenerationActual = {
 			name: "Actual export",
 			data: [],
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var monthEsolActual = {
 			name: "Actual irradiation",
 			data: [],
@@ -39,7 +39,7 @@ angular.module('monthReport', [
 			type: "line",
 			yAxis: 1
 		};
-		
+
 		var monthGenerationPredict = {
 			name: "Predicted export",
 			type: 'line',
@@ -47,7 +47,7 @@ angular.module('monthReport', [
 			data: [],
 			yAxis: 0
 		};
-		
+
 		var monthEsolPredict = {
 			name: "Predicted irradiation",
 			type: 'line',
@@ -55,35 +55,35 @@ angular.module('monthReport', [
 			data: [],
 			yAxis: 1
 		};
-		
+
 		var highChartsPredictData = {
 			name: "Predicted",
 			data: [],
 			color: '#4CAF50',
 			yAxis: 0
 		};
-		
+
 		var highChartsSumData = {
 			name: "Actual",
 			data: [],
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var highChartsSumActualPR = {
 			name: "Actual PR",
 			data: [],
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var highChartSumPvsystPR = {
 			name: "PVSYST PR",
 			data: [],
 			// color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var highChartSumGuaranteePR = {
 			name: "Guarantee PR",
 			data: [],
@@ -107,7 +107,7 @@ angular.module('monthReport', [
 					})
 				});
 		}
-		
+
 		siteMonthIncidents(SP, month);
 		function siteMonthIncidents(SP, month) {
 			dataFactory.siteMonthIncidents(SP, month)
@@ -115,7 +115,7 @@ angular.module('monthReport', [
 					$scope.monthIncidents = res;
 				});
 		}
-		
+
 		siteMonthSumGeneration(SP, month);
 		function siteMonthSumGeneration(SP, month) {
 			dataFactory.siteMonthSumGeneration(SP, month)
@@ -127,7 +127,7 @@ angular.module('monthReport', [
 					})
 				});
 		}
-		
+
 		siteMonthSumPR(SP, month);
 		function siteMonthSumPR(SP, month) {
 			dataFactory.siteMonthSumPR(SP, month)
@@ -139,7 +139,7 @@ angular.module('monthReport', [
 					})
 				});
 		}
-		
+
 		//  Chart for export generation
 		$scope.chartMonthGeneration = {
 			credits: {
@@ -162,36 +162,37 @@ angular.module('monthReport', [
 			title: {
 				text: titleMonth
 			},
-			xAxis: {categories: chartDate,
+			xAxis: {
+				categories: chartDate,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'Export kWh'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0
-		   }, {
-			   title: {
-				   text: 'Irradiation kWh/m2'
-			   },
-			   opposite: true,
-			   min: 0
-		   }],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'Export kWh'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0
+			}, {
+					title: {
+						text: 'Irradiation kWh/m2'
+					},
+					opposite: true,
+					min: 0
+				}],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
 		};
-		
-		 //  Chart for export generation
+
+		//  Chart for export generation
 		$scope.chartMonthSumGeneration = {
 			credits: {
 				enabled: false
@@ -213,7 +214,8 @@ angular.module('monthReport', [
 			title: {
 				text: null
 			},
-			xAxis: {categories: sumChartDate,
+			xAxis: {
+				categories: sumChartDate,
 				title: {
 					text: null
 				}
@@ -227,8 +229,8 @@ angular.module('monthReport', [
 			series: [],
 			loading: false
 		};
-		
-		  $scope.chartMonthPR = {
+
+		$scope.chartMonthPR = {
 			credits: {
 				enabled: false
 			},
@@ -249,24 +251,25 @@ angular.module('monthReport', [
 			title: {
 				text: null
 			},
-			xAxis: {categories: sumChartDate,
+			xAxis: {
+				categories: sumChartDate,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'PR %'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 50
-		   }],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'PR %'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 50
+			}],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
@@ -291,8 +294,8 @@ angular.module('monthReport', [
 		$scope.chartMonthPR.series.push(highChartsSumActualPR);
 		$scope.chartMonthPR.series.push(highChartSumPvsystPR);
 		$scope.chartMonthPR.series.push(highChartSumGuaranteePR);
-		
+
 		$scope.highChartsPredictData = highChartsPredictData;
-		
+
 
 	}]);

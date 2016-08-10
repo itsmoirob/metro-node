@@ -6,19 +6,19 @@ angular.module('displayProject', [
 	'apiFactory'
 ])
 
-	.controller('DisplayCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', function($scope, $stateParams, $http, $log, $state, dataFactory) {
+	.controller('DisplayCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', function ($scope, $stateParams, $http, $log, $state, dataFactory) {
 
 		var SP = $stateParams.siteResult;
 
 		getSiteSummary(SP); //gets summary array of site
 		function getSiteSummary(SP) {
 			dataFactory.getSiteSummary(SP)
-				.success(function(res) {
+				.success(function (res) {
 					$scope.currentDisplaySite = res;
 					$http({
 						method: 'GET',
 						url: 'http://api.openweathermap.org/data/2.5/forecast/daily?&units=metric&lat=' + res[0].latitude + '&lon=' + res[0].longitude + '&cnt=3&APPID=ede052db245fa42874e3cc8513991c6e'
-					}).then(function(response) {
+					}).then(function (response) {
 						$scope.forecast = response;
 					});
 					$scope.map = { center: { latitude: res[0].latitude, longitude: res[0].longitude }, zoom: 8 }; //sets up gmaps
@@ -36,7 +36,7 @@ angular.module('displayProject', [
 		getReport(SP);
 		function getReport(SP) {
 			dataFactory.getMKReport(SP)
-				.success(function(res) {
+				.success(function (res) {
 					$scope.MKReport = res;
 				});
 		}
@@ -44,14 +44,14 @@ angular.module('displayProject', [
 		getSiteInstallInfo(SP);
 		function getSiteInstallInfo(SP) {
 			dataFactory.getSiteInstallInfo(SP)
-				.success(function(res) {
+				.success(function (res) {
 					$scope.siteInstallInfo = res;
 				});
 		}
-		
+
 		$scope.reverse = true;
-		$scope.order = function() {
+		$scope.order = function () {
 			$scope.reverse = !$scope.reverse;
 		};
-		
+
 	}]);

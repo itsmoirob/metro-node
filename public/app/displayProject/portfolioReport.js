@@ -9,8 +9,8 @@ angular.module('portfolioReport', [
 
 
 	.controller('PortfolioReportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', '$filter', function ($scope, $stateParams, $http, $log, $state, dataFactory, $filter) {
-		
-		var chartDate = [];            
+
+		var chartDate = [];
 		var month = moment().format('YYYY-MM');
 		var titleMonth = moment().format('MMMM');
 		if ($stateParams.month) {
@@ -18,53 +18,13 @@ angular.module('portfolioReport', [
 			titleMonth = moment($stateParams.month, 'YYYY-MM').format('MMMM');
 		}
 
-		var sites = [1, 2, 3, 4, 5, 11];
-		var allSites = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11];
+		var allSites = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16];
 		var nameGrouping = [];
 		$scope.month = month;
-
 		var portfolioSiteInfo = [];
 		var portfolioSiteDataMonth = [];
-
-		// var monthGenerationActual = {
-		//     name: "Actual export",
-		//     data: [],
-		//     dataLabels: {
-		//         enabled: true,
-		//         rotation: -90,
-		//         color: '#FFFFFF',
-		//         align: 'right',
-		//         format: '{point.y:.1f}', // one decimal
-		//         y: -50, // 10 pixels down from the top
-		//         style: {
-		//             fontSize: '13px',
-		//             fontFamily: 'Verdana, sans-serif'
-		//         }
-		//     },
-		//     color: '#FBA11B',
-		//     yAxis: 0,
-		// };
-		
-		// var monthGenerationPredict = {
-		//     name: "Predicted export",
-		//     data: [],
-		//     dataLabels: {
-		//         enabled: true,
-		//         rotation: -90,
-		//         color: '#FFFFFF',
-		//         align: 'right',
-		//         format: '{point.y:.1f}', // one decimal
-		//         y: -50, // 10 pixels down from the top
-		//         style: {
-		//             fontSize: '13px',
-		//             fontFamily: 'Verdana, sans-serif'
-		//         }
-		//     },
-		//     yAxis: 0
-		// };
-		
 		var allSumData = [];
-		
+
 		var monthActualPR = {
 			name: "Actual PR",
 			data: [],
@@ -83,7 +43,7 @@ angular.module('portfolioReport', [
 			},
 			yAxis: 0
 		};
-		
+
 		var monthPredictPR = {
 			name: "Predicted PR",
 			data: [],
@@ -101,7 +61,7 @@ angular.module('portfolioReport', [
 			},
 			yAxis: 0
 		};
-		
+
 		var monthActualEsol = {
 			name: "Actual irradiation",
 			type: 'column',
@@ -121,7 +81,7 @@ angular.module('portfolioReport', [
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var monthPredictEsol = {
 			name: "Predicted irradiation",
 			type: 'column',
@@ -140,7 +100,7 @@ angular.module('portfolioReport', [
 			},
 			yAxis: 0
 		};
-		
+
 		var yearGenerationActual = {
 			name: "Actual generation",
 			type: 'column',
@@ -160,7 +120,7 @@ angular.module('portfolioReport', [
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var yearGenerationPredict = {
 			name: "Predicted export",
 			type: 'column',
@@ -179,7 +139,7 @@ angular.module('portfolioReport', [
 			},
 			yAxis: 0
 		};
-		
+
 		var yearGenerationAllActual = {
 			name: "Actual export",
 			type: 'column',
@@ -187,14 +147,14 @@ angular.module('portfolioReport', [
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var yearGenerationAllPredict = {
 			name: "Predicted export",
 			type: 'column',
 			data: [],
 			yAxis: 0
 		};
-		
+
 		var cumulativeGenerationAllActual = {
 			name: "Actual export",
 			type: 'column',
@@ -202,7 +162,7 @@ angular.module('portfolioReport', [
 			color: '#FBA11B',
 			yAxis: 0
 		};
-		
+
 		var cumulativeGenerationAllPredict = {
 			name: "Predicted export",
 			type: 'column',
@@ -233,44 +193,42 @@ angular.module('portfolioReport', [
 				.success(function (res) {
 					$scope.portfolioActExpPredExpActPrPredPr = res;
 					portfolioSiteDataMonth.push(res[0]);
-					var actualGrouping = sites.map(function (i) {
+					var actualGrouping = allSites.map(function (i) {
 						return "aPS" + i;
 					});
-					var predictGrouping = sites.map(function (i) {
+					var predictGrouping = allSites.map(function (i) {
 						return "pPS" + i;
 					});
-					var aPRGrouping = sites.map(function (i) {
+					var aPRGrouping = allSites.map(function (i) {
 						return "aPR" + i;
 					});
-					var pPRGrouping = sites.map(function (i) {
+					var pPRGrouping = allSites.map(function (i) {
 						return "pPR" + i;
 					});
-					sites.map(function (i) {
+					allSites.map(function (i) {
 						nameGrouping.push("PS" + i);
 					});
-					
-					
-					
+
 					angular.forEach(aPRGrouping, function (value, key) {
 						monthActualPR.data.push(res[0][value] * 100);
 					});
-					
+
 					angular.forEach(pPRGrouping, function (value, key) {
 						monthPredictPR.data.push(res[0][value] * 100);
 					});
-					
+
 				})
 		}
-		
+
 		getPortfolioSiteEsolMonth(month);
 		function getPortfolioSiteEsolMonth(month) {
 			dataFactory.getPortfolioSiteEsolMonth(month)
 				.success(function (res) {
 					$scope.portfolioEsol = res;
-					var actualGrouping = sites.map(function (i) {
+					var actualGrouping = allSites.map(function (i) {
 						return "aPS" + i;
 					});
-					var predictGrouping = sites.map(function (i) {
+					var predictGrouping = allSites.map(function (i) {
 						return "pPS" + i;
 					});
 					angular.forEach(actualGrouping, function (value, key) {
@@ -279,32 +237,33 @@ angular.module('portfolioReport', [
 					angular.forEach(predictGrouping, function (value, key) {
 						monthPredictEsol.data.push(res[0][value]);
 					});
-					
+
 				});
 		}
-		
+
 		getPortfolioSiteDataYear(month);
 		function getPortfolioSiteDataYear(month) {
 			dataFactory.getPortfolioSiteDataYear(month)
 				.success(function (res) {
-					var actualGrouping = sites.map(function (i) {
+					$scope.testnow = res;
+					var actualGrouping = allSites.map(function (i) {
 						return "ePS" + i;
 					});
-					var predictGrouping = sites.map(function (i) {
+					var predictGrouping = allSites.map(function (i) {
 						return "pPS" + i;
 					});
-					
+
 					angular.forEach(actualGrouping, function (value, key) {
 						yearGenerationActual.data.push(res[0][value] / 1000);
 					});
-					
+
 					angular.forEach(predictGrouping, function (value, key) {
 						yearGenerationPredict.data.push(res[0][value] / 1000);
 					});
 
 				});
 		}
-		
+
 		getPortfolioAllDataYear(month);
 		function getPortfolioAllDataYear(month) {
 			dataFactory.getPortfolioAllDataYear(month)
@@ -317,15 +276,15 @@ angular.module('portfolioReport', [
 					});
 				});
 		}
-		
+
 		getPortfolioAllSiteDataYear(month);
 		function getPortfolioAllSiteDataYear(month) {
 			dataFactory.portfolioAllSiteDataYear(month)
 				.success(function (res) {
-					
+
 					$scope.getPortfolioAllSiteDataYear = res;
 
-					
+
 					var actualGrouping = allSites.map(function (i) {
 						return "agPS" + i;
 					});
@@ -333,30 +292,30 @@ angular.module('portfolioReport', [
 						return "pgPS" + i;
 					});
 					$scope.predictGrouping = predictGrouping;
-					
+
 					actualGrouping.forEach(function (deviceName) {
-						
+
 						var dataForOneDevice = res.map(function (item) {
-							return item[deviceName]/1000;
+							return item[deviceName] / 1000;
 						});
-						
-						allSumData.push({name: deviceName.substring(2,deviceName.length), data:dataForOneDevice, stack: 'Actual'});
+
+						allSumData.push({ name: deviceName.substring(2, deviceName.length), data: dataForOneDevice, stack: 'Actual' });
 					});
-					
+
 					predictGrouping.forEach(function (deviceName) {
-						
+
 						var dataForOneDevice = res.map(function (item) {
-							return item[deviceName]/1000;
+							return item[deviceName] / 1000;
 						});
-						
-						allSumData.push({name: deviceName.substring(2,deviceName.length), data:dataForOneDevice, stack: 'Predict', showInLegend: false});
+
+						allSumData.push({ name: deviceName.substring(2, deviceName.length), data: dataForOneDevice, stack: 'Predict', showInLegend: false });
 					});
-					
+
 
 				});
 		}
 		$scope.allSumData = allSumData;
-		
+
 		getPortfolioAvailability(month);
 		function getPortfolioAvailability(month) {
 			dataFactory.getPortfolioAvailability(month)
@@ -364,40 +323,40 @@ angular.module('portfolioReport', [
 					$scope.availabilty = res;
 				})
 		}
-		
+
 		siteMonthSumGeneration(month);
-		function siteMonthSumGeneration(month) {            
+		function siteMonthSumGeneration(month) {
 			dataFactory.getPortfolioAllDataYear(month)
-			.success(function (res) {
-				var modifiedArray = [];
-				for (var index = 0; index < res.length; index++) {
-					if(index === 0) {
-						modifiedArray.push({
-							date:res[index].date,
-							actual:res[index].actual,
-							predicted: res[index].predicted
-						});
-					} else {
-						modifiedArray.push({
-							date: res[index].date,
-							actual: res[index].actual + modifiedArray[index-1].actual,
-							predicted: res[index].predicted + modifiedArray[index-1].predicted
-					});
-				}
-			}
-				
-				
-				$scope.modifiedArray = modifiedArray;
-				$scope.test1 = modifiedArray[0].date;
-				
-				angular.forEach(modifiedArray, function (modifiedArray) {
-					cumulativeGenerationAllActual.data.push(modifiedArray.actual);
-					cumulativeGenerationAllPredict.data.push(modifiedArray.predicted);
-				})
-					
-			});
+				.success(function (res) {
+					var modifiedArray = [];
+					for (var index = 0; index < res.length; index++) {
+						if (index === 0) {
+							modifiedArray.push({
+								date: res[index].date,
+								actual: res[index].actual,
+								predicted: res[index].predicted
+							});
+						} else {
+							modifiedArray.push({
+								date: res[index].date,
+								actual: res[index].actual + modifiedArray[index - 1].actual,
+								predicted: res[index].predicted + modifiedArray[index - 1].predicted
+							});
+						}
+					}
+
+
+					$scope.modifiedArray = modifiedArray;
+					$scope.test1 = modifiedArray[0].date;
+
+					angular.forEach(modifiedArray, function (modifiedArray) {
+						cumulativeGenerationAllActual.data.push(modifiedArray.actual);
+						cumulativeGenerationAllPredict.data.push(modifiedArray.predicted);
+					})
+
+				});
 		}
-		
+
 
 		$scope.portfolioSiteInfo = portfolioSiteInfo;
 		$scope.portfolioSiteDataMonth = portfolioSiteDataMonth;
@@ -405,8 +364,8 @@ angular.module('portfolioReport', [
 		$scope.convertDateMonth = function (date) {
 			return $filter('date')(date, 'yyyy-MM')
 		}
-		
-		 //  Chart for export generation
+
+		//  Chart for export generation
 		$scope.chartMonthGeneration = {
 			credits: {
 				enabled: false
@@ -420,24 +379,24 @@ angular.module('portfolioReport', [
 					text: null
 				}
 			},
-			
+
 			yAxis: {
 				min: 0,
 				title: {
 					text: 'Export MWh'
-				},
-				stackLabels: {
-					rotation: -90,
-					verticalAlign: 'top',
-					enabled: true,
-					formatter: function() {
-						return this.stack.substring(0,1) + '; ' + Highcharts.numberFormat(this.total, 1, ".", ",");
-					},
-					style: {
-						fontWeight: 'bold',
-						color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
-					}
 				}
+				// stackLabels: {
+				// 	rotation: -90,
+				// 	verticalAlign: 'top',
+				// 	enabled: true,
+				// 	formatter: function () {
+				// 		return this.stack.substring(0, 1) + '; ' + Highcharts.numberFormat(this.total, 1, ".", ",");
+				// 	},
+				// 	style: {
+				// 		fontWeight: 'bold',
+				// 		color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+				// 	}
+				// }
 			},
 			options: {
 				chart: {
@@ -453,47 +412,40 @@ angular.module('portfolioReport', [
 					borderColor: '#CCC',
 					borderWidth: 1,
 					shadow: true,
-					labelFormatter: function() {
-					return '<div style="text-align: left; width:130px;float:left;">' + this.name + '</div>';
-				}
+					labelFormatter: function () {
+						return '<div style="text-align: left; width:130px;float:left;">' + this.name + '</div>';
+					}
 				},
 				tooltip: {
-					formatter: function() {
-						return '<b>'+ this.x +'</b><br/>'+
-						this.series.name +': '+ Highcharts.numberFormat(this.y, 1) +'<br/>'+
-						'Total: '+ Highcharts.numberFormat(this.point.stackTotal, 1);
+					formatter: function () {
+						return '<b>' + this.x + '</b><br/>' +
+							this.series.name + ': ' + Highcharts.numberFormat(this.y, 1) + '<br/>' +
+							'Total: ' + Highcharts.numberFormat(this.point.stackTotal, 1);
 					}
 				},
 				plotOptions: {
 					column: {
 						stacking: 'normal',
-						// dataLabels: {
-						//     enabled: true,
-						//     format: '{point.y:,.1f}',
-						//     color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
-						//     style: {
-						//         textShadow: '0 0 3px black, 0 0 3px black'
-						//     }
-						// }
 					},
 					series: {
-				events: {
-					legendItemClick: function(event){
-						event.preventDefault();
-						var name = this.name;
-						$(this.chart.series).each(function(i,e){
-							if(e.name === name){
-								e.visible ? e.hide() : e.show();
+						events: {
+							legendItemClick: function (event) {
+								event.preventDefault();
+								var name = this.name;
+								$(this.chart.series).each(function (i, e) {
+									if (e.name === name) {
+										e.visible ? e.hide() : e.show();
+									}
+								})
 							}
-						})
+						}
 					}
 				}
-			}
-			}},
+			},
 
 			series: allSumData
 		};
-		
+
 		//  Chart for export generation
 		$scope.chartMonthPR = {
 			credits: {
@@ -516,40 +468,41 @@ angular.module('portfolioReport', [
 			title: {
 				text: 'Monthly PR - ' + titleMonth
 			},
-			xAxis: {categories: nameGrouping,
+			xAxis: {
+				categories: nameGrouping,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'Performance Ratio %'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0,
-			   max: 100
-		   }
-		//    ,{
-		//        title: {
-		//            text: 'Availability %'
-		//        },
-		//        opposite: true,
-		//        lineWidth: 2,
-		//        min: 40,
-		//        max: 100
-		//    }
-		   ],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'Performance Ratio %'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0,
+				max: 100
+			}
+				//    ,{
+				//        title: {
+				//            text: 'Availability %'
+				//        },
+				//        opposite: true,
+				//        lineWidth: 2,
+				//        min: 40,
+				//        max: 100
+				//    }
+			],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
 		};
-		
+
 		//  Chart for export generation
 		$scope.chartMonthEsol = {
 			credits: {
@@ -572,29 +525,30 @@ angular.module('portfolioReport', [
 			title: {
 				text: 'Monthly irradiation - ' + titleMonth
 			},
-			xAxis: {categories: nameGrouping,
+			xAxis: {
+				categories: nameGrouping,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'Irradiation kWh/m2'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0
-		   }],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'Irradiation kWh/m2'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0
+			}],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
 		};
-		
+
 		//  Chart for export generation
 		$scope.chartYearGeneration = {
 			credits: {
@@ -617,29 +571,30 @@ angular.module('portfolioReport', [
 			title: {
 				text: 'Year export - ' + titleMonth
 			},
-			xAxis: {categories: nameGrouping,
+			xAxis: {
+				categories: nameGrouping,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'Export MWh'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0
-		   }],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'Export MWh'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0
+			}],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
 		};
-		
+
 		//  Chart for export generation
 		$scope.chartYearAllGeneration = {
 			credits: {
@@ -662,29 +617,30 @@ angular.module('portfolioReport', [
 			title: {
 				text: 'Monthly export all sites for year to ' + titleMonth
 			},
-			xAxis: {categories: chartDate,
+			xAxis: {
+				categories: chartDate,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'Export MWh'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0
-		   }],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'Export MWh'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0
+			}],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
 		};
-		
+
 		//  Chart for export generation
 		$scope.chartCumulativeAllGeneration = {
 			credits: {
@@ -707,29 +663,30 @@ angular.module('portfolioReport', [
 			title: {
 				text: 'Cumulative export all sites for year to ' + titleMonth
 			},
-			xAxis: {categories: chartDate,
+			xAxis: {
+				categories: chartDate,
 				title: {
 					text: null
 				}
 			},
 			yAxis: [{
-			   title: {
-				   text: 'Export MWh'
-			   },
-			   opposite: false,
-			   lineWidth: 2,
-			   min: 0
-		   }],
-		   legend: {
-			   layout: 'vertical',
-			   align: 'right',
-			   verticalAlign: 'middle',
-			   borderWidth: 0
+				title: {
+					text: 'Export MWh'
+				},
+				opposite: false,
+				lineWidth: 2,
+				min: 0
+			}],
+			legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle',
+				borderWidth: 0
 			},
 			series: [],
 			loading: false
 		};
-		
+
 		// $scope.chartMonthGeneration.series.push(allSumData);
 		// $scope.chartMonthGeneration.series.push(monthGenerationPredict);
 		$scope.chartMonthPR.series.push(monthActualPR);
@@ -743,22 +700,22 @@ angular.module('portfolioReport', [
 		$scope.chartYearAllGeneration.series.push(yearGenerationAllPredict);
 		$scope.chartCumulativeAllGeneration.series.push(cumulativeGenerationAllActual);
 		$scope.chartCumulativeAllGeneration.series.push(cumulativeGenerationAllPredict);
-		
+
 
 
 	}])
-	
+
 	.directive('varianceValue', function ($timeout) {
-	return {
-		restrict: 'A',
-		link: function (scope, el, attr) {
-		  $timeout(function(){
-			  $(el).toggleClass("text-red", parseFloat($(el).text()) < 0);
-			  $(el).toggleClass("text-green", parseFloat($(el).text()) > 0);
-		  },0);
-		},
-	}
-})
-	
-;
+		return {
+			restrict: 'A',
+			link: function (scope, el, attr) {
+				$timeout(function () {
+					$(el).toggleClass("text-red", parseFloat($(el).text()) < 0);
+					$(el).toggleClass("text-green", parseFloat($(el).text()) > 0);
+				}, 0);
+			},
+		}
+	})
+
+	;
 

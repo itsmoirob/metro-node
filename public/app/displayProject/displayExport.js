@@ -4,7 +4,7 @@ angular.module('displayExport', [
 	'apiFactory'
 ])
 
-	.controller('ExportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', function($scope, $stateParams, $http, $log, $state, dataFactory) {
+	.controller('ExportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', function ($scope, $stateParams, $http, $log, $state, dataFactory) {
 
 		var SP = $stateParams.siteResult;
 		var highChartsData = {
@@ -18,11 +18,19 @@ angular.module('displayExport', [
 			yAxis: 1
 		};
 
+		getSiteSummary(SP); //gets summary array of site
+		function getSiteSummary(SP) {
+			dataFactory.getSiteSummary(SP)
+				.success(function (res) {
+					$scope.currentDisplaySite = res;
+				});
+		}
+
 		getChartExportGeneration(SP);
 		function getChartExportGeneration(SP) {
 			dataFactory.getSiteExportGeneration(SP)
-				.success(function(res) {
-					angular.forEach(res, function(res) {
+				.success(function (res) {
+					angular.forEach(res, function (res) {
 						highChartsData.data.push([res.timeU, res.generation]);
 					});
 				});
@@ -31,8 +39,8 @@ angular.module('displayExport', [
 		getChartMeanPyro(SP);
 		function getChartMeanPyro(SP) {
 			dataFactory.getChartPyro(SP)
-				.success(function(res) {
-					angular.forEach(res, function(res) {
+				.success(function (res) {
+					angular.forEach(res, function (res) {
 						highChartsPyro.data.push([res.timeU, res.avgPyro]);
 					});
 				});

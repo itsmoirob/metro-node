@@ -10,12 +10,12 @@ angular.module('displaySite', [
 
 	.constant('API_URL', 'http://localhost:3000')
 
-	.controller('SiteCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function($scope, $stateParams, $http, $log, dataFactory, UserFactory) {
+	.controller('SiteCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function ($scope, $stateParams, $http, $log, dataFactory, UserFactory) {
 
 		getIncidentReport();
 		function getIncidentReport() {
 			dataFactory.getIncidentReport()
-				.success(function(res) {
+				.success(function (res) {
 					$scope.incidentReport = res;
 				});
 		}
@@ -33,23 +33,23 @@ angular.module('displaySite', [
 		getAllSiteDaily();
 		function getAllSiteDaily() {
 			dataFactory.allSiteDaily()
-				.success(function(res) {
-					var groupings = selectedGrouping.map(function(i) { return "ps" + i; });
+				.success(function (res) {
+					var groupings = selectedGrouping.map(function (i) { return "ps" + i; });
 					// loop over the keys
-					groupings.forEach(function(deviceName) {
+					groupings.forEach(function (deviceName) {
 						// data is one huge array that has readings for all sensors on each day
 						// Use .map on the array to transform each element of the array.
 						// The function will transform the array element by selecting a reading for a single device
-						var dataForOneDevice = res.map(function(item) {
+						var dataForOneDevice = res.map(function (item) {
 							return item[deviceName];
 						});
 						// add a new key (the value of sensorName, e.g. "ps1") to allSumData.
 						allSumData.push({ name: deviceName, data: dataForOneDevice });
 					});
-					angular.forEach(res, function(entry) {
+					angular.forEach(res, function (entry) {
 						chartDate.push(moment(entry.date).format("MMM Do"));
 					});
-					$scope.siteLatest = res[res.length-1];
+					$scope.siteLatest = res[res.length - 1];
 				});
 		}
 
@@ -57,14 +57,14 @@ angular.module('displaySite', [
 		getAllSiteDailyMWp();
 		function getAllSiteDailyMWp() {
 			dataFactory.allSiteDailyMWp()
-				.success(function(res) {
-					var groupings = selectedGrouping.map(function(i) { return "ps" + i; });
+				.success(function (res) {
+					var groupings = selectedGrouping.map(function (i) { return "ps" + i; });
 					// loop over the keys
-					groupings.forEach(function(deviceName) {
+					groupings.forEach(function (deviceName) {
 						// data is one huge array that has readings for all sensors on each day
 						// Use .map on the array to transform each element of the array.
 						// The function will transform the array element by selecting a reading for a single device
-						var dataForOneDevice = res.map(function(item) {
+						var dataForOneDevice = res.map(function (item) {
 							return item[deviceName];
 						});
 						// add a new key (the value of sensorName, e.g. "ps1") to allSumData.
@@ -78,14 +78,14 @@ angular.module('displaySite', [
 		getAllSiteDailyEsol();
 		function getAllSiteDailyEsol() {
 			dataFactory.allSiteDailyEsol()
-				.success(function(res) {
-					var groupings = selectedGrouping.map(function(i) { return "PS" + i; });
+				.success(function (res) {
+					var groupings = selectedGrouping.map(function (i) { return "PS" + i; });
 					// loop over the keys
-					groupings.forEach(function(deviceName) {
+					groupings.forEach(function (deviceName) {
 						// data is one huge array that has readings for all sensors on each day
 						// Use .map on the array to transform each element of the array.
 						// The function will transform the array element by selecting a reading for a single device
-						var dataForOneDevice = res.map(function(item) {
+						var dataForOneDevice = res.map(function (item) {
 							return item[deviceName];
 						});
 						// add a new key (the value of sensorName, e.g. "ps1") to allSumData.
@@ -197,25 +197,25 @@ angular.module('displaySite', [
 		mapAllSiteCoords();
 		function mapAllSiteCoords() {
 			dataFactory.getAllSiteCoords()
-				.success(function(res) {
+				.success(function (res) {
 					$scope.res = res;
-					var latMin = Math.min.apply(null, res.map(function(item) {
+					var latMin = Math.min.apply(null, res.map(function (item) {
 						return item.latitude;
 					}))
-					var latMax = Math.max.apply(null, res.map(function(item) {
+					var latMax = Math.max.apply(null, res.map(function (item) {
 						return item.latitude;
 					}))
 					var mapLat = (latMin + latMax) / 2;
-					var longMin = Math.min.apply(null, res.map(function(item) {
+					var longMin = Math.min.apply(null, res.map(function (item) {
 						return item.longitude;
 					}))
-					var longMax = Math.max.apply(null, res.map(function(item) {
+					var longMax = Math.max.apply(null, res.map(function (item) {
 						return item.longitude;
 					}))
 					var mapLong = (longMin + longMax) / 2;
 					$scope.map = { center: { latitude: mapLat, longitude: mapLong }, zoom: 6 };
 					$scope.markers = [];
-					angular.forEach(res, function(res) {
+					angular.forEach(res, function (res) {
 						$scope.markers.push({
 							id: res.id,
 							coords: {

@@ -6,7 +6,7 @@ angular.module('displayAllReport', [
 ])
 
 	.controller('ReportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', '$filter', function ($scope, $stateParams, $http, $log, $state, dataFactory, $filter) {
-		
+
 
 		var startDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
 		$scope.yesterdaysDate = moment(startDate, 'YYYY-MM-DD').format('DD/MM/YYYY');;
@@ -24,7 +24,7 @@ angular.module('displayAllReport', [
 
 		$scope.startDate = startDate;
 		$scope.endDate = endDate;
-		
+
 		getAllReports(startDate, endDate); //gets summary array of site
 		function getAllReports(startDate, endDate) {
 			dataFactory.getAllReports(startDate, endDate)
@@ -107,12 +107,12 @@ angular.module('displayAllReport', [
 					$scope.totalMWp = totalMWp;
 				})
 		};
-		
+
 
 		$scope.convertDate = function (date) {
 			return $filter('date')(date, 'yyyy-MM-dd')
 		}
-		
-		
+
+
 
 	}]);
