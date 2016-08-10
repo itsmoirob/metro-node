@@ -1,12 +1,10 @@
-<div class="row">
+<div class="row page">
 	<h5>You are viewing {{ currentDisplaySite[0].name }}</h5>
 	<hr/>
 	<a download="{{ currentDisplaySite[0].name }} PR.csv" href="" onclick="return ExcellentExport.csv(this, 'datatable');">Export to CSV</a>
 	<br/>
-
 	<button ng-click="order()">Order</button>
 	<span id="symbol" ng-class="{reverse:reverse}"></span>
-
 	<table class="metroTable" id="datatable">
 		<caption>Daily stats and PR</caption>
 		<tr>
