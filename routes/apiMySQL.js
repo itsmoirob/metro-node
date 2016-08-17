@@ -116,66 +116,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		}
 	});
 
-	// upload export to database tables export_# and dailySumExport
-	app.get('/api/mySQL/exportUpload/:id', function (req, res) {
-
-		var id = req.params.id;
-		var filePath = "./files/Primrose Solar Limited.csv";
-		var startIndex = 3;
-		fs.readFile(filePath, {
-			encoding: 'utf-8'
-		}, function (err, csvData) {
-			if (err) {
-				console.log(err);
-			}
-			csvParse(csvData, {
-				separator: ',',
-				newline: '\n'
-			}, function (err, data) {
-				if (err) {
-					console.log(err);
-				} else {
-					var readingsForExport = mpanList.map(function (mpan) {
-						var readingsForOneExport = data.filter(function (item) {
-							return item[0] === mpan.mpan;
-						});
-						return {
-							id: mpan.id,
-							data: readingsForOneExport
-						};
-					});
-					var site = readingsForExport.filter(function (site) { return site.id == id })[0];
-					var sqlInputData = [];
-					var n = 0;
-					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
-						var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
-						var hour = moment("00:00", "HH:mm").format("HH:mm");
-						for (var i = startIndex; i < site.data[j].length; i++) {
-
-							if (site.data[j][i] === "-") {
-								site.data[j][i] = "NULL";
-							}
-
-							sqlInputData[n] = ["('" + day + "','" + hour + "'," + site.data[j][i] + ")"];
-							hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
-							n++;
-						}
-					}
-					connection.query('INSERT INTO export_' + site.id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS' + site.id + ') select date, sum(generation) from export_' + site.id + ' where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
-						if (err) {
-							console.log('Error auto export upload file ' + site.exportMpan + ' : ' + err);
-							res.send('ERROR file ' + site.exportMpan + ' : INSERT INTO export_' + site.id + ' VALUES ' + sqlInputData);
-						} else {
-							console.log('Site: ' + site.id + '; ExportHHSQL: ' + result[0].message + '; ExportDailySumSQL: ' + result[1].message);
-							res.send('COMPLETE: INSERT INTO export_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ExportHHSQL: ' + result[0].message + '; ExportDailySumSQL: ' + result[1].message);
-						}
-					});
-
-				}
-			});
-		});
-	});
-
 // upload export to database tables export_# and dailySumExport
 	app.get('/api/mySQL/exportUpload/:id', function (req, res) {
 
@@ -209,7 +149,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					var n = 0;
 					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
 						var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
-						var hour = moment("00:00", "HH:mm").format("HH:mm");
+						var hour = moment("00:30", "HH:mm").format("HH:mm");
 						for (var i = startIndex; i < site.data[j].length; i++) {
 
 							if (site.data[j][i] === "-") {
@@ -269,7 +209,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					var n = 0;
 					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
 						var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
-						var hour = moment("00:00", "HH:mm").format("HH:mm");
+						var hour = moment("00:30", "HH:mm").format("HH:mm");
 						for (var i = startIndex; i < site.data[j].length; i++) {
 							if (site.data[j][i] === "-") {
 								site.data[j][i] = "NULL";
@@ -313,7 +253,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					var sqlInputData = [];
 					var n = 0;
 
-					for (j = 8; j < data.length; j++) { // use this line only for histroical data
+					for (j = 1; j < data.length; j++) { // use this line only for histroical data
 						var day = moment(data[j][7], "DD/MM/YYYY").format("YYYY-MM-DD");
 						for (i = 8; i < data[j].length; i++) {
 							var hour = data[7][i];
@@ -324,7 +264,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							n++;
 						}
 					}
-					// res.send('INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation);');
+					// res.send('Start transaction; INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' where date > NOW() - INTERVAL 600 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + '); commit;');
 					connection.query('Start transaction; INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' where date > NOW() - INTERVAL 600 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + '); commit;', function (err, result) {
 						if (err) {
 							console.log('Error manual import upload file ' + site.importMpan + ' : ' + err);
@@ -359,7 +299,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					var n = 0;
 
 					for (j = 8; j < data.length; j++) { // use this line only for histroical data
-						var day = moment(data[j][7], "DD/MM/YY").format("YYYY-MM-DD");
+						var day = moment(data[j][7], "DD/MM/YYYY").format("YYYY-MM-DD");
 						for (i = 8; i < data[j].length; i++) {
 							var hour = data[7][i];
 							if (data[j][i] === "-") {
@@ -863,7 +803,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/mySQL/autoInvUpload/:id', function (req, res) {
 		var id = req.params.id;
 		if (id == 5) {
-			var end = moment().subtract(1471, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+			var end = moment().subtract(4320, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			// var end = '2016-08-0100:00:00';
 			var options = {

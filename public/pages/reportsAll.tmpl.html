@@ -37,7 +37,7 @@
 		<br/>
 		<table class="metroTable" id="dailyProductionReportTable" style="width:100%">
 			<caption>Production report for {{yesterdaysDate}}. <a download="1 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
-			<tr ng-init="aveDailyEsol = 0">
+			<tr>
 				<th>Site</th>
 				<th>MWp</th>
 				<th>Export</th>
@@ -54,8 +54,8 @@
 				<td>{{site.Day | number:0 }}</td>
 				<td>{{site.PredictDay | number:0 }}</td>
 				<td>{{(site.Day-site.PredictDay)/site.PredictDay*100 | number:2 }}</td>
-				<td ng-init="$parent.aveDailyEsol = $parent.aveDailyEsol + site.DailyEsol">{{site.DailyEsol | number:2 }}</td>
-				<td>{{site.DailySolarGis | number:2 }}</td>
+				<td ng-init="$parent.aveDailyEsol = $parent.aveDailyEsol + (site.DailyEsol * site.Mwp)">{{site.DailyEsol | number:2 }}</td>
+				<td ng-init="$parent.aveDailySolarGis = $parent.aveDailySolarGis + (site.DailySolarGis * site.Mwp)">{{site.DailySolarGis | number:2 }}</td>
 				<td>{{site.PR*100 | number:2 }}%</td>
 				<td>{{site.PRSolarGis*100 | number:2 }}%</td>
 			</tr>
@@ -65,14 +65,14 @@
 				<th>{{totalDailyExport | number : 0}}</th>
 				<th>{{expectedExport | number : 0}}</th>
 				<th>{{(totalDailyExport-expectedExport)/expectedExport*100 | number:2 }}</th>
-				<th>{{aveDailyEsol | number:2}}</th>
-				<th>SolarGis</th>
-				<th>Irr PR</th>
-				<th>SG PR</th>
+				<th>{{aveDailyEsol/totalMWp | number:2}}</th>
+				<th>{{aveDailySolarGis/totalMWp | number:2}}</th>
+				<th>{{totalDailyExport/(aveDailyEsol*1000)*100 | number:2}}%</th>
+				<th>{{totalDailyExport/(aveDailySolarGis*1000)*100 | number:2}}%</th>
 			</tr>
-
 		</table>
 	</div>
+
 	<div class="row">
 		<br/>
 		<table class="metroTable" id="sumProductionReportTable" style="width:100%">
@@ -94,8 +94,8 @@
 				<td>{{site.Group | number:0 }}</td>
 				<td>{{site.PredictDay*5 | number:0 }}</td>
 				<td>{{(site.Group-(site.PredictDay*5))/(site.PredictDay*5)*100 | number:2 }}</td>
-				<td>{{site.GroupEsol | number:2 }}</td>
-				<td>{{site.GroupSolarGis | number:2 }}</td>
+				<td ng-init="$parent.aveGroupEsol = $parent.aveGroupEsol + (site.GroupEsol * site.Mwp)">{{site.GroupEsol | number:2 }}</td>
+				<td ng-init="$parent.aveGroupSolarGis = $parent.aveGroupSolarGis + (site.GroupSolarGis * site.Mwp)">{{site.GroupSolarGis | number:2 }}</td>
 				<td>{{site.GroupPR*100 | number:2 }}%</td>
 				<td>{{site.GroupPRSolarGis*100 | number:2 }}%</td>
 			</tr>
@@ -105,10 +105,10 @@
 				<th>{{totalGroupExport | number : 0}}</th>
 				<th>{{expectedExport | number : 0}}</th>
 				<th>{{(totalGroupExport-(expectedExport*5))/(expectedExport*5)*100 | number:2 }}</th>
-				<th>Irridiation</th>
-				<th>SolarGis</th>
-				<th>Irr PR</th>
-				<th>SG PR</th>
+				<th>{{aveGroupEsol/totalMWp | number:2}}</th>
+				<th>{{aveGroupSolarGis/totalMWp | number:2}}</th>
+				<th>{{totalGroupExport/(aveGroupEsol*1000)*100 | number:2}}%</th>
+				<th>{{totalGroupExport/(aveGroupSolarGis*1000)*100 | number:2}}%</th>
 			</tr>
 		</table>
 	</div>
