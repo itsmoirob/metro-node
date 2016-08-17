@@ -39,14 +39,14 @@
 			<caption>Production report for {{yesterdaysDate}}. <a download="1 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
 			<tr>
 				<th>Site</th>
-				<th>MWp</th>
-				<th>Export</th>
-				<th>Expected</th>
-				<th>Deviation</th>
-				<th>Irridiation</th>
-				<th>SolarGis</th>
-				<th>Irr PR</th>
-				<th>SG PR</th>
+				<th>MWp(MWp)</th>
+				<th>Export(kWh)</th>
+				<th>Expected(kWh)</th>
+				<th>Deviation(%)</th>
+				<th>Irridiation(wm2)</th>
+				<th>SolarGis(wm2)</th>
+				<th>Irr PR(%)</th>
+				<th>SG PR(%)</th>
 			</tr>
 			<tr ng-repeat="site in dailyProductionReport">
 				<td>{{sitesInfo[$index].name }}</td>
@@ -79,14 +79,14 @@
 			<caption>Production report for five previous days. <a download="5 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
 			<tr>
 				<th>Site</th>
-				<th>MWp</th>
-				<th>Export</th>
-				<th>Expected</th>
-				<th>Deviation</th>
-				<th>Irridiation</th>
-				<th>SolarGis</th>
-				<th>Irr PR</th>
-				<th>SG PR</th>
+				<th>TIC(MWp)</th>
+				<th>Export(kWh)</th>
+				<th>Expected(kWh)</th>
+				<th>Deviation(%)</th>
+				<th>Irridiation(wm2)</th>
+				<th>SolarGis(wm2)</th>
+				<th>Irr PR(%)</th>
+				<th>SG PR(%)</th>
 			</tr>
 			<tr ng-repeat="site in dailyProductionReport">
 				<td>{{sitesInfo[$index].name }}</td>
