@@ -409,4 +409,52 @@ module.exports = function (app, connection) {
 		});
 	});
 
+	app.get('/api/reports/inverterGeneration/:id', function (req, res) {
+		var id = req.params.id;
+		if (id == 15) {
+			res.send('Coming soon --- hopefully');
+		} else if (id > 5 && id < 11) {
+			res.send('no longer here');
+		} else if (id <= 4) {
+			var groupings = [{ 'id': 1, 'inv': [10, 8, 8, 8, 8] }, { 'id': 2, 'inv': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'inv': [8, 8, 10, 8] }, { 'id': 4, 'inv': [8, 10, 10, 10, 10, 10, 10, 10] }];
+			var site = groupings.filter(function (site) { return site.id == id })[0];
+			var querySelectText = '';
+			var queryTableText = '';
+			var queryTables = ' FROM inverter_generation_' + id + '_T01 t1 ';
+
+			site.inv.forEach(function (combinerNumber, transformer) {
+				for (var combine = 1; combine <= combinerNumber; combine++) {
+					for (var inverter = 1; inverter <= 10; inverter++) {
+						querySelectText = querySelectText + ', inverter_' + (transformer + 1) + '_' + combine + '_' + inverter;
+						queryTableText = queryTableText + ', ROUND(SUM(IF( t' + (transformer + 1) + '.inverter = ' + inverter + ' AND t' + (transformer + 1) + '.combine_box = ' + combine + ', t' + (transformer + 1) + '.generation, 0 )), 2 ) AS inverter_' + (transformer + 1) + '_' + combine + '_' + inverter;
+					}
+				}
+			});
+			querySelectText = querySelectText.substr(1);
+			queryTableText = queryTableText.substr(1);
+
+			res.send('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' GROUP BY date(t1.dateTime), hour(t1.dateTime)) AS sums;');
+
+		} else if (id == 12) {
+			res.send('This may not work;')
+		} else {
+			var groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }];
+			var site = groupings.filter(function (site) { return site.id == id })[0];
+			var querySelectText = 'inverter_1';
+			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_1';
+
+			for (var i = 2; i <= site.inv; i++) {
+				querySelectText = querySelectText + ', inverter_' + i;
+				queryTableText = queryTableText + ', ROUND(SUM(If( inverter = ' + i + ', generation, 0 )), 2 ) AS inverter_' + i;
+			};
+			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT dateTime AS date, ' + queryTableText + ' FROM inverter_generation_' + id + ' GROUP BY date(dateTime), hour(dateTime)) AS sums;', function (err, rows) {
+				if (err) {
+					return res.json(err);
+				} else {
+					return res.json(rows);
+				}
+			});
+		}
+	});
+
 };
