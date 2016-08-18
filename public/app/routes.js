@@ -170,6 +170,19 @@ angular.module('routes', [
 					}
 				}
 			})
+			.state('parent.displayInverterProject', { //list the main body of the 'generation' page
+				url: '/site/inverter?siteResult&transformer',
+				views: {
+					'display@': {
+						controller: 'InverterCtrl',
+						templateUrl: 'pages/displaySiteInverter.tmpl.html'
+					},
+					'other@': {
+						controller: 'ListCtrl',
+						templateUrl: 'pages/displaySiteList.tmpl.html'
+					}
+				}
+			})
 			;
 		// $urlRouterProvider.otherwise('/index'); //take to front page
 	})

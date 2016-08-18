@@ -10,6 +10,6 @@ angular.module('metro', [
 	'displayAllReport',
 	'monthReport',
 	'portfolioReport',
-	'eveleyOwn'
-])
-	;
+	'eveleyOwn',
+	'displayInverter'
+]);
