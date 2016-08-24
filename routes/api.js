@@ -440,14 +440,20 @@ module.exports = function (app, connection) {
 		} else {
 			var groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }];
 			var site = groupings.filter(function (site) { return site.id == id })[0];
-			var querySelectText = 'inverter_1';
-			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_1';
+			var querySelectText = 'inverter_01';
+			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_01';
 
 			for (var i = 2; i <= site.inv; i++) {
-				querySelectText = querySelectText + ', inverter_' + i;
-				queryTableText = queryTableText + ', ROUND(SUM(If( inverter = ' + i + ', generation, 0 )), 2 ) AS inverter_' + i;
+				var AsInverter = '';
+				if (i < 10) {
+					AsInverter = '' + 0 + i;
+				} else {
+					AsInverter = i;
+				}
+				querySelectText = querySelectText + ', inverter_' + AsInverter;
+				queryTableText = queryTableText + ', ROUND(SUM(If( inverter = ' + i + ', generation, 0 )), 2 ) AS inverter_' + AsInverter;
 			};
-			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT dateTime AS date, ' + queryTableText + ' FROM inverter_generation_' + id + ' GROUP BY date(dateTime), hour(dateTime)) AS sums;', function (err, rows) {
+			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT dateTime AS date, ' + queryTableText + ' FROM inverter_generation_' + id + ' WHERE dateTime > now() - INTERVAL 31 DAY GROUP BY date(dateTime), hour(dateTime) ORDER BY dateTime DESC) AS sums;', function (err, rows) {
 				if (err) {
 					return res.json(err);
 				} else {
