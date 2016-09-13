@@ -116,7 +116,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		}
 	});
 
-// upload export to database tables export_# and dailySumExport
+	// upload export to database tables export_# and dailySumExport
 	app.get('/api/mySQL/exportUpload/:id', function (req, res) {
 
 		var id = req.params.id;
@@ -265,7 +265,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						}
 					}
 					// res.send('Start transaction; INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' where date > NOW() - INTERVAL 600 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + '); commit;');
-					connection.query('Start transaction; INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' where date > NOW() - INTERVAL 600 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + '); commit;', function (err, result) {
+					connection.query('Start transaction; INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + '); commit;', function (err, result) {
 						if (err) {
 							console.log('Error manual import upload file ' + site.importMpan + ' : ' + err);
 							res.send('ERROR file ' + site.importMpan + ' : INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData);
@@ -310,7 +310,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							n++;
 						}
 					}
-					connection.query("Start transaction; INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + mpanList[id].id + ") select date, sum(generation) from export_" + mpanList[id].id + " where date > NOW() - INTERVAL 90 DAY group by date order by date asc on duplicate key update PS" + mpanList[id].id + "=VALUES(PS" + mpanList[id].id + "); commit;", function (err, result) {
+					connection.query("Start transaction; INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData + "  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS" + mpanList[id].id + ") select date, sum(generation) from export_" + mpanList[id].id + " group by date order by date asc on duplicate key update PS" + mpanList[id].id + "=VALUES(PS" + mpanList[id].id + "); commit;", function (err, result) {
 						if (err) throw err;
 						console.log(result.insertId);
 						res.send("Done: INSERT INTO export_" + mpanList[id].id + " VALUES " + sqlInputData);
@@ -566,7 +566,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							n++;
 						}
 
-						connection.query('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 14 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function (err, result) {
+						connection.query('Start transaction;INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE pyro_1=VALUES(pyro_1), pyro_2=VALUES(pyro_2), pyro_3=VALUES(pyro_3), pyro_4=VALUES(pyro_4); insert into dailyEsol (date, PS' + id + ') select date(dateTime), sum((ifnull(pyro_1,0) + ifnull(pyro_2,0) + ifnull(pyro_3,0) + ifnull(pyro_4,0))/((case when pyro_1 >= 0 then 1 else 0 end) + (case when pyro_2 >= 0 then 1 else 0 end) + (case when pyro_3 >= 0 then 1 else 0 end) + (case when pyro_4 >= 0 then 1 else 0 end)))/60000 from pyro_site_' + id + ' where date(dateTime) > NOW() - INTERVAL 30 day group by date(dateTime) order by dateTime desc on duplicate key update PS' + id + ' = values(PS' + id + '); Commit;', function (err, result) {
 							if (err) throw err;
 							console.log(result);
 							res.send('Done: INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData[0]);
@@ -699,7 +699,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " where generation is null; Commit;", function (err, result) {
 							if (err) throw err;
 							console.log(result.insertId);
-							res.send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
+							res.status(201).send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
 						});
 					} else {
 						for (j = 1; j < data.length; j++) {
@@ -717,11 +717,10 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								}
 							}
 						}
-						// res.send("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;");
 						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
 							if (err) throw err;
 							console.log(result.insertId);
-							res.send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
+							res.status(201).send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
 						});
 					}
 				}
@@ -734,7 +733,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/mySQL/autoPyroUpload/:id', function (req, res) {
 		var id = req.params.id;
 		if (id == 5) {
-			var end = moment().subtract(211, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
+			var end = moment().subtract(10080, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			var start = moment().subtract(31, 'minutes').format('YYYY-MM-DDHH:mm') + ':00';
 			var options = {
 				hostname: 'host.webdom.es',
@@ -795,6 +794,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				console.log('problem with request: ' + e.message);
 			});
 			req.end();
+			res.status(200).send();
 		}
 	});
 
@@ -838,7 +838,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				console.log('problem with request: ' + e.message);
 			});
 			req.end();
-			res.send('done');
+			res.status(200).send();
 		}
 	});
 };
