@@ -377,7 +377,15 @@ module.exports = function (app, connection) {
 	});
 
 
-	app.get('/api/reports/dailyProductionReport', function (req, res) {
+	app.get('/api/reports/dailyProductionReport/:date?', function (req, res) {
+		var date1, date5;
+		if (!req.params.date) {
+			date1 = 'DATE(NOW() - INTERVAL 1 DAY)';
+			date5 = 'DATE(NOW() - INTERVAL 5 DAY)';
+		} else {
+			date1 = '\'' + req.params.date + '\'';
+			date5 = 'DATE(' + '\'' + req.params.date + '\'' + ' - INTERVAL 5 DAY)';
+		}
 		var groupings = [{ "id": 1, "name": "PS01" }, { "id": 2, "name": "PS02" }, { "id": 3, "name": "PS03" }, { "id": 4, "name": "PS04" }, { "id": 5, "name": "PS05" }, { "id": 11, "name": "PS11" }, { "id": 12, "name": "PS12" }, { "id": 13, "name": "PS13" }, { "id": 14, "name": "PS14" }, { "id": 15, "name": "PS15" }, { "id": 16, "name": "PS16" }];
 
 		var requestText = '';
@@ -400,7 +408,7 @@ module.exports = function (app, connection) {
 		sumText = sumText.slice(0, -1);
 		singleText = singleText.slice(0, -1);
 
-		connection.query('SELECT ' + requestText + ' FROM dailySumExport dg JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailySumExport WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) gg ON dg.date = gg.date JOIN (SELECT date, ' + singleText + ' FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de on dg.date = de.date JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailyEsol WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) ge ON dg.date = ge.date JOIN dailySolarGis ds on dg.date = ds.date JOIN (SELECT DATE(NOW() - INTERVAL 1 DAY) AS date, ' + sumText + ' FROM dailySolarGis WHERE (date BETWEEN DATE(NOW() - INTERVAL 5 DAY) AND DATE(NOW() - INTERVAL 1 DAY))) gs ON dg.date = gs.date WHERE dg.date = DATE(NOW() - INTERVAL 1 DAY);', function (err, rows) {
+		connection.query('SELECT ' + requestText + ' FROM dailySumExport dg JOIN (SELECT ' + date1 + ' AS date, ' + sumText + ' FROM dailySumExport WHERE (date BETWEEN ' + date5 + '  AND ' + date1 + ')) gg ON dg.date = gg.date JOIN (SELECT date, ' + singleText + ' FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de on dg.date = de.date JOIN (SELECT ' + date1 + ' AS date, ' + sumText + ' FROM dailyEsol WHERE (date BETWEEN ' + date5 + ' AND ' + date1 + ')) ge ON dg.date = ge.date JOIN dailySolarGis ds on dg.date = ds.date JOIN (SELECT ' + date1 + ' AS date, ' + sumText + ' FROM dailySolarGis WHERE (date BETWEEN ' + date5 + '  AND ' + date1 + ')) gs ON dg.date = gs.date WHERE dg.date = ' + date1 + ';', function (err, rows) {
 			if (err) {
 				return res.json(err);
 			} else {

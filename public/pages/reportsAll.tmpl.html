@@ -34,9 +34,13 @@
 </div>
 <hr>-->
 	<div class="row">
-		<br/>
+		<div class="col s6 m4">
+			<label for="selectStartDate">Select report date: </label>
+			<input type="date" ng-model="selectStartDate" name="input" required>
+			<button class="btn waves-effect waves-light indigo accent-3" ui-sref="parent.reportsAll({date:convertDate(selectStartDate)})">Submit</button>
+		</div>
 		<table class="metroTable" id="dailyProductionReportTable" style="width:100%">
-			<caption>Production report for {{yesterdaysDate}}. <a download="1 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
+			<caption>Production report for {{displayDate}}. <a download="1 day {{displayDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
 			<tr>
 				<th>Site</th>
 				<th>TIC</th>
@@ -87,7 +91,7 @@
 	<div class="row">
 		<br/>
 		<table class="metroTable" id="sumProductionReportTable" style="width:100%">
-			<caption>Production report for five previous days. <a download="5 day {{yesterdaysDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
+			<caption>Production report for five previous days. <a download="5 day {{displayDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
 			<tr>
 				<th>Site</th>
 				<th>TIC</th>

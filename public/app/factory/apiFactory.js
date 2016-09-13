@@ -135,8 +135,8 @@ angular.module('apiFactory', [])
 			return $http.get(urlBase + 'displaySite/allSiteCoords');
 		};
 		
-		dataFactory.dailyProductionReport = function() {
-			return $http.get(urlBase + 'reports/dailyProductionReport');
+		dataFactory.dailyProductionReport = function(date) {
+			return $http.get(urlBase + 'reports/dailyProductionReport/' + date);
 		};
 
 		dataFactory.getInverterData = function (id) {

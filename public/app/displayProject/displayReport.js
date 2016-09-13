@@ -7,46 +7,17 @@ angular.module('displayAllReport', [
 
 	.controller('ReportCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', '$filter', function ($scope, $stateParams, $http, $log, $state, dataFactory, $filter) {
 
+		var date = $stateParams.date || ''; //get paramater date, or set to blank for API calls
 
-		var startDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
-		$scope.yesterdaysDate = moment(startDate, 'YYYY-MM-DD').format('DD/MM/YYYY');;
-		var endDate = moment().subtract(14, 'days').format('YYYY-MM-DD');
-		var titleStartDate = '';
-		var titleEndDate = '';
-		if ($stateParams.startDate) {
-			startDate = $stateParams.startDate;
-			titleStartDate = moment($stateParams.month, 'YYYY-MM-DD').format('YYYY-MM-DD');
-		}
-		if ($stateParams.endDate) {
-			endDate = $stateParams.endDate;
-			titleEndDate = moment($stateParams.month, 'YYYY-MM-DD').format('YYYY-MM-DD');
+		if (!$stateParams.date) { // change disaplyDate, if no date selected disaplyDate sets to yesterday 
+			$scope.displayDate = moment().subtract(1, 'days').format('DD/MM/YYYY');
+		} else {
+			$scope.displayDate = moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY');
 		}
 
-		$scope.startDate = startDate;
-		$scope.endDate = endDate;
-
-		getAllReports(startDate, endDate); //gets summary array of site
-		function getAllReports(startDate, endDate) {
-			dataFactory.getAllReports(startDate, endDate)
-				.success(function (res) {
-					// $scope.testReports = res;
-
-					var newObj = _.reduce(res[0], function (accumulator, value, key) {
-						var group = key.substring(0, 4);
-						var property = key.substring(5);
-
-						if (!accumulator[group]) accumulator[group] = {};
-						if (!accumulator[group].site) accumulator[group].site = group;
-						accumulator[group][property] = value;
-						return accumulator;
-					}, {});
-					$scope.allReports = newObj;
-				});
-		}
-
-		getDailyProductionReport();
-		function getDailyProductionReport() {
-			dataFactory.dailyProductionReport()
+		getDailyProductionReport(date); // call function to access date depending on parameter date, or defaults to yesteday
+		function getDailyProductionReport(date) {
+			dataFactory.dailyProductionReport(date)
 				.success(function (res) {
 					var totalDailyExport = 0;
 					var totalGroupExport = 0;
@@ -78,12 +49,10 @@ angular.module('displayAllReport', [
 						if (!accumulator[group].site) accumulator[group].site = group;
 						accumulator[group][property] = value;
 
-
 						return accumulator;
 					}, {});
 
 					$scope.dailyProductionReport = newObj;
-
 					$scope.totalDailyExport = totalDailyExport;
 					$scope.totalGroupExport = totalGroupExport;
 					$scope.expectedExport = expectedExport;
@@ -93,9 +62,7 @@ angular.module('displayAllReport', [
 				});
 		};
 
-
-
-		getPickUp();
+		getPickUp(); 
 		function getPickUp() {
 			dataFactory.getPickUp()
 				.success(function (res) {
@@ -108,11 +75,7 @@ angular.module('displayAllReport', [
 				})
 		};
 
-
-		$scope.convertDate = function (date) {
+		$scope.convertDate = function (date) { //date converter, to convert javascript date to mysql date
 			return $filter('date')(date, 'yyyy-MM-dd')
 		}
-
-
-
 	}]);

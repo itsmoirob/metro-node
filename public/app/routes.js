@@ -106,7 +106,7 @@ angular.module('routes', [
 				}
 			})
 			.state('parent.reportsAll', { //list the main body of the 'admin' page
-				url: '/reportsAll?startDate&endDate',
+				url: '/reportsAll?date',
 				views: {
 					'display@': {
 						controller: 'ReportCtrl',
