@@ -60,7 +60,7 @@ angular.module('displayAllReport', [
 					$scope.totalGroupEsol = totalGroupEsol;
 
 				});
-		};
+		}
 
 		getPickUp(); 
 		function getPickUp() {
@@ -72,10 +72,10 @@ angular.module('displayAllReport', [
 						totalMWp = totalMWp + res.tic_mwp;
 					});
 					$scope.totalMWp = totalMWp;
-				})
-		};
+				});
+		}
 
 		$scope.convertDate = function (date) { //date converter, to convert javascript date to mysql date
-			return $filter('date')(date, 'yyyy-MM-dd')
-		}
+			return $filter('date')(date, 'yyyy-MM-dd');
+		};
 	}]);

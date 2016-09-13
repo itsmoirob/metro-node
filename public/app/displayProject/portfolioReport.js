@@ -217,7 +217,7 @@ angular.module('portfolioReport', [
 						monthPredictPR.data.push(res[0][value] * 100);
 					});
 
-				})
+				});
 		}
 
 		getPortfolioSiteEsolMonth(month);
@@ -321,7 +321,7 @@ angular.module('portfolioReport', [
 			dataFactory.getPortfolioAvailability(month)
 				.success(function (res) {
 					$scope.availabilty = res;
-				})
+				});
 		}
 
 		siteMonthSumGeneration(month);
@@ -352,7 +352,7 @@ angular.module('portfolioReport', [
 					angular.forEach(modifiedArray, function (modifiedArray) {
 						cumulativeGenerationAllActual.data.push(modifiedArray.actual);
 						cumulativeGenerationAllPredict.data.push(modifiedArray.predicted);
-					})
+					});
 
 				});
 		}
@@ -362,8 +362,8 @@ angular.module('portfolioReport', [
 		$scope.portfolioSiteDataMonth = portfolioSiteDataMonth;
 
 		$scope.convertDateMonth = function (date) {
-			return $filter('date')(date, 'yyyy-MM')
-		}
+			return $filter('date')(date, 'yyyy-MM');
+		};
 
 		//  Chart for export generation
 		$scope.chartMonthGeneration = {
@@ -436,7 +436,7 @@ angular.module('portfolioReport', [
 									if (e.name === name) {
 										e.visible ? e.hide() : e.show();
 									}
-								})
+								});
 							}
 						}
 					}
@@ -714,8 +714,6 @@ angular.module('portfolioReport', [
 					$(el).toggleClass("text-green", parseFloat($(el).text()) > 0);
 				}, 0);
 			},
-		}
+		};
 	})
-
 	;
-

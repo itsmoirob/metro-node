@@ -1,4 +1,4 @@
-https://github.com/steelx/nodeauth
+// https://github.com/steelx/nodeauth
 
 var express = require('express');
 var path = require('path');

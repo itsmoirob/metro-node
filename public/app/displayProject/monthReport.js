@@ -22,8 +22,8 @@ angular.module('monthReport', [
 		var sumChartDate = [];
 
 		$scope.convertDateMonth = function (date) {
-			return $filter('date')(date, 'yyyy-MM')
-		}
+			return $filter('date')(date, 'yyyy-MM');
+		};
 
 		var monthGenerationActual = {
 			name: "Actual export",
@@ -92,7 +92,7 @@ angular.module('monthReport', [
 		};
 
 		getMonthGeneration(SP, month);
-		if (month == "") {
+		if (month === "") {
 			month = "2015-12";
 		}
 		function getMonthGeneration(SP, month) {
@@ -104,7 +104,7 @@ angular.module('monthReport', [
 						monthGenerationPredict.data.push(res.predictGen);
 						monthEsolPredict.data.push(res.predictEsol);
 						chartDate.push(moment(res.date).format("Do"));
-					})
+					});
 				});
 		}
 
@@ -124,7 +124,7 @@ angular.module('monthReport', [
 						highChartsSumData.data.push(res.sum);
 						highChartsPredictData.data.push(res.predicted);
 						sumChartDate.push(moment(res.date).format("MMM YY"));
-					})
+					});
 				});
 		}
 
@@ -136,7 +136,7 @@ angular.module('monthReport', [
 						highChartsSumActualPR.data.push(res.prActual);
 						highChartSumPvsystPR.data.push(res.prPvsyst);
 						highChartSumGuaranteePR.data.push(res.prGuarantee);
-					})
+					});
 				});
 		}
 

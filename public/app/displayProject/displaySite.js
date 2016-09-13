@@ -201,17 +201,17 @@ angular.module('displaySite', [
 					$scope.res = res;
 					var latMin = Math.min.apply(null, res.map(function (item) {
 						return item.latitude;
-					}))
+					}));
 					var latMax = Math.max.apply(null, res.map(function (item) {
 						return item.latitude;
-					}))
+					}));
 					var mapLat = (latMin + latMax) / 2;
 					var longMin = Math.min.apply(null, res.map(function (item) {
 						return item.longitude;
-					}))
+					}));
 					var longMax = Math.max.apply(null, res.map(function (item) {
 						return item.longitude;
-					}))
+					}));
 					var mapLong = (longMin + longMax) / 2;
 					$scope.map = { center: { latitude: mapLat, longitude: mapLong }, zoom: 6 };
 					$scope.markers = [];
@@ -226,7 +226,7 @@ angular.module('displaySite', [
 								title: res.name
 							}
 						});
-					});;
+					});
 				});
 		}
 
@@ -237,7 +237,6 @@ angular.module('displaySite', [
 		function login(username, password) {
 			UserFactory.login(username, password).then(function success(response) {
 				$scope.user = response.data.user;
-				// alert(response.data.token);
 			}, handleError);
 		}
 

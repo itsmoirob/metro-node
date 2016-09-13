@@ -20,9 +20,9 @@ angular.module('eveleyOwn', [
 					}
 					sliceArr = sliceArr.reverse();
 					slicePyro = slicePyro.reverse();
-					sliceDate = sliceDate.reverse()
+					sliceDate = sliceDate.reverse();
 				});
-		};
+		}
 
 
 		$scope.reverse = true;
