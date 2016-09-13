@@ -67,11 +67,13 @@ ul.success li {
 	border-color: #d6e9c6;
 }
 
-.page {
-	margin-top: 50px;
-	background-color: white;
-	padding: 50px;
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+@media screen and (min-width: 992px) {
+	.page {
+		margin-top: 50px;
+		background-color: white;
+		padding: 50px;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
 }
 
 .letter {
@@ -231,7 +233,7 @@ td {
 }
 
 #topNavDrop a {
-	color: #3d5afe;
+	color: #c67803;
 }
 
 #symbol:after {
@@ -242,27 +244,6 @@ td {
 	content: '\25bc';
 }
 
-
-/*#chartMonthGenerationPortfolio {
-		height: 250px;
-		width: 50%;
-		float: left;
+.tabActive {
+	background-color : #c67803;
 }
-
-#chartMonthPRPortfolio {
-		height: 250px;
-		width: 50%;
-		float: right;
-}
-
-#chartMonthEsolPortfolio {
-		height: 250px;
-		width: 50%;
-		float: left;
-}
-
-#chartYearGenerationPortfolio {
-		height: 250px;
-		width: 50%;
-		float: right;
-}*/

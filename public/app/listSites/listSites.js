@@ -1,4 +1,4 @@
-angular.module('listSites', [
+var myApp = angular.module('listSites', [
 	'ui.router',
 	'ngAnimate',
 	'apiFactory'
@@ -7,22 +7,24 @@ angular.module('listSites', [
 		$httpProvider.interceptors.push('AuthInterceptor');
 	})
 
-	.constant('API_URL', 'http://localhost:3000')
+myApp.constant('API_URL', 'http://localhost:3000')
 
-	.controller('ListCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function($scope, $stateParams, $http, $log, dataFactory, UserFactory) {
+myApp.controller('ListCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function ($scope, $stateParams, $http, $log, dataFactory, UserFactory) {
 
-		getIntroSites();
-		function getIntroSites() {
-			dataFactory.getPickUp()
-				.success(function(res) {
-					$scope.introSites = res;
-				});
-		}
+	getIntroSites();
+	function getIntroSites() {
+		dataFactory.getPickUp()
+			.success(function (res) {
+				$scope.introSites = res;
+			});
+	}
 
-		var SP = $stateParams.siteResult;
-		$scope.SP = SP;
+	var SP = $stateParams.siteResult;
+	$scope.SP = SP;
 
+	$scope.isActive = function (route) {
+		return route === $location.path();
+	}
 
-
-	}])
+}])
 	;

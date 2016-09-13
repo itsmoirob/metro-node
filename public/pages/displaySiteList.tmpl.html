@@ -1,11 +1,11 @@
-<li><a class="waves-effect waves-light">{{(introSites | filter:{'id':SP})[0].name }}</a></li>
-<hr />
-<li><a class="waves-effect waves-light" ui-sref=parent.displaySummaryProject({siteResult:SP})>Summary</a></li>
-<li><a class="waves-effect waves-light" ui-sref=parent.displayGenerationProject({siteResult:SP})>Generation</a></li>
-<li><a class="waves-effect waves-light" ui-sref=parent.displayInstallProject({siteResult:SP})>Site install details</a></li>
-<li><a class="waves-effect waves-light" ui-sref=parent.displayFinanceProject({siteResult:SP})>Finance/Warranty</a></li>
-<li><a class="waves-effect waves-light" ui-sref=parent.displayAdminProject({siteResult:SP})>Admin</a></li>
-<li><a class="waves-effect waves-light" ui-sref=parent.displayMKReport({siteResult:SP})>Daily stats and PR</a></li>
-<!--<li><a class="waves-effect waves-light" ui-sref=parent.reportsIncidentSite({siteResult:SP})>Incidents</a></li>-->
-<li><a class="waves-effect waves-light" ui-sref=parent.monthReportPage({siteResult:SP})>Month Report</a></li>
-
+<ul>
+	<li><a class="waves-effect waves-light">{{(introSites | filter:{'id':SP})[0].name }}</a></li>
+	<hr />
+	<li><a href ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.displaySummaryProject({siteResult:SP})>Summary</a></li>
+	<li><a ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.displayGenerationProject({siteResult:SP})>Generation</a></li>
+	<li><a ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.displayInstallProject({siteResult:SP})>Site install details</a></li>
+	<li><a ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.displayFinanceProject({siteResult:SP})>Finance/Warranty</a></li>
+	<li><a ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.displayAdminProject({siteResult:SP})>Admin</a></li>
+	<li><a ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.displayMKReport({siteResult:SP})>Daily stats and PR</a></li>
+	<li><a ui-sref-active="tabActive" class="waves-effect waves-light" ui-sref=parent.monthReportPage({siteResult:SP})>Month Report</a></li>
+</ul>
