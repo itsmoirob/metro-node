@@ -108,14 +108,6 @@ angular.module('monthReport', [
 				});
 		}
 
-		siteMonthIncidents(SP, month);
-		function siteMonthIncidents(SP, month) {
-			dataFactory.siteMonthIncidents(SP, month)
-				.success(function (res) {
-					$scope.monthIncidents = res;
-				});
-		}
-
 		siteMonthSumGeneration(SP, month);
 		function siteMonthSumGeneration(SP, month) {
 			dataFactory.siteMonthSumGeneration(SP, month)

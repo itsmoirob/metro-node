@@ -12,14 +12,6 @@ angular.module('displaySite', [
 
 	.controller('SiteCtrl', ['$scope', '$stateParams', '$http', '$log', 'dataFactory', 'UserFactory', function ($scope, $stateParams, $http, $log, dataFactory, UserFactory) {
 
-		getIncidentReport();
-		function getIncidentReport() {
-			dataFactory.getIncidentReport()
-				.success(function (res) {
-					$scope.incidentReport = res;
-				});
-		}
-
 		var allSumData = [];
 		var chartDate = [];
 

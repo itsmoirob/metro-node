@@ -52,8 +52,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							}
 						});
 						console.log('The file was saved! ' + filePath);
-
-					})
+					});
 				});
 				res.send('The file was saved! ' + filePath + ' from ' + rows[0].date);
 			}

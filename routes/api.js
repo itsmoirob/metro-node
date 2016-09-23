@@ -120,7 +120,7 @@ module.exports = function (app, connection) {
 
 	// Get data FRONT PAGE chart MONTHLY SUM
 	app.get('/api/displaySite/allSiteDaily/', function (req, res) {
-		var selectedDate = "NOW()"
+		var selectedDate = "NOW()";
 		connection.query("select date, ps1, ps2, ps3, ps4, ps5, ps11, ps12, ps13, ps14, ps15, ps16 from dailySumExport where (date between (" + selectedDate + " - INTERVAL 31 DAY) and " + selectedDate + ") order by date asc;", function (err, rows) {
 			if (err) {
 				return res.json(err);
@@ -178,7 +178,7 @@ module.exports = function (app, connection) {
 	app.get('/api/displaySite/monthReport/:id/:month', function (req, res) {
 		var id = req.params.id;
 		var month = req.params.month;
-		var year = req.params.month.substring(0, 4)
+		var year = req.params.month.substring(0, 4);
 		var inverters = null;
 
 		if (id == 1) {
@@ -229,20 +229,6 @@ module.exports = function (app, connection) {
 			}
 		});
 	});
-
-
-	app.get('/api/displaySite/siteMonthIncidents/:id/:month', function (req, res) {
-		var id = req.params.id;
-		var month = req.params.month;
-		connection.query('select id, site, date_logged, start_time, end_time, reported_by_person, (select value from incident_report_company where id = reported_by_company) as reported_by_company, (select value from incident_report_category where id = category) as category,(select value from incident_report_planned where id = planned) as planned, (select value from incident_report_generation_loss where id = loss_of_generation) as loss_of_generation, details, case when status = 1 then \'Open\' else \'Closed\' end as status, incident_report_number from incident_log where site = ' + id + ' and date_format(date_logged, "%Y-%m") = "' + month + '";', function (err, rows) {
-			if (err) {
-				return res.json(err);
-			} else {
-				return res.json(rows);
-			}
-		});
-	});
-
 
 	app.get('/api/displaySite/siteMonthSumPR/:id/:month', function (req, res) {
 		var id = req.params.id;
@@ -393,7 +379,7 @@ module.exports = function (app, connection) {
 		var singleText = '';
 
 		groupings.forEach(function (element) {
-			requestText = requestText + '(SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ') as ' + element.name + '_Mwp, dg.ps' + element.id + ' AS ' + element.name + '_Day, gg.ps' + element.id + ' AS ' + element.name + '_Group, mp.ps' + element.id + ' / DAY(LAST_DAY(NOW() - INTERVAL 1 DAY)) AS ' + element.name + '_PredictDay, de.ps' + element.id + ' AS ' + element.name + '_DailyEsol, ge.ps' + element.id + ' AS ' + element.name + '_GroupEsol, dg.ps' + element.id + ' / (de.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_PR, gg.ps' + element.id + ' / (ge.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_GroupPR, ds.ps' + element.id + ' AS ' + element.name + '_DailySolarGis, gs.ps' + element.id + ' AS ' + element.name + '_GroupSolarGis, dg.ps' + element.id + ' / (ds.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_PRSolarGis, gg.ps' + element.id + ' / (gs.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_GroupPRSolarGis,'
+			requestText = requestText + '(SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ') as ' + element.name + '_Mwp, dg.ps' + element.id + ' AS ' + element.name + '_Day, gg.ps' + element.id + ' AS ' + element.name + '_Group, mp.ps' + element.id + ' / DAY(LAST_DAY(NOW() - INTERVAL 1 DAY)) AS ' + element.name + '_PredictDay, de.ps' + element.id + ' AS ' + element.name + '_DailyEsol, ge.ps' + element.id + ' AS ' + element.name + '_GroupEsol, dg.ps' + element.id + ' / (de.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_PR, gg.ps' + element.id + ' / (ge.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_GroupPR, ds.ps' + element.id + ' AS ' + element.name + '_DailySolarGis, gs.ps' + element.id + ' AS ' + element.name + '_GroupSolarGis, dg.ps' + element.id + ' / (ds.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_PRSolarGis, gg.ps' + element.id + ' / (gs.ps' + element.id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + element.id + ')*1000) AS ' + element.name + '_GroupPRSolarGis,';
 		});
 
 		groupings.forEach(function (element) {
@@ -425,7 +411,7 @@ module.exports = function (app, connection) {
 			res.send('no longer here');
 		} else if (id <= 4) {
 			var groupings = [{ 'id': 1, 'inv': [10, 8, 8, 8, 8] }, { 'id': 2, 'inv': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'inv': [8, 8, 10, 8] }, { 'id': 4, 'inv': [8, 10, 10, 10, 10, 10, 10, 10] }];
-			var site = groupings.filter(function (site) { return site.id == id })[0];
+			var site = groupings.filter(function (site) { return site.id == id; })[0];
 			var querySelectText = '';
 			var queryTableText = '';
 			var queryTables = ' FROM inverter_generation_' + id + '_T01 t1 ';
@@ -444,10 +430,10 @@ module.exports = function (app, connection) {
 			res.send('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' GROUP BY date(t1.dateTime), hour(t1.dateTime)) AS sums;');
 
 		} else if (id == 12) {
-			res.send('This may not work;')
+			res.send('This may not work;');
 		} else {
 			var groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }];
-			var site = groupings.filter(function (site) { return site.id == id })[0];
+			var site = groupings.filter(function (site) { return site.id == id; })[0];
 			var querySelectText = 'inverter_01';
 			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_01';
 
@@ -460,7 +446,7 @@ module.exports = function (app, connection) {
 				}
 				querySelectText = querySelectText + ', inverter_' + AsInverter;
 				queryTableText = queryTableText + ', ROUND(SUM(If( inverter = ' + i + ', generation, 0 )), 2 ) AS inverter_' + AsInverter;
-			};
+			}
 			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT dateTime AS date, ' + queryTableText + ' FROM inverter_generation_' + id + ' WHERE dateTime > now() - INTERVAL 31 DAY GROUP BY date(dateTime), hour(dateTime) ORDER BY dateTime DESC) AS sums;', function (err, rows) {
 				if (err) {
 					return res.json(err);

@@ -26,10 +26,6 @@ angular.module('apiFactory', [])
 		dataFactory.siteMonthSumGeneration = function (id, month) {
 			return $http.get(urlBase + 'displaySite/siteMonthSumGeneration/' + id + '/' + month);
 		};
-
-		dataFactory.siteMonthIncidents = function (id, month) {
-			return $http.get(urlBase + 'displaySite/siteMonthIncidents/' + id + '/' + month);
-		};
 		
 		dataFactory.siteMonthSumPR = function (id, month) {
 			return $http.get(urlBase + 'displaySite/siteMonthSumPR/' + id + '/' + month);
@@ -63,40 +59,8 @@ angular.module('apiFactory', [])
 			return $http.get(urlBase + 'displaySite/pyroMean/' + id);
 		};
 
-		dataFactory.getIncidentReport = function () {
-			return $http.get(urlBase + 'reports/incidents');
-		};
-
-		dataFactory.getIncidentReportAll = function () {
-			return $http.get(urlBase + 'reports/incidentsAll');
-		};
-
-		dataFactory.getIncidentReportSite = function (id) {
-			return $http.get(urlBase + 'reports/incidentsSite/' + id);
-		};
-
-		dataFactory.getOpenIncidentSite = function (id) {
-			return $http.get(urlBase + 'reports/openIncidentsSite/' + id);
-		};
-
-		dataFactory.getIncidentReportLog = function (id) {
-			return $http.get(urlBase + 'reports/incidentLog/' + id);
-		};
-
-		dataFactory.getIncidentReportLogComment = function (id) {
-			return $http.get(urlBase + 'reports/incidentLogComments/' + id);
-		};
-
 		dataFactory.getAllReports = function (startDate, endDate) {
 			return $http.get(urlBase + 'displaySite/allReport/' + startDate + '/' + endDate + '/');
-		};
-
-		dataFactory.getIncidentSiteName = function () {
-			return $http.get(urlBase + 'incidents/incidentSiteName/');
-		};
-
-		dataFactory.getIncidentCategory = function () {
-			return $http.get(urlBase + 'incidents/incidentCategory/');
 		};
 		
 		dataFactory.getPortfolioSiteInfo = function () {

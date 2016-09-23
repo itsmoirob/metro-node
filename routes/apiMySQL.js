@@ -38,11 +38,12 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	app.get('/api/ftp/:id', function (req, res) {
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id })[0];
+		var fileName;
+		var site = mpanList.filter(function (site) { return site.id == id; })[0];
 		if (id === 'NonHH') {
-			var fileName = 'Primrose Solar Limited NonHH.csv';
+			fileName = 'Primrose Solar Limited NonHH.csv';
 		} else {
-			fileName = 'Primrose Solar Limited.csv'
+			fileName = 'Primrose Solar Limited.csv';
 		}
 		starkFtp.get(fileName, './files/' + fileName, function (hadErr) {
 			if (hadErr) {
@@ -57,7 +58,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	app.get('/api/solarGisFtp/:id', function (req, res) {
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id })[0];;
+		var site = mpanList.filter(function (site) { return site.id == id; })[0];
 
 		var day = moment().subtract(1, 'days').format('YYYYMMDD');
 		var fileName = site.solarGis + day + '.csv';
@@ -77,7 +78,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
 
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id })[0];;
+		var site = mpanList.filter(function (site) { return site.id == id; })[0];
 		var day = moment().subtract(1, 'days').format('YYYYMMDD');
 		var mySQLDay = moment(day).format('YYYY-MM-DD');
 		var filePath = './files/solarGis/' + site.id + '_' + site.solarGis + day + '.csv';
@@ -144,7 +145,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							data: readingsForOneExport
 						};
 					});
-					var site = readingsForExport.filter(function (site) { return site.id == id })[0];
+					var site = readingsForExport.filter(function (site) { return site.id == id; })[0];
 					var sqlInputData = [];
 					var n = 0;
 					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
@@ -204,7 +205,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							data: readingsForOneExport
 						};
 					});
-					var site = readingsForExport.filter(function (site) { return site.id == id })[0];
+					var site = readingsForExport.filter(function (site) { return site.id == id; })[0];
 					var sqlInputData = [];
 					var n = 0;
 					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
@@ -235,7 +236,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	app.get('/api/mySQL/manualImportUpload/:id', function (req, res) {
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id })[0];
+		var site = mpanList.filter(function (site) { return site.id == id; })[0];
 		var filePath = "./files/" + site.importMpan + ".csv";
 		fs.readFile(filePath, {
 			encoding: 'utf-8'
@@ -341,6 +342,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				} else {
 					var sqlInputData = [];
 					var n = 0;
+					var j;
 					if (id < 5) {
 						for (j = 1; j < data.length; j++) { // if site is 1 to 4
 							// data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
@@ -469,7 +471,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 					} else if (id > 7 && id < 11) {
 
-						for (var j = 2; j < data.length; j++) { // if site is 7 to 11
+						for (j = 2; j < data.length; j++) { // if site is 7 to 11
 							data[j][0] = moment(data[j][0], "DD.MM.YYYY HH:mm").format("YYYY-MM-DD HH:mm"); // if required uncomment out this line
 							data[j][1] = parseFloat(data[j][1]);
 							data[j][2] = parseFloat(data[j][2]);
@@ -656,9 +658,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							res.send('Done: INSERT INTO pyro_site_' + id + ' VALUES ' + sqlInputData[0]);
 						});
 					}
-				};
+				}
 			});
-		})
+		});
 	});
 
 	// upload pyro data.
@@ -680,6 +682,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					console.log(err);
 				} else {
 					var sqlInputData = [];
+					var j;
 					if (id <= 4) {
 						for (j = 1; j < data.length; j++) {
 							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
@@ -743,7 +746,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				method: 'GET'
 			};
 			console.log(options.hostname + ':' + options.port + options.path);
-			var req = http.request(options, function (res) {
+			req = http.request(options, function (res) {
 				var data = '';
 				var sqlInputData1 = [];
 				var sqlInputData2 = [];
@@ -758,7 +761,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					data += chunk;
 				});
 				res.on('end', function () {
-					console.log('No more data in response.')
+					console.log('No more data in response.');
 					var parseArr = JSON.parse(data);
 					for (i = 1; i <= parseArr.length - 1; i++) {
 						var number = (parseArr[i].Value).replace(/\./g, '').replace(/\,/g, '.');
@@ -788,7 +791,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						if (err) throw err;
 						console.log(result);
 					});
-				})
+				});
 			});
 			req.on('error', function (e) {
 				console.log('problem with request: ' + e.message);
@@ -814,7 +817,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				method: 'GET'
 			};
 			console.log(options.hostname + ':' + options.port + options.path);
-			var req = http.request(options, function (res) {
+			req = http.request(options, function (res) {
 				var data = '';
 				var sqlInputData = [];
 				res.setEncoding('utf8');
@@ -822,7 +825,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					data += chunk;
 				});
 				res.on('end', function () {
-					console.log('No more data in response.')
+					console.log('No more data in response.');
 					var parseArr = JSON.parse(data);
 					for (i = 1; i <= parseArr.length - 1; i++) {
 						var number = (parseArr[i].Value).replace(/\./g, '').replace(/\,/g, '.') / 1000;
@@ -832,7 +835,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						if (err) throw err;
 						console.log(result);
 					});
-				})
+				});
 			});
 			req.on('error', function (e) {
 				console.log('problem with request: ' + e.message);

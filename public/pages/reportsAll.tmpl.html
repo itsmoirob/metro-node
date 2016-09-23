@@ -1,141 +1,113 @@
 <div class="page">
-	<!--<div class="row">
-	<div class="col s6 m4">
-		<label for="selectStartDate">Select start date: </label>
-		<input type="date" ng-model="selectStartDate" name="input" required>
-	</div>
-	<div class="col s6 m4">
-		<label for="selectStartDate">Select end date: </label>
-		<input type="date" ng-model="selectEndDate" name="input" required>
-	</div>
-	<button class="btn waves-effect waves-light indigo accent-3" ui-sref="parent.reportsAll({startDate:convertDate(selectStartDate), endDate:convertDate(selectEndDate)})">Submit</button>
-</div>
-<div class="row">
-	
-	
-	<br/>
-	<table class="metroTable" id="incidentTable" style="width:100%">
-		<caption>Report for days between {{startDate}} and {{endDate}}. <a download="Report all.csv" href="" onclick="return ExcellentExport.csv(this, 'incidentTable');">Export to CSV</a></caption>
-		<tr>
-			<th>Site</th>
-			<th>Comms availabilty</th>
-			<th>Inverter availabilty</th>
-			<th>PR</th>
-			<th>Export</th>
-		</tr>
-		<tr ng-repeat="site in allReports">
-			<td>{{site.site}}</td>
-			<td>{{site.avail * 100 | number:1 }}%</td>
-			<td>{{site.Over0 * 100 | number:1 }}%</td>
-			<td>{{site.PR * 100 | number:1 }}%</td>
-			<td>{{site.export | number:1 }}</td>
-		</tr>
-	</table>
-</div>
-<hr>-->
 	<div class="row">
 		<div class="col s6 m4">
 			<label for="selectStartDate">Select report date: </label>
 			<input type="date" ng-model="selectStartDate" name="input" required>
 			<button class="btn waves-effect waves-light indigo accent-3" ui-sref="parent.reportsAll({date:convertDate(selectStartDate)})">Submit</button>
 		</div>
-		<table class="metroTable" id="dailyProductionReportTable" style="width:100%">
-			<caption>Production report for {{displayDate}}. <a download="1 day {{displayDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
-			<tr>
-				<th>Site</th>
-				<th>TIC</th>
-				<th>Export</th>
-				<th>Expected</th>
-				<th>Deviation</th>
-				<th>Irridiation</th>
-				<th>SolarGis</th>
-				<th>Irr PR</th>
-				<th>SG PR</th>
-			</tr>
-			<tr>
-				<th></th>
-				<th>MWp</th>
-				<th>kWh</th>
-				<th>kWh</th>
-				<th>%</th>
-				<th>kW/m2</th>
-				<th>kW/m2</th>
-				<th>%</th>
-				<th>%</th>
-			</tr>
-			<tr ng-repeat="site in dailyProductionReport">
-				<td>{{sitesInfo[$index].name }}</td>
-				<td>{{sitesInfo[$index].tic_mwp | number:1 }}</td>
-				<td>{{site.Day | number:0 }}</td>
-				<td>{{site.PredictDay | number:0 }}</td>
-				<td>{{(site.Day-site.PredictDay)/site.PredictDay*100 | number:2 }}</td>
-				<td ng-init="$parent.aveDailyEsol = $parent.aveDailyEsol + (site.DailyEsol * site.Mwp)">{{site.DailyEsol | number:2 }}</td>
-				<td ng-init="$parent.aveDailySolarGis = $parent.aveDailySolarGis + (site.DailySolarGis * site.Mwp)">{{site.DailySolarGis | number:2 }}</td>
-				<td>{{site.PR*100 | number:2 }}%</td>
-				<td>{{site.PRSolarGis*100 | number:2 }}%</td>
-			</tr>
-			<tr>
-				<th>Total</th>
-				<th>{{totalMWp | number : 1}}</th>
-				<th>{{totalDailyExport | number : 0}}</th>
-				<th>{{expectedExport | number : 0}}</th>
-				<th>{{(totalDailyExport-expectedExport)/expectedExport*100 | number:2 }}</th>
-				<th>{{aveDailyEsol/totalMWp | number:2}}</th>
-				<th>{{aveDailySolarGis/totalMWp | number:2}}</th>
-				<th>{{totalDailyExport/(aveDailyEsol*1000)*100 | number:2}}%</th>
-				<th>{{totalDailyExport/(aveDailySolarGis*1000)*100 | number:2}}%</th>
-			</tr>
-		</table>
 	</div>
+	<div ng-show="!dailyProductionReport.PS01" class="row">
+		<p>Data not availble for {{displayDate}}.</p>
+	</div>
+	<div ng-show="dailyProductionReport.PS01">
+		<div class="row">
+			<table class="metroTable" id="dailyProductionReportTable" style="width:100%">
+				<caption>Production report for {{displayDate}}. <a download="1 day {{displayDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');">Export to CSV</a></caption>
+				<tr>
+					<th>Site</th>
+					<th>TIC</th>
+					<th>Export</th>
+					<th>Expected</th>
+					<th>Deviation</th>
+					<th>Irridiation</th>
+					<th>SolarGis</th>
+					<th>Irr PR</th>
+					<th>SG PR</th>
+				</tr>
+				<tr>
+					<th></th>
+					<th>MWp</th>
+					<th>kWh</th>
+					<th>kWh</th>
+					<th>%</th>
+					<th>kW/m2</th>
+					<th>kW/m2</th>
+					<th>%</th>
+					<th>%</th>
+				</tr>
+				<tr ng-repeat="site in dailyProductionReport">
+					<td>{{sitesInfo[$index].name }}</td>
+					<td>{{sitesInfo[$index].tic_mwp | number:1 }}</td>
+					<td>{{site.Day | number:0 }}</td>
+					<td>{{site.PredictDay | number:0 }}</td>
+					<td>{{(site.Day-site.PredictDay)/site.PredictDay*100 | number:2 }}</td>
+					<td ng-init="$parent.aveDailyEsol = $parent.aveDailyEsol + (site.DailyEsol * site.Mwp)">{{site.DailyEsol | number:2 }}</td>
+					<td ng-init="$parent.aveDailySolarGis = $parent.aveDailySolarGis + (site.DailySolarGis * site.Mwp)">{{site.DailySolarGis | number:2 }}</td>
+					<td>{{site.PR*100 | number:2 }}%</td>
+					<td>{{site.PRSolarGis*100 | number:2 }}%</td>
+				</tr>
+				<tr>
+					<th>Total</th>
+					<th>{{totalMWp | number : 1}}</th>
+					<th>{{totalDailyExport | number : 0}}</th>
+					<th>{{expectedExport | number : 0}}</th>
+					<th>{{(totalDailyExport-expectedExport)/expectedExport*100 | number:2 }}</th>
+					<th>{{aveDailyEsol/totalMWp | number:2}}</th>
+					<th>{{aveDailySolarGis/totalMWp | number:2}}</th>
+					<th>{{totalDailyExport/(aveDailyEsol*1000)*100 | number:2}}%</th>
+					<th>{{totalDailyExport/(aveDailySolarGis*1000)*100 | number:2}}%</th>
+				</tr>
+			</table>
+		</div>
+		<div class="row">
 
-	<div class="row">
-		<br/>
-		<table class="metroTable" id="sumProductionReportTable" style="width:100%">
-			<caption>Production report for five previous days. <a download="5 day {{displayDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
-			<tr>
-				<th>Site</th>
-				<th>TIC</th>
-				<th>Export</th>
-				<th>Expected</th>
-				<th>Deviation</th>
-				<th>Irridiation</th>
-				<th>SolarGis</th>
-				<th>Irr PR</th>
-				<th>SG PR</th>
-			</tr>
-			<tr>
-				<th></th>
-				<th>MWp</th>
-				<th>kWh</th>
-				<th>kWh</th>
-				<th>%</th>
-				<th>kW/m2</th>
-				<th>kW/m2</th>
-				<th>%</th>
-				<th>%</th>
-			</tr>
-			<tr ng-repeat="site in dailyProductionReport">
-				<td>{{sitesInfo[$index].name }}</td>
-				<td>{{sitesInfo[$index].tic_mwp | number:1 }}</td>
-				<td>{{site.Group | number:0 }}</td>
-				<td>{{site.PredictDay*5 | number:0 }}</td>
-				<td>{{(site.Group-(site.PredictDay*5))/(site.PredictDay*5)*100 | number:2 }}</td>
-				<td ng-init="$parent.aveGroupEsol = $parent.aveGroupEsol + (site.GroupEsol * site.Mwp)">{{site.GroupEsol | number:2 }}</td>
-				<td ng-init="$parent.aveGroupSolarGis = $parent.aveGroupSolarGis + (site.GroupSolarGis * site.Mwp)">{{site.GroupSolarGis | number:2 }}</td>
-				<td>{{site.GroupPR*100 | number:2 }}%</td>
-				<td>{{site.GroupPRSolarGis*100 | number:2 }}%</td>
-			</tr>
-			<tr>
-				<th>Total</th>
-				<th>{{totalMWp | number : 1}}</th>
-				<th>{{totalGroupExport | number : 0}}</th>
-				<th>{{expectedExport*5 | number : 0}}</th>
-				<th>{{(totalGroupExport-(expectedExport*5))/(expectedExport*5)*100 | number:2 }}</th>
-				<th>{{aveGroupEsol/totalMWp | number:2}}</th>
-				<th>{{aveGroupSolarGis/totalMWp | number:2}}</th>
-				<th>{{totalGroupExport/(aveGroupEsol*1000)*100 | number:2}}%</th>
-				<th>{{totalGroupExport/(aveGroupSolarGis*1000)*100 | number:2}}%</th>
-			</tr>
-		</table>
+			<table class="metroTable" id="sumProductionReportTable" style="width:100%">
+				<caption>Production report for five previous days. <a download="5 day {{displayDate}}.csv" href="" onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');">Export to CSV</a></caption>
+				<tr>
+					<th>Site</th>
+					<th>TIC</th>
+					<th>Export</th>
+					<th>Expected</th>
+					<th>Deviation</th>
+					<th>Irridiation</th>
+					<th>SolarGis</th>
+					<th>Irr PR</th>
+					<th>SG PR</th>
+				</tr>
+				<tr>
+					<th></th>
+					<th>MWp</th>
+					<th>kWh</th>
+					<th>kWh</th>
+					<th>%</th>
+					<th>kW/m2</th>
+					<th>kW/m2</th>
+					<th>%</th>
+					<th>%</th>
+				</tr>
+				<tr ng-repeat="site in dailyProductionReport">
+					<td>{{sitesInfo[$index].name }}</td>
+					<td>{{sitesInfo[$index].tic_mwp | number:1 }}</td>
+					<td>{{site.Group | number:0 }}</td>
+					<td>{{site.PredictDay*5 | number:0 }}</td>
+					<td>{{(site.Group-(site.PredictDay*5))/(site.PredictDay*5)*100 | number:2 }}</td>
+					<td ng-init="$parent.aveGroupEsol = $parent.aveGroupEsol + (site.GroupEsol * site.Mwp)">{{site.GroupEsol | number:2 }}</td>
+					<td ng-init="$parent.aveGroupSolarGis = $parent.aveGroupSolarGis + (site.GroupSolarGis * site.Mwp)">{{site.GroupSolarGis | number:2 }}</td>
+					<td>{{site.GroupPR*100 | number:2 }}%</td>
+					<td>{{site.GroupPRSolarGis*100 | number:2 }}%</td>
+				</tr>
+				<tr>
+					<th>Total</th>
+					<th>{{totalMWp | number : 1}}</th>
+					<th>{{totalGroupExport | number : 0}}</th>
+					<th>{{expectedExport*5 | number : 0}}</th>
+					<th>{{(totalGroupExport-(expectedExport*5))/(expectedExport*5)*100 | number:2 }}</th>
+					<th>{{aveGroupEsol/totalMWp | number:2}}</th>
+					<th>{{aveGroupSolarGis/totalMWp | number:2}}</th>
+					<th>{{totalGroupExport/(aveGroupEsol*1000)*100 | number:2}}%</th>
+					<th>{{totalGroupExport/(aveGroupSolarGis*1000)*100 | number:2}}%</th>
+				</tr>
+			</table>
+		</div>
 	</div>
 </div>
