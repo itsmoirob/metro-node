@@ -403,36 +403,49 @@ module.exports = function (app, connection) {
 		});
 	});
 
-	app.get('/api/reports/inverterGeneration/:id', function (req, res) {
+	app.get('/api/reports/inverterGeneration/:id/:transformer?/:combinebox?', function (req, res) {
 		var id = req.params.id;
+		var transformer = req.params.transformer;
+		var combinebox = req.params.combinebox;
+
 		if (id == 15) {
 			res.send('Coming soon --- hopefully');
-		} else if (id > 5 && id < 11) {
+		} else if (id > 5 && id < 11) { //these sites have been sold
 			res.send('no longer here');
-		} else if (id <= 4) {
-			var groupings = [{ 'id': 1, 'inv': [10, 8, 8, 8, 8] }, { 'id': 2, 'inv': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'inv': [8, 8, 10, 8] }, { 'id': 4, 'inv': [8, 10, 10, 10, 10, 10, 10, 10] }];
-			var site = groupings.filter(function (site) { return site.id == id; })[0];
-			var querySelectText = '';
-			var queryTableText = '';
-			var queryTables = ' FROM inverter_generation_' + id + '_T01 t1 ';
+		} else if (id <= 4) { //conergy sites which have multiple tables per site for inverters
+			var groupings = [{ 'id': 1, 'combine': [10, 8, 8, 8, 8] }, { 'id': 2, 'combine': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'combine': [8, 8, 10, 8] }, { 'id': 4, 'combinecb': [8, 10, 10, 10, 10, 10, 10, 10] }]; //array of objects showing how many combine 'combine' are in each site 'id'. There are 10 inverters in each combine.
+			var site = groupings.filter(function (site) { return site.id == id; })[0]; //select the correct array based on id
+			var querySelectText = []; //array for text for querying
+			var queryTableText = []; //array for text for querying table
+			var queryTables = ' FROM inverter_generation_' + id + '_T0' + combinebox + ' t1 ';
 
-			site.inv.forEach(function (combinerNumber, transformer) {
-				for (var combine = 1; combine <= combinerNumber; combine++) {
-					for (var inverter = 1; inverter <= 10; inverter++) {
-						querySelectText = querySelectText + ', inverter_' + (transformer + 1) + '_' + combine + '_' + inverter;
-						queryTableText = queryTableText + ', ROUND(SUM(IF( t' + (transformer + 1) + '.inverter = ' + inverter + ' AND t' + (transformer + 1) + '.combine_box = ' + combine + ', t' + (transformer + 1) + '.generation, 0 )), 2 ) AS inverter_' + (transformer + 1) + '_' + combine + '_' + inverter;
-					}
+			for (var inverter = 1; inverter <= 10; inverter++) { //Loop through 10 inverters, there are 10 inverters on every combine box
+				var AsInverter = ''; //this is used to make inverter names from single to double digits, ie 1 now 01, so that the inverters are ordered correctly in table
+				if (inverter < 10) {
+					AsInverter = '' + 0 + inverter;
+				} else {
+					AsInverter = inverter;
+				}
+				querySelectText.push('inverter_' + transformer + '_' + combinebox + '_' + AsInverter);
+				queryTableText.push('ROUND(SUM(IF( t' + transformer + '.inverter = ' + inverter + ' AND t' + transformer + '.combine_box = ' + combinebox + ', t' + transformer + '.generation, 0 )), 2 ) AS inverter_' + transformer + '_' + combinebox + '_' + AsInverter);
+			}
+
+			querySelectText = querySelectText.join(', '); //turn array in to string
+			queryTableText = queryTableText.join(', '); //turn array in to string
+
+			console.log('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t1.dateTime), hour(t1.dateTime) ORDER BY dateTime desc) AS sums;');
+			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t1.dateTime), hour(t1.dateTime) ORDER BY dateTime desc) AS sums;', function (err, rows) {
+				if (err) {
+					return res.json(err);
+				} else {
+					return res.json(rows);
 				}
 			});
-			querySelectText = querySelectText.substr(1);
-			queryTableText = queryTableText.substr(1);
-
-			res.send('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' GROUP BY date(t1.dateTime), hour(t1.dateTime)) AS sums;');
 
 		} else if (id == 12) {
 			res.send('This may not work;');
 		} else {
-			var groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }];
+			var groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }]; //array of objects showing how many inverters 'inv' are in each site 'id'
 			var site = groupings.filter(function (site) { return site.id == id; })[0];
 			var querySelectText = 'inverter_01';
 			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_01';

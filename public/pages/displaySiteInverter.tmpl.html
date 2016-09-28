@@ -1,4 +1,9 @@
 <div class="row">
+	<div ng-show="site <= 4">
+		<div ng-repeat="t in getTimes(numberOfCombines) track by $index">
+			Number of combines {{$index+1}}
+		</div>
+	</div>
 	<div class="page">
 		<p ng-show="!inverterData">Data is loading, please be patient</p>
 		<table ng-show="inverterData" class="metroTable">
@@ -8,7 +13,7 @@
 				<th ng-repeat="(key, val) in inverterData[0]" ng-if="!$first">{{substringAng(key)}}</th>
 			</tr>
 			<tr ng-repeat="inverter in inverterData">
-				<td>{{inverter.date | date:'dd/MM hh:mm' }}</td>
+				<td>{{inverter.date | date:'dd/MM HH:mm' }}</td>
 				<td ng-repeat="n in inverter" ng-if="!$first">{{inverter.inverter_+n | number:0}}</td>
 			</tr>
 		</table>

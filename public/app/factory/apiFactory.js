@@ -103,8 +103,8 @@ angular.module('apiFactory', [])
 			return $http.get(urlBase + 'reports/dailyProductionReport/' + date);
 		};
 
-		dataFactory.getInverterData = function (id) {
-			return $http.get(urlBase + 'reports/inverterGeneration/' + id);
+		dataFactory.getInverterData = function (id, transformer, combineBox) {
+			return $http.get(urlBase + 'reports/inverterGeneration/' + id + '/' + transformer + '/' + combineBox);
 		};
 		
 		return dataFactory;

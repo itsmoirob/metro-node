@@ -681,7 +681,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				if (err) {
 					console.log(err);
 				} else {
-					var sqlInputData = [];
+					var sqlInputData = []; //store the results of query
 					var j;
 					if (id <= 4) {
 						for (j = 1; j < data.length; j++) {
@@ -704,26 +704,24 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							console.log(result.insertId);
 							res.status(201).send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
 						});
-					} else {
+					} else { //how to query for all sites that arent using multiple tables
+						// collect data and format it in array to use in sqlquery
 						for (j = 1; j < data.length; j++) {
 							data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-							sqlInputData.push("('" + data[j][0] + "'");
 							for (i = 1; i <= data[j].length - 1; i++) {
 								data[j][i] = parseFloat(data[j][i]);
 								if (isNaN(data[j][i])) {
-									data[j][i] = "NULL";
+									data[j][i] = 'NULL';
 								}
-								if (i == data[j].length - 1) {
-									sqlInputData.push(i + "," + data[j][i] + ")");
-								} else {
-									sqlInputData.push(i + "," + data[j][i] + "),('" + data[j][0] + "'");
-								}
+								sqlInputData.push('("' + data[j][0] + '", ' + data[0][i] + ', ' + data[j][i] + ')');
 							}
 						}
-						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) {
+						console.log(sqlInputData.join(', '));
+						// res.send('Start transaction; INSERT INTO inverter_generation_' + id + ' VALUES ' + sqlInputData.join(', ') + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_' + id + ' where generation is null; Commit;');
+						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) { //Run query to upload inverter data to table
 							if (err) throw err;
-							console.log(result.insertId);
-							res.status(201).send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]);
+							console.log(result.insertId); 
+							res.status(201).send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]); //output to screen summary
 						});
 					}
 				}

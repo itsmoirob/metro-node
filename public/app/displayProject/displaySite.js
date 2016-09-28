@@ -14,14 +14,15 @@ angular.module('displaySite', [
 
 		var allSumData = [];
 		var chartDate = [];
-
 		var groupingSwitch = 1;
-
-		var groupedGroupings = [{ id: 1, sites: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
-			{ id: 2, sites: [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16] }];
-
+		var groupedGroupings = [
+			{ id: 1, sites: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+			{ id: 2, sites: [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16] }
+		];
 		var selectedGrouping = groupedGroupings[groupingSwitch].sites;
+		var allDailyEsol = [];
 
+		// Get data for and fill in chart series Monthly Sum on front page
 		getAllSiteDaily();
 		function getAllSiteDaily() {
 			dataFactory.allSiteDaily()
@@ -45,6 +46,7 @@ angular.module('displaySite', [
 				});
 		}
 
+		// Get data for and fill in chart series Monthly kwhkwp on front page
 		var allSumDataMWp = [];
 		getAllSiteDailyMWp();
 		function getAllSiteDailyMWp() {
@@ -65,8 +67,7 @@ angular.module('displaySite', [
 				});
 		}
 
-		var allDailyEsol = [];
-
+		// Get data for and fill in chart series Daily Esol on front page
 		getAllSiteDailyEsol();
 		function getAllSiteDailyEsol() {
 			dataFactory.allSiteDailyEsol()
@@ -119,6 +120,7 @@ angular.module('displaySite', [
 			loading: false
 		};
 
+		
 
 		//  Chart for export generation
 		$scope.chartSumMWpSites = {
