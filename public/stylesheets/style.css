@@ -241,3 +241,22 @@ td {
 	background-color : #c67803;
 	/*width:100%;*/
 }
+
+.inverter-select .btn-floating {
+	margin: 10px;
+}
+
+.inverter-select .btn-large i{
+	font-size: 3.5rem;
+	font-weight: bold;
+	text-align: left;
+}
+
+
+.highlight i {
+	color: cadetblue;
+}
+
+.highlight {
+	box-shadow: 0px 6px 6px #666;
+}

@@ -7,16 +7,18 @@ angular.module('displayInverter', [
 	.controller('InverterCtrl', ['$scope', '$stateParams', '$http', '$log', '$state', 'dataFactory', function ($scope, $stateParams, $http, $log, $state, dataFactory) {
 
 		var SP = $stateParams.siteResult; //get site from url for 
-		var transformer = 1 || $stateParams.transformer; //default transformer if no transformer given
-		var combineBox = 1 || $stateParams.combineBox; //default combineBox if not give in URL for query
+		var transformer = $stateParams.transformer || 1; //default transformer if no transformer given
+		var combineBox = $stateParams.combinebox || 1; //default combineBox if not give in URL for query
 		$scope.site = parseInt(SP);
+		$scope.transformer = transformer; 
+		$scope.combineBox = combineBox //required to pass through scope for when passing through buttons to change inverters
 
 		if (SP <= 4) { //this only runs the code for conergy sites as theyre the only one with multiple parameters for getting inverter information
 			var groupings = [{ 'id': 1, 'combine': [10, 8, 8, 8, 8] }, { 'id': 2, 'combine': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'combine': [8, 8, 10, 8] }, { 'id': 4, 'combinecb': [8, 10, 10, 10, 10, 10, 10, 10] }]; //array of objects showing how many combine 'combine' are in each site 'id'. There are 10 inverters in each combine.
 
 			var siteInvs = groupings.filter(function (site) { return site.id == SP; })[0];
 			$scope.numberOfTransformers = siteInvs.combine.length;
-			$scope.numberOfCombines = siteInvs.combine[combineBox];
+			$scope.numberOfCombines = siteInvs.combine[transformer-1];
 		}
 
 		getInverterData(SP, transformer, combineBox);

@@ -403,10 +403,10 @@ module.exports = function (app, connection) {
 		});
 	});
 
-	app.get('/api/reports/inverterGeneration/:id/:transformer?/:combinebox?', function (req, res) {
+	app.get('/api/reports/inverterGeneration/:id/:transformer?/:combineBox?', function (req, res) {
 		var id = req.params.id;
 		var transformer = req.params.transformer;
-		var combinebox = req.params.combinebox;
+		var combineBox = req.params.combineBox;
 
 		if (id == 15) {
 			res.send('Coming soon --- hopefully');
@@ -417,7 +417,7 @@ module.exports = function (app, connection) {
 			var site = groupings.filter(function (site) { return site.id == id; })[0]; //select the correct array based on id
 			var querySelectText = []; //array for text for querying
 			var queryTableText = []; //array for text for querying table
-			var queryTables = ' FROM inverter_generation_' + id + '_T0' + combinebox + ' t1 ';
+			var queryTables = ' FROM inverter_generation_' + id + '_T0' + transformer + ' t ';
 
 			for (var inverter = 1; inverter <= 10; inverter++) { //Loop through 10 inverters, there are 10 inverters on every combine box
 				var AsInverter = ''; //this is used to make inverter names from single to double digits, ie 1 now 01, so that the inverters are ordered correctly in table
@@ -426,15 +426,15 @@ module.exports = function (app, connection) {
 				} else {
 					AsInverter = inverter;
 				}
-				querySelectText.push('inverter_' + transformer + '_' + combinebox + '_' + AsInverter);
-				queryTableText.push('ROUND(SUM(IF( t' + transformer + '.inverter = ' + inverter + ' AND t' + transformer + '.combine_box = ' + combinebox + ', t' + transformer + '.generation, 0 )), 2 ) AS inverter_' + transformer + '_' + combinebox + '_' + AsInverter);
+				querySelectText.push('inverter_' + transformer + '_' + combineBox + '_' + AsInverter);
+				queryTableText.push('ROUND(SUM(IF( t.inverter = ' + inverter + ' AND t.combine_box = ' + combineBox + ', t.generation, 0 )), 2 ) AS inverter_' + transformer + '_' + combineBox + '_' + AsInverter);
 			}
 
 			querySelectText = querySelectText.join(', '); //turn array in to string
 			queryTableText = queryTableText.join(', '); //turn array in to string
 
-			console.log('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t1.dateTime), hour(t1.dateTime) ORDER BY dateTime desc) AS sums;');
-			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT t1.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t1.dateTime), hour(t1.dateTime) ORDER BY dateTime desc) AS sums;', function (err, rows) {
+			console.log('SELECT date, ' + querySelectText + ' FROM (SELECT t.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;');
+			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT t.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;', function (err, rows) {
 				if (err) {
 					return res.json(err);
 				} else {

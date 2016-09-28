@@ -171,7 +171,7 @@ angular.module('routes', [
 				}
 			})
 			.state('parent.displayInverterProject', { //list the main body of the 'generation' page
-				url: '/site/inverter?siteResult&transformer',
+				url: '/site/inverter?siteResult&transformer&combinebox',
 				views: {
 					'display@': {
 						controller: 'InverterCtrl',
