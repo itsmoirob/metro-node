@@ -31,10 +31,6 @@ angular.module('apiFactory', [])
 			return $http.get(urlBase + 'displaySite/siteMonthSumPR/' + id + '/' + month);
 		};
 
-		dataFactory.getSiteExportGeneration = function (id) {
-			return $http.get(urlBase + 'displaySite/export/' + id);
-		};
-
 		dataFactory.getMKReport = function (id) {
 			return $http.get(urlBase + 'displaySite/report/' + id);
 		};
@@ -55,8 +51,8 @@ angular.module('apiFactory', [])
 			return $http.get(urlBase + 'displaySite/allSiteDailyEsol');
 		};
 
-		dataFactory.getChartPyro = function (id) {
-			return $http.get(urlBase + 'displaySite/pyroMean/' + id);
+		dataFactory.chartData = function (id) {
+			return $http.get(urlBase + 'displaySite/chartData/' + id);
 		};
 
 		dataFactory.getAllReports = function (startDate, endDate) {

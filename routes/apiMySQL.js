@@ -712,6 +712,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								data[j][i] = parseFloat(data[j][i]);
 								if (isNaN(data[j][i])) {
 									data[j][i] = 'NULL';
+								} 
+								if (data[j][i] < 0) {
+									data[j][i] = 0;
 								}
 								sqlInputData.push('("' + data[j][0] + '", ' + data[0][i] + ', ' + data[j][i] + ')');
 							}
