@@ -719,7 +719,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								sqlInputData.push('("' + data[j][0] + '", ' + data[0][i] + ', ' + data[j][i] + ')');
 							}
 						}
-						console.log(sqlInputData.join(', '));
 						// res.send('Start transaction; INSERT INTO inverter_generation_' + id + ' VALUES ' + sqlInputData.join(', ') + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_' + id + ' where generation is null; Commit;');
 						connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) { //Run query to upload inverter data to table
 							if (err) throw err;
