@@ -78,4 +78,5 @@ angular.module('displayAllReport', [
 		$scope.convertDate = function (date) { //date converter, to convert javascript date to mysql date
 			return $filter('date')(date, 'yyyy-MM-dd');
 		};
+		
 	}]);

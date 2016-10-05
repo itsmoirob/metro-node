@@ -73,7 +73,7 @@ angular.module('displayExport', [
 				});
 		}
 
-		$scope.chartExport.series.push(highChartsData);
+		$scope.chartExport.series.push(highChartsData); //push data to chart
 		$scope.chartExport.series.push(highChartsPyro);
 
 
