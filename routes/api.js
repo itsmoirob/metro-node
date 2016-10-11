@@ -1,4 +1,4 @@
-module.exports = function (app, connection) {
+module.exports = function (app, connection, fs) {
 
 
 	// api for getting top level summary data of all sites
@@ -443,6 +443,16 @@ module.exports = function (app, connection) {
 				}
 			});
 		}
+	});
+
+// get list of files to be displayed in the file uplad page. 
+	app.get('/api/getFiles', function (req, res) {
+		fs.readdir('./files', function (err, files) {
+			if (err) {
+				return res.status(500).json(err);
+			}
+			res.json(files);
+		});
 	});
 
 };
