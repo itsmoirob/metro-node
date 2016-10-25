@@ -382,19 +382,50 @@ module.exports = function (app, connection, fs) {
 		var id = req.params.id;
 		var transformer = req.params.transformer;
 		var combineBox = req.params.combineBox;
+		var groupings = [];
 
 		if (id == 15) {
 			res.send('Coming soon --- hopefully');
 		} else if (id > 5 && id < 11) { //these sites have been sold
 			res.send('no longer here');
 		} else if (id <= 4) { //conergy sites which have multiple tables per site for inverters
-			var groupings = [{ 'id': 1, 'combine': [10, 8, 8, 8, 8] }, { 'id': 2, 'combine': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'combine': [8, 8, 10, 8] }, { 'id': 4, 'combinecb': [8, 10, 10, 10, 10, 10, 10, 10] }]; //array of objects showing how many combine 'combine' are in each site 'id'. There are 10 inverters in each combine.
+			groupings = [{ 'id': 1, 'combine': [10, 8, 8, 8, 8] }, { 'id': 2, 'combine': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'combine': [8, 8, 10, 8] }, { 'id': 4, 'combine': [8, 10, 10, 10, 10, 10, 10, 10] }]; //array of objects showing how many combine 'combine' are in each site 'id'. There are 10 inverters in each combine.
 			var site = groupings.filter(function (site) { return site.id == id; })[0]; //select the correct array based on id
 			var querySelectText = []; //array for text for querying
 			var queryTableText = []; //array for text for querying table
 			var queryTables = ' FROM inverter_generation_' + id + '_T0' + transformer + ' t ';
 
 			for (var inverter = 1; inverter <= 10; inverter++) { //Loop through 10 inverters, there are 10 inverters on every combine box
+				var AsInverter = ''; //this is used to make inverter names from single to double digits, ie 1 now 01, so that the inverters are ordered correctly in table
+				if (inverter < 10) {
+					AsInverter = '' + 0 + inverter;
+				} else {
+					AsInverter = inverter;
+				}
+				querySelectText.push('inverter_' + transformer + '_' + combineBox + '_' + AsInverter);
+				queryTableText.push('ROUND(SUM(IF( t.inverter = ' + inverter + ' AND t.combine_box = ' + combineBox + ', t.generation, 0 )), 2 )/12 AS inverter_' + transformer + '_' + combineBox + '_' + AsInverter);
+			}
+
+			querySelectText = querySelectText.join(', '); //turn array in to string
+			queryTableText = queryTableText.join(', '); //turn array in to string
+			console.log('SELECT date, ' + querySelectText + ' FROM (SELECT t.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;');
+			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT t.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;', function (err, rows) {
+				if (err) {
+					return res.status(500).json(err);
+				} else {
+					return res.json(rows);
+				}
+			});
+
+		} else if (id == 12) {
+
+			groupings = [[6,6,6,6,5,6,6,5,5,6,6,6,6,6,4,5],[6,6,6,6,6,6,6,5,6,6,6,6,4,4,6,5]]; //array of objects showing how many inverters are in each combine box.
+
+			var querySelectText = []; //array for text for querying
+			var queryTableText = []; //array for text for querying table
+			var queryTables = ' FROM inverter_generation_' + id + '_T' + transformer + ' t ';
+
+			for (var inverter = 1; inverter <= groupings[transformer-1][combineBox-1]; inverter++) { //Loop through 10 inverters, there are 10 inverters on every combine box
 				var AsInverter = ''; //this is used to make inverter names from single to double digits, ie 1 now 01, so that the inverters are ordered correctly in table
 				if (inverter < 10) {
 					AsInverter = '' + 0 + inverter;
@@ -417,10 +448,14 @@ module.exports = function (app, connection, fs) {
 				}
 			});
 
-		} else if (id == 12) {
-			res.send('This may not work;');
+
+
+
+
+
+
 		} else {
-			var groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }]; //array of objects showing how many inverters 'inv' are in each site 'id'
+			groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }]; //array of objects showing how many inverters 'inv' are in each site 'id'
 			var site = groupings.filter(function (site) { return site.id == id; })[0];
 			var querySelectText = 'inverter_01';
 			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_01';
@@ -445,9 +480,10 @@ module.exports = function (app, connection, fs) {
 		}
 	});
 
-// get list of files to be displayed in the file uplad page. 
-	app.get('/api/getFiles', function (req, res) {
-		fs.readdir('./files', function (err, files) {
+	// get list of files to be displayed in the file uplad page. Opitional PARAM value, defaults to 'files'
+	app.get('/api/getFiles/:folder?', function (req, res) {
+		var folder = req.params.folder || 'files';
+		fs.readdir('./' + folder, function (err, files) {
 			if (err) {
 				return res.status(500).json(err);
 			}

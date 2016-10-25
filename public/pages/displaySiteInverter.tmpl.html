@@ -1,30 +1,29 @@
 <div class="row">
 	<div ng-show="site <= 4">
 		<div class="inverter-select">
-		Transformer
-		<span ng-repeat="t in getTimes(numberOfTransformers) track by $index">
-			<a ng-class="{highlight: ($index+1) == transformer}" ui-sref="parent.displayInverterProject({transformer:($index+1), combinebox:1})" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">{{$index+1}}</i></a>
+			Transformer
+			<span ng-repeat="t in getTimes(numberOfTransformers) track by $index">
+			<a ng-class="{highlight: ($index+1) == transformer}" ui-sref="parent.displayInverterProject({transformer:($index+1), combinebox:1})" class="btn-floating btn-large waves-effect waves-light red"><i>{{$index+1}}</i></a>
 		</span>
 		</div>
 		<div class="inverter-select">
 			Combiner box
-		<span ng-repeat="t in getTimes(numberOfCombines) track by $index">
-			<a ng-class="{highlight: ($index+1) == combineBox}" ui-sref="parent.displayInverterProject({transformer:transformer, combinebox:($index+1)})" class="btn-floating btn-large waves-effect waves-light orange"><i class="material-icons">{{$index+1}}</i></a>
+			<span ng-repeat="t in getTimes(numberOfCombines) track by $index">
+			<a ng-class="{highlight: ($index+1) == combineBox}" ui-sref="parent.displayInverterProject({transformer:transformer, combinebox:($index+1)})" class="btn-floating btn-large waves-effect waves-light orange"><i>{{$index+1}}</i></a>
 		</span>
-			
 		</div>
 	</div>
 	<div class="page">
 		<p ng-show="!inverterData">Data is loading, please be patient</p>
-		<table ng-show="inverterData" class="metroTable">
-			<caption>Summary of inverters output</caption>
+		<table ng-show="inverterData" class="metroTable" id="datatable">
+			<caption>Summary of inverters energy output (kWh)<a download="Inverter stats.csv" href="" onclick="return ExcellentExport.csv(this, 'datatable');">Export to CSV</a></caption>
 			<tr>
 				<th>Date</th>
 				<th ng-repeat="(key, val) in inverterData[0]" ng-if="!$first">{{substringAng(key)}}</th>
 			</tr>
 			<tr ng-repeat="inverter in inverterData">
 				<td>{{inverter.date | date:'dd/MM HH:mm' }}</td>
-				<td ng-repeat="n in inverter" ng-if="!$first">{{inverter.inverter_+n | number:0}}</td>
+				<td ng-repeat="n in inverter" ng-if="!$first">{{inverter.inverter_+n | number:1}}</td>
 			</tr>
 		</table>
 	</div>
