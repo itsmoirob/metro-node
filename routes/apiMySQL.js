@@ -1,23 +1,86 @@
 module.exports = function (app, connection, csvParse, fs, moment, pool, config, http, JSFtp) {
 
-	var mpanList = [
-		{ "id": 1, "mpan": "2100041172109", "solarGis": "SolarGIS_min15_6_Cowbridge_", "importMpan": "2100041172093", "pyroMinutes": 60000 },
-		{ "id": 2, "mpan": "2000055901355", "solarGis": "SolarGIS_min15_4_Poole_", "importMpan": "2000055901346", "pyroMinutes": 60000 },
-		{ "id": 3, "mpan": "2000055901300", "solarGis": "SolarGIS_min15_5_Lytchett_Minster_", "importMpan": "2000055901285", "pyroMinutes": 60000 },
-		{ "id": 4, "mpan": "1050000588215", "solarGis": "SolarGIS_min15_2_West_Caister_", "importMpan": "1050000588206", "pyroMinutes": 60000 },
-		{ "id": 5, "mpan": "2200042384200", "solarGis": "SolarGIS_min15_8_Canworthy_", "importMpan": "2200042384194", "pyroMinutes": 60000 },
-		{ "id": 6, "mpan": null },
-		{ "id": 7, "mpan": "2000056147387" },
-		{ "id": 8, "mpan": "1900091171276" },
-		{ "id": 9, "mpan": "1900091178963" },
-		{ "id": 10, "mpan": "1900091183411" },
-		{ "id": 11, "mpan": "2200042480656", "solarGis": "SolarGIS_min15_9_Wilton_", "importMpan": "2200042480610", "pyroMinutes": 60000 },
-		{ "id": 12, "mpan": "2000056366930", "solarGis": "SolarGIS_min15_4_Poole_", "importMpan": "2000056366860", "pyroMinutes": 60000 },
-		{ "id": 13, "mpan": "2000056456265", "solarGis": "SolarGIS_min15_10_Merston_", "importMpan": "2000056456256", "pyroMinutes": 60000 },
-		{ "id": 14, "mpan": "1170000610807", "solarGis": "SolarGIS_min15_11_Ashby_", "importMpan": "1170000610791", "pyroMinutes": 4000 },
-		{ "id": 15, "mpan": "1640000523609", "solarGis": "SolarGIS_min15_7_Morecambe_", "importMpan": "1640000523593" },
-		{ "id": 16, "mpan": "2000056474812", "solarGis": "SolarGIS_min15_12_Eveley_", "importMpan": "2000056474803", "pyroMinutes": 60000 }
-	];
+	var mpanList = [{
+		"id": 1,
+		"mpan": "2100041172109",
+		"solarGis": "SolarGIS_min15_6_Cowbridge_",
+		"importMpan": "2100041172093",
+		"pyroMinutes": 60000
+	}, {
+		"id": 2,
+		"mpan": "2000055901355",
+		"solarGis": "SolarGIS_min15_4_Poole_",
+		"importMpan": "2000055901346",
+		"pyroMinutes": 60000
+	}, {
+		"id": 3,
+		"mpan": "2000055901300",
+		"solarGis": "SolarGIS_min15_5_Lytchett_Minster_",
+		"importMpan": "2000055901285",
+		"pyroMinutes": 60000
+	}, {
+		"id": 4,
+		"mpan": "1050000588215",
+		"solarGis": "SolarGIS_min15_2_West_Caister_",
+		"importMpan": "1050000588206",
+		"pyroMinutes": 60000
+	}, {
+		"id": 5,
+		"mpan": "2200042384200",
+		"solarGis": "SolarGIS_min15_8_Canworthy_",
+		"importMpan": "2200042384194",
+		"pyroMinutes": 60000
+	}, {
+		"id": 6,
+		"mpan": null
+	}, {
+		"id": 7,
+		"mpan": "2000056147387"
+	}, {
+		"id": 8,
+		"mpan": "1900091171276"
+	}, {
+		"id": 9,
+		"mpan": "1900091178963"
+	}, {
+		"id": 10,
+		"mpan": "1900091183411"
+	}, {
+		"id": 11,
+		"mpan": "2200042480656",
+		"solarGis": "SolarGIS_min15_9_Wilton_",
+		"importMpan": "2200042480610",
+		"pyroMinutes": 60000
+	}, {
+		"id": 12,
+		"mpan": "2000056366930",
+		"solarGis": "SolarGIS_min15_4_Poole_",
+		"importMpan": "2000056366860",
+		"pyroMinutes": 60000
+	}, {
+		"id": 13,
+		"mpan": "2000056456265",
+		"solarGis": "SolarGIS_min15_10_Merston_",
+		"importMpan": "2000056456256",
+		"pyroMinutes": 60000
+	}, {
+		"id": 14,
+		"mpan": "1170000610807",
+		"solarGis": "SolarGIS_min15_11_Ashby_",
+		"importMpan": "1170000610791",
+		"pyroMinutes": 4000
+	}, {
+		"id": 15,
+		"mpan": "1640000523609",
+		"solarGis": "SolarGIS_min15_7_Morecambe_",
+		"importMpan": "1640000523593"
+	}, {
+		"id": 16,
+		"mpan": "2000056474812",
+		"solarGis": "SolarGIS_min15_12_Eveley_",
+		"importMpan": "2000056474803",
+		"pyroMinutes": 60000
+	}];
 
 	// connect ftp
 	var starkFtp = new JSFtp({
@@ -39,7 +102,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/ftp/:id', function (req, res) {
 		var id = req.params.id;
 		var fileName;
-		var site = mpanList.filter(function (site) { return site.id == id; })[0];
+		var site = mpanList.filter(function (site) {
+			return site.id == id;
+		})[0];
 		if (id === 'NonHH') {
 			fileName = 'Primrose Solar Limited NonHH.csv';
 		} else {
@@ -58,7 +123,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	app.get('/api/solarGisFtp/:id', function (req, res) {
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id; })[0];
+		var site = mpanList.filter(function (site) {
+			return site.id == id;
+		})[0];
 
 		var day = moment().subtract(1, 'days').format('YYYYMMDD');
 		var fileName = site.solarGis + day + '.csv';
@@ -78,7 +145,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
 
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id; })[0];
+		var site = mpanList.filter(function (site) {
+			return site.id == id;
+		})[0];
 		var day = moment().subtract(1, 'days').format('YYYYMMDD');
 		var mySQLDay = moment(day).format('YYYY-MM-DD');
 		var filePath = './files/solarGis/' + site.id + '_' + site.solarGis + day + '.csv';
@@ -90,7 +159,10 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				if (err) {
 					console.log(err);
 				}
-				csvParse(csvData, { comment: '#', delimiter: ';' }, function (err, data) {
+				csvParse(csvData, {
+					comment: '#',
+					delimiter: ';'
+				}, function (err, data) {
 					if (err) {
 						console.log(err);
 					} else {
@@ -145,7 +217,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							data: readingsForOneExport
 						};
 					});
-					var site = readingsForExport.filter(function (site) { return site.id == id; })[0];
+					var site = readingsForExport.filter(function (site) {
+						return site.id == id;
+					})[0];
 					var sqlInputData = [];
 					var n = 0;
 					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
@@ -179,7 +253,6 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	// upload export to database tables export_# and dailySumExport
 	app.get('/api/mySQL/importUpload/:id', function (req, res) {
-
 		var id = req.params.id;
 		var filePath = "./files/Primrose Solar Limited.csv";
 		var startIndex = 3;
@@ -205,7 +278,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							data: readingsForOneExport
 						};
 					});
-					var site = readingsForExport.filter(function (site) { return site.id == id; })[0];
+					var site = readingsForExport.filter(function (site) {
+						return site.id == id;
+					})[0];
 					var sqlInputData = [];
 					var n = 0;
 					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
@@ -236,7 +311,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 	app.get('/api/mySQL/manualImportUpload/:id', function (req, res) {
 		var id = req.params.id;
-		var site = mpanList.filter(function (site) { return site.id == id; })[0];
+		var site = mpanList.filter(function (site) {
+			return site.id == id;
+		})[0];
 		var filePath = "./files/" + site.importMpan + ".csv";
 		fs.readFile(filePath, {
 			encoding: 'utf-8'
@@ -325,9 +402,11 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	app.get('/api/mySQL/pyroUpload/:id', function (req, res) {
 		var id = req.params.id; //get ID from url
 		var filePath = "./files/PS" + id + " Pyro.csv"; //locate correct CSV for uploading data
-		var site = mpanList.filter(function (site) { return site.id == id; })[0]; //filter the correct site for extra params
+		var site = mpanList.filter(function (site) {
+			return site.id == id;
+		})[0]; //filter the correct site for extra params
 
-		fs.readFile(filePath, {  //start reading file
+		fs.readFile(filePath, { //start reading file
 			encoding: 'utf-8'
 		}, function (err, csvData) {
 			if (err) {
@@ -348,7 +427,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 
 					// loop through each row and get text ready for data to be uploaded to database tables
 					for (var j = 1; j < data.length; j++) {
-						if (data[j][0] === '') { continue; } // If there are any extra rows that contain no date/data, this will skip them
+						if (data[j][0] === '') {
+							continue;
+						} // If there are any extra rows that contain no date/data, this will skip them
 
 						var sqlText = ''; //base text variable for individual lines of CSV
 
@@ -443,14 +524,14 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							data[j][1] = moment(data[j][1]).format('YYYY-MM-DD HH:mm');
 						}
 						var generation; // this stores the generation values to be sent to query
-						if(j==1){ //if the first in the loop then set all values to first/0
+						if (j == 1) { //if the first in the loop then set all values to first/0
 							previousGen = data[j][2];
 							currentGen = data[j][2];
 							generation = 0;
 						}
 
 						currentGen = data[j][2]; // get generation for current value of j
-						if(currentGen - previousGen < 0){ //take previous value off current value to get the difference, unless value is negative then store 0
+						if (currentGen - previousGen < 0) { //take previous value off current value to get the difference, unless value is negative then store 0
 							generation = 0;
 						} else {
 							generation = currentGen - previousGen;
@@ -465,6 +546,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				}
 			});
 		}); ///end fs.read
+		// return 'Done ' + filePath;
 	}
 
 	// upload inverter data.
@@ -500,55 +582,69 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						console.log(err);
 					} else {
 						var sqlInputData = []; //store the results of query
-						var j;
-						if (id <= 4) {
+						var j, time;
+						if (id <= 4) { 
+							var transformerIndex; //create transformer index, name is linked to database table.
+							var singleTransData = {};
 							for (j = 1; j < data.length; j++) {
-								data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-								sqlInputData.push("('" + data[j][0] + "'");
-								for (i = 1; i <= data[j].length - 1; i++) {
-									data[j][i] = parseFloat(data[j][i]);
-									if (isNaN(data[j][i])) {
-										data[j][i] = "NULL";
+								time = moment(data[j][0], 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm');
+								for(var i = 1; i < data[0].length-1; i++) {
+									transformerIndex = 'inverter_generation_' + id + '_T' + data[0][i].substring(1,3); //set var it db table name
+									var combineBox = data[0][i].substring(7, 9); //set var to combine box number in column name
+									var inverter = data[0][i].substring(13, 15);//set var to transformer number in column name
+									var value = parseFloat(data[j][i]); //set var to value of kwh
+									if (isNaN(value)) {
+										value = 'NULL';
 									}
-									if (i == data[j].length - 1) {
-										sqlInputData.push(data[0][i].substring(7, 9) + "," + data[0][i].substring(13, 15) + "," + data[j][i] + ")");
-									} else {
-										sqlInputData.push(data[0][i].substring(7, 9) + "," + data[0][i].substring(13, 15) + "," + data[j][i] + "),('" + data[j][0] + "'");
+									if(!singleTransData[transformerIndex]) { //check if array with database name exists and create if doesnt
+										singleTransData[transformerIndex] = [];
 									}
+									singleTransData[transformerIndex].push('(\'' + time + '\', ' + combineBox + ', ' + inverter + ', ' + value + ')'); //push the VALUES query for each cell in to the correct object based on database table name
 								}
 							}
-							connection.query("Start transaction; INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + " where generation is null; Commit;", function (err, result) {
+							// this now loops through an object and pushes all the data together in a string and pushes that string to an array.
+							for(var key in singleTransData) {
+								sqlInputData.push('INSERT INTO ' + key + ' VALUES ' + singleTransData[key].join(', ') + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from ' + key + ' where generation is null;');
+								console.log(key);
+							}
+							// once we have array with text of connection query, run query.
+							// res.send(sqlInputData.join(' '));
+							connection.query(sqlInputData.join(' '), function (err, result) {
 								if (err) throw err;
-								console.log(result.insertId);
-								res.status(201).send("Done: INSERT INTO inverter_generation_" + id + "_" + data[0][1].substring(0, 3) + sqlInputData[0]);
+								console.log(result);
+								res.send('Done ' + id + ' > '+ singleTransData['inverter_generation_' + id + '_T01'][0]);
 							});
 						} else { //how to query for all sites that arent using multiple tables
 							// collect data and format it in array to use in sqlquery
 							for (j = 1; j < data.length; j++) {
-								data[j][0] = moment(data[j][0], "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-								for (i = 1; i <= data[j].length - 1; i++) {
-									data[j][i] = parseFloat(data[j][i]);
-									if (isNaN(data[j][i])) {
-										data[j][i] = 'NULL';
+								var columnVal, value;
+								var dateTime = moment(data[j][0], 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
+								for (var i = 1; i <= data[j].length - 1; i++) {
+									if (data[0][i] == '' || isNaN(data[0][i])) {
+										columnVal = i;
+									} else {
+										columnVal = data[0][i];
 									}
-									if (data[j][i] < 0) {
-										data[j][i] = 0;
+									value = parseFloat(data[j][i]);
+									if (isNaN(value)) {
+										value = 'NULL';
+									} else if (value < 0) {
+										value = 0;
 									}
-									sqlInputData.push('("' + data[j][0] + '", ' + data[0][i] + ', ' + data[j][i] + ')');
+									sqlInputData.push('(\'' + dateTime + '\', ' + columnVal + ', ' + value + ')');
 								}
 							}
-							connection.query("Start transaction; INSERT INTO inverter_generation_" + id + " VALUES " + sqlInputData + " ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_" + id + " where generation is null; Commit;", function (err, result) { //Run query to upload inverter data to table
+							connection.query('INSERT INTO inverter_generation_' + id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_' + id + ' where generation is null;', function (err, result) { //Run query to upload inverter data to table
 								if (err) throw err;
-								console.log(result.insertId);
+								console.log('inverter upload for PS' + id + ' : ');
+								console.log(result);
 								res.status(201).send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]); //output to screen summary
 							});
 						}
 					}
 				});
 			}); ///end fs.read
-
 		}
-
 	});
 
 
