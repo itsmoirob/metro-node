@@ -28,24 +28,35 @@ $('.dropdown-button').dropdown({
 );
 
 if (window.location.pathname === "/upload") { //only run for "upload" page
-	var allSite = ['PS1 Pyro','PS2 Pyro','PS3 Pyro','PS4 Pyro','PS5 Pyro','PS11 Pyro','PS12 Pyro','PS13 Pyro','PS14 Pyro','PS15 Pyro','PS16 Pyro'];
-//get a list of files currently stored on server
+	var allSite = ['PS1 Pyro', 'PS2 Pyro', 'PS3 Pyro', 'PS4 Pyro', 'PS5 Pyro', 'PS11 Pyro', 'PS12 Pyro', 'PS13 Pyro', 'PS14 Pyro', 'PS15 Pyro', 'PS16 Pyro', 'PS1 Inv', 'PS2 Inv', 'PS3 Inv', 'PS4 Inv', 'PS5 Inv', 'PS11 Inv', 'PS12 Inv', 'PS13 Inv', 'PS14 Inv', 'PS15 Inv', 'PS16 Inv'];
+	//get a list of files currently stored on server
 	$.getJSON('./api/getFiles', function (data) { //calls a fs.readdir api
 		var items = [];
 		$.each(allSite, function (key, val) {
-			var inArray, hrefVal; 
-			if($.inArray(val+'.csv', data) > -1) {
-				inArray = '<i class="material-icons green-text">done</i>'; //make a nice tick if item exists on server
+			var inArray, hrefVal, buttonVal, dataVal;
+			dataVal = allSite[key].slice(-4);
+			if (dataVal !== 'Pyro') {
+				dataVal = 'Inv';
+				if (val.length > 7) { // to call api an "id" is needed, here we use different string methods depending on length, ie ps1 pyro or ps11 pyro will be different string lengths 
+					hrefVal = val.substring(2, 4);
+				} else {
+					hrefVal = val.charAt(2);
+				}
 			} else {
-				inArray = '<i class="material-icons red-text">error</i>'; //make warning if item does not exist on server
+				if (val.length > 8) { // to call api an "id" is needed, here we use different string methods depending on length, ie ps1 pyro or ps11 pyro will be different string lengths 
+					hrefVal = val.substring(2, 4);
+				} else {
+					hrefVal = val.charAt(2);
+				}
 			}
-			if(val.length > 8) { // to call api a "id" is needed, here we use different string methods depending on length, ie ps1 pyro or ps11 pyro will be different string lengths 
-				hrefVal = val.substring(2,4);
+			if ($.inArray(val + '.csv', data) > -1) { //make a nice tick if item exists on server and add refresh button
+				inArray = '<i class="material-icons green-text">done</i>';
+				buttonVal = '<input id="clickMe" type="button" value="Refresh" onclick="refreshData(' + hrefVal + ', \'' + dataVal + '\');" />';
 			} else {
-				hrefVal = val.charAt(2);
-			} 
-			
-			items.push('<li id=\'' + key + '\'>' + val + ' ' + inArray + ' <input id="clickMe" type="button" value="Refresh" onclick="refreshPyroData(' + hrefVal + ');" /></li>');
+				inArray = '<i class="material-icons red-text">error</i>'; //make warning if item does not exist on server and no button
+				buttonVal = '';
+			}
+			items.push('<li id=\'' + key + '\'>' + val + ' ' + inArray + ' ' + buttonVal + '</li>');
 		});
 		$('<ul/>', { // send the items list to the ul
 			'id': 'listOfSites',
@@ -54,10 +65,10 @@ if (window.location.pathname === "/upload") { //only run for "upload" page
 	});
 }
 
-function refreshPyroData(id) { // a function to refresh data on press
-	$.getJSON('./api/mySQL/pyroUpload/' + id, function (data) {
-		
+function refreshData(id, dataType) { // a function to refresh data on press
+	$.getJSON('./api/mySQL/' + dataType + 'Upload/' + id, function (data) {
+
 		console.log(id);
-		
+
 	});
 }

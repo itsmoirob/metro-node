@@ -408,7 +408,6 @@ module.exports = function (app, connection, fs) {
 
 			querySelectText = querySelectText.join(', '); //turn array in to string
 			queryTableText = queryTableText.join(', '); //turn array in to string
-			console.log('SELECT date, ' + querySelectText + ' FROM (SELECT t.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;');
 			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT t.dateTime AS date, ' + queryTableText + queryTables + ' where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;', function (err, rows) {
 				if (err) {
 					return res.status(500).json(err);
