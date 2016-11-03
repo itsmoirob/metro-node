@@ -80,9 +80,12 @@ module.exports = function (app, connection, fs) {
 			inverters = "ifnull(PS3_T01,0) + ifnull(PS3_T02,0) + ifnull(PS3_T03,0) + ifnull(PS3_T04,0)";
 		} else if (id == 4) {
 			inverters = "ifnull(PS4_T01,0) + ifnull(PS4_T02,0) + ifnull(PS4_T03,0) + ifnull(PS4_T04,0) + ifnull(PS4_T05,0) + ifnull(PS4_T06,0) + ifnull(PS4_T07,0) + ifnull(PS4_T08,0)";
+		} else if (id == 12) {
+			inverters = "ifnull(PS12_T1,0) + ifnull(PS12_T2,0)";
 		} else {
 			inverters = "ifnull(PS" + id + ",0)";
 		}
+		console.log('SELECT e.date, SUM(generation) AS generation, i.ps' + id + ' * 1000 / (SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END)) AS avgPyro, SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END) AS opHours, i.ps' + id + ' AS esol, i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000 AS theoretical, SUM(generation) / (i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000) AS pr, ia.ps' + id + ' / td.ps' + id + ' AS commsAvailabilty, oo.ps' + id + ' / ia.ps' + id + ' AS technicalAvailability, s.type FROM export_' + id + ' e left join (select date, site, type from alternativeInsolationData where site = ' + id + ') s on e.date = s.date LEFT JOIN dailyEsol i ON e.date = i.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterTimeDiff) td ON e.date = td.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterAvailabilty) ia ON e.date = ia.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterOver0) oo ON e.date = oo.date GROUP BY e.date ORDER BY e.date DESC;');
 		connection.query('SELECT e.date, SUM(generation) AS generation, i.ps' + id + ' * 1000 / (SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END)) AS avgPyro, SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END) AS opHours, i.ps' + id + ' AS esol, i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000 AS theoretical, SUM(generation) / (i.ps' + id + ' * (SELECT tic_mwp FROM top_table WHERE id = ' + id + ') * 1000) AS pr, ia.ps' + id + ' / td.ps' + id + ' AS commsAvailabilty, oo.ps' + id + ' / ia.ps' + id + ' AS technicalAvailability, s.type FROM export_' + id + ' e left join (select date, site, type from alternativeInsolationData where site = ' + id + ') s on e.date = s.date LEFT JOIN dailyEsol i ON e.date = i.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterTimeDiff) td ON e.date = td.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterAvailabilty) ia ON e.date = ia.date LEFT JOIN (SELECT date, ' + inverters + ' as ps' + id + ' FROM dailySumInverterOver0) oo ON e.date = oo.date GROUP BY e.date ORDER BY e.date DESC;', function (err, rows) {
 			if (err) {
 				return res.status(500).json(err);
@@ -382,7 +385,10 @@ module.exports = function (app, connection, fs) {
 		var id = req.params.id;
 		var transformer = req.params.transformer;
 		var combineBox = req.params.combineBox;
-		var groupings = [];
+		var groupings = []; //this stores arrays of how many transformers and inverters at certain sites
+		var querySelectText = []; //array for text for querying selecting
+		var queryTableText = []; //array for text for querying table
+		var queryTables;
 
 		if (id == 15) {
 			res.send('Coming soon --- hopefully');
@@ -391,9 +397,7 @@ module.exports = function (app, connection, fs) {
 		} else if (id <= 4) { //conergy sites which have multiple tables per site for inverters
 			groupings = [{ 'id': 1, 'combine': [10, 8, 8, 8, 8] }, { 'id': 2, 'combine': [9, 10, 8, 10, 10, 9, 8] }, { 'id': 3, 'combine': [8, 8, 10, 8] }, { 'id': 4, 'combine': [8, 10, 10, 10, 10, 10, 10, 10] }]; //array of objects showing how many combine 'combine' are in each site 'id'. There are 10 inverters in each combine.
 			var site = groupings.filter(function (site) { return site.id == id; })[0]; //select the correct array based on id
-			var querySelectText = []; //array for text for querying
-			var queryTableText = []; //array for text for querying table
-			var queryTables = ' FROM inverter_generation_' + id + '_T0' + transformer + ' t ';
+			queryTables = ' FROM inverter_generation_' + id + '_T0' + transformer + ' t ';
 
 			for (var inverter = 1; inverter <= 10; inverter++) { //Loop through 10 inverters, there are 10 inverters on every combine box
 				var AsInverter = ''; //this is used to make inverter names from single to double digits, ie 1 now 01, so that the inverters are ordered correctly in table
@@ -419,10 +423,7 @@ module.exports = function (app, connection, fs) {
 		} else if (id == 12) {
 
 			groupings = [[6,6,6,6,5,6,6,5,5,6,6,6,6,6,4,5],[6,6,6,6,6,6,6,5,6,6,6,6,4,4,6,5]]; //array of objects showing how many inverters are in each combine box.
-
-			var querySelectText = []; //array for text for querying
-			var queryTableText = []; //array for text for querying table
-			var queryTables = ' FROM inverter_generation_' + id + '_T' + transformer + ' t ';
+			queryTables = ' FROM inverter_generation_' + id + '_T' + transformer + ' t ';
 
 			for (var inverter = 1; inverter <= groupings[transformer-1][combineBox-1]; inverter++) { //Loop through 10 inverters, there are 10 inverters on every combine box
 				var AsInverter = ''; //this is used to make inverter names from single to double digits, ie 1 now 01, so that the inverters are ordered correctly in table
@@ -446,29 +447,30 @@ module.exports = function (app, connection, fs) {
 					return res.json(rows);
 				}
 			});
-
-
-
-
-
-
-
 		} else {
 			groupings = [{ 'id': 5, 'inv': 21 }, { 'id': 11, 'inv': 6 }, { 'id': 13, 'inv': 4 }, { 'id': 14, 'inv': 4 }, { 'id': 16, 'inv': 19 }]; //array of objects showing how many inverters 'inv' are in each site 'id'
 			var site = groupings.filter(function (site) { return site.id == id; })[0];
-			var querySelectText = 'inverter_01';
-			var queryTableText = 'ROUND(SUM(If( inverter = 1, generation, 0 )), 2 ) AS inverter_01';
+			var convertToMWh = ''; //this should be used used to convert to MWH on central inverters at 5 and 16
 
-			for (var i = 2; i <= site.inv; i++) {
+			if(id == 5 || id == 16) {
+				convertToMWh = '/1000';
+			}
+
+			for (var i = 1; i <= site.inv; i++) {
 				var AsInverter = '';
 				if (i < 10) {
 					AsInverter = '' + 0 + i;
 				} else {
 					AsInverter = i;
 				}
-				querySelectText = querySelectText + ', inverter_' + AsInverter;
-				queryTableText = queryTableText + ', ROUND(SUM(If( inverter = ' + i + ', generation, 0 )), 2 ) AS inverter_' + AsInverter;
+				querySelectText.push('inverter_' + AsInverter);
+				// queryTableText = queryTableText + ', ROUND(SUM(If( inverter = ' + i + ', generation, 0 ))' + convertToMWh + ', 2 ) AS inverter_' + AsInverter;
+				queryTableText.push('ROUND(SUM(If(inverter = ' + i + ', generation, 0 ))' + convertToMWh + ', 2 ) AS inverter_' + AsInverter);
 			}
+			querySelectText = querySelectText.join(', ');
+			queryTableText = queryTableText.join(', ');
+
+			console.log('SELECT date, ' + querySelectText + ' FROM (SELECT dateTime AS date, ' + queryTableText + ' FROM inverter_generation_' + id + ' WHERE dateTime > now() - INTERVAL 31 DAY GROUP BY date(dateTime), hour(dateTime) ORDER BY dateTime DESC) AS sums;');
 			connection.query('SELECT date, ' + querySelectText + ' FROM (SELECT dateTime AS date, ' + queryTableText + ' FROM inverter_generation_' + id + ' WHERE dateTime > now() - INTERVAL 31 DAY GROUP BY date(dateTime), hour(dateTime) ORDER BY dateTime DESC) AS sums;', function (err, rows) {
 				if (err) {
 					return res.status(500).json(err);

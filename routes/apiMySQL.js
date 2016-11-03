@@ -583,27 +583,27 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					} else {
 						var sqlInputData = []; //store the results of query
 						var j, time;
-						if (id <= 4) { 
+						if (id <= 4) {
 							var transformerIndex; //create transformer index, name is linked to database table.
 							var singleTransData = {};
 							for (j = 1; j < data.length; j++) {
-								time = moment(data[j][0], 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm');
-								for(var i = 1; i < data[0].length-1; i++) {
-									transformerIndex = 'inverter_generation_' + id + '_T' + data[0][i].substring(1,3); //set var it db table name
+								time = data[j][0];
+								for (var i = 1; i < data[0].length - 1; i++) {
+									transformerIndex = 'inverter_generation_' + id + '_T' + data[0][i].substring(1, 3); //set var it db table name
 									var combineBox = data[0][i].substring(7, 9); //set var to combine box number in column name
-									var inverter = data[0][i].substring(13, 15);//set var to transformer number in column name
+									var inverter = data[0][i].substring(13, 15); //set var to transformer number in column name
 									var value = parseFloat(data[j][i]); //set var to value of kwh
 									if (isNaN(value)) {
 										value = 'NULL';
 									}
-									if(!singleTransData[transformerIndex]) { //check if array with database name exists and create if doesnt
+									if (!singleTransData[transformerIndex]) { //check if array with database name exists and create if doesnt
 										singleTransData[transformerIndex] = [];
 									}
 									singleTransData[transformerIndex].push('(\'' + time + '\', ' + combineBox + ', ' + inverter + ', ' + value + ')'); //push the VALUES query for each cell in to the correct object based on database table name
 								}
 							}
 							// this now loops through an object and pushes all the data together in a string and pushes that string to an array.
-							for(var key in singleTransData) {
+							for (var key in singleTransData) {
 								sqlInputData.push('INSERT INTO ' + key + ' VALUES ' + singleTransData[key].join(', ') + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from ' + key + ' where generation is null;');
 								console.log(key);
 							}
@@ -611,8 +611,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							// res.send(sqlInputData.join(' '));
 							connection.query(sqlInputData.join(' '), function (err, result) {
 								if (err) throw err;
+								console.log('inverter upload for PS' + id + ' : ' + singleTransData['inverter_generation_' + id + '_T01'][0]);
 								console.log(result);
-								res.send('Done ' + id + ' > '+ singleTransData['inverter_generation_' + id + '_T01'][0]);
+								res.send('Done ' + id + ' > ' + singleTransData['inverter_generation_' + id + '_T01'][0]);
 							});
 						} else { //how to query for all sites that arent using multiple tables
 							// collect data and format it in array to use in sqlquery
