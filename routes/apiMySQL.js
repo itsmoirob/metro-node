@@ -99,24 +99,24 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	});
 	solarGisFtp.keepAlive();
 
-	app.get('/api/ftp/:id', function (req, res) {
+	app.get(`/api/ftp/:id`, function (req, res) {
 		var id = req.params.id;
 		var fileName;
 		var site = mpanList.filter(function (site) {
 			return site.id == id;
 		})[0];
-		if (id === 'NonHH') {
-			fileName = 'Primrose Solar Limited NonHH.csv';
+		if (id === `NonHH`) {
+			fileName = `Primrose Solar Limited NonHH.csv`;
 		} else {
-			fileName = 'Primrose Solar Limited.csv';
+			fileName = `Primrose Solar Limited.csv`;
 		}
-		starkFtp.get(fileName, './files/' + fileName, function (hadErr) {
+		starkFtp.get(fileName, `./files/${fileName}`, function (hadErr) {
 			if (hadErr) {
-				console.error('There was an error retrieving the file.' + hadErr);
-				res.send('There was an error retrieving the file.' + hadErr);
+				console.error(`There was an error retrieving the file. ${hadErr}`);
+				res.send(`There was an error retrieving the file. ${hadErr}`);
 			} else {
-				console.log('File copied successfully!');
-				res.send('File ' + fileName + ' has been downloaded');
+				console.log(`File copied successfully!`);
+				res.send(`File ${fileName} has been downloaded`);
 			}
 		});
 	});

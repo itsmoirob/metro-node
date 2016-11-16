@@ -85,7 +85,6 @@ module.exports = function (app, connection, fs) {
 		} else {
 			inverters = `ifnull(PS${id},0)`;
 		}
-		console.log(`SELECT e.date, SUM(generation) AS generation, i.ps${id} * 1000 / (SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END)) AS avgPyro, SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END) AS opHours, i.ps${id} AS esol, i.ps${id} * (SELECT tic_mwp FROM top_table WHERE id = ${id}) * 1000 AS theoretical, SUM(generation) / (i.ps${id} * (SELECT tic_mwp FROM top_table WHERE id = ${id}) * 1000) AS pr, ia.ps${id} / td.ps${id} AS commsAvailabilty, oo.ps${id} / ia.ps${id} AS technicalAvailability, s.type FROM export_${id} e left join (select date, site, type from alternativeInsolationData where site = ${id}) s on e.date = s.date LEFT JOIN dailyEsol i ON e.date = i.date LEFT JOIN (SELECT date, ${inverters} as ps${id} FROM dailySumInverterTimeDiff) td ON e.date = td.date LEFT JOIN (SELECT date, ${inverters} as ps${id} FROM dailySumInverterAvailabilty) ia ON e.date = ia.date LEFT JOIN (SELECT date, ${inverters} as ps${id} FROM dailySumInverterOver0) oo ON e.date = oo.date GROUP BY e.date ORDER BY e.date DESC;`);
 		connection.query(`SELECT e.date, SUM(generation) AS generation, i.ps${id} * 1000 / (SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END)) AS avgPyro, SUM(CASE WHEN generation > 0 THEN 0.5 ELSE 0 END) AS opHours, i.ps${id} AS esol, i.ps${id} * (SELECT tic_mwp FROM top_table WHERE id = ${id}) * 1000 AS theoretical, SUM(generation) / (i.ps${id} * (SELECT tic_mwp FROM top_table WHERE id = ${id}) * 1000) AS pr, ia.ps${id} / td.ps${id} AS commsAvailabilty, oo.ps${id} / ia.ps${id} AS technicalAvailability, s.type FROM export_${id} e left join (select date, site, type from alternativeInsolationData where site = ${id}) s on e.date = s.date LEFT JOIN dailyEsol i ON e.date = i.date LEFT JOIN (SELECT date, ${inverters} as ps${id} FROM dailySumInverterTimeDiff) td ON e.date = td.date LEFT JOIN (SELECT date, ${inverters} as ps${id} FROM dailySumInverterAvailabilty) ia ON e.date = ia.date LEFT JOIN (SELECT date, ${inverters} as ps${id} FROM dailySumInverterOver0) oo ON e.date = oo.date GROUP BY e.date ORDER BY e.date DESC;`, function (err, rows) {
 			if (err) {
 				return res.status(500).json(err);
@@ -304,12 +303,51 @@ module.exports = function (app, connection, fs) {
 		});
 	});
 
-// gets data the daily/5 day table All Site Report
+	// gets data the daily/5 day table All Site Report
 	app.get(`/api/reports/dailyProductionReport/:date?`, function (req, res) {
 		//set date1 to param date or default to yesterday
-		let date1 = `'${req.params.date}'` || `DATE(NOW() - INTERVAL 1 DAY)`;
-		let date5 = `DATE('${req.params.date}' - INTERVAL 5 DAY)` || `DATE(NOW() - INTERVAL 5 DAY)`;
-		let groupings = [{"id": 1,"name": "PS01"}, {"id": 2,"name": "PS02"}, {"id": 3,"name": "PS03"}, {"id": 4,"name": "PS04"}, {"id": 5,"name": "PS05"}, {"id": 11,"name": "PS11"}, {"id":12,"name": "PS12"}, {"id": 13,"name": "PS13"}, {"id": 14,"name": "PS14"}, {"id": 15,"name": "PS15"}, {"id": 16,"name": "PS16"}];
+		let date1, date5;
+		if (req.params.date) {
+			date1 = `'${req.params.date}'`;
+			date5 = `DATE('${req.params.date}' - INTERVAL 5 DAY)`;
+		} else {
+			date1 = `DATE(NOW() - INTERVAL 1 DAY)`;
+			date5 = `DATE(NOW() - INTERVAL 5 DAY)`;
+		}
+		let groupings = [{
+			"id": 1,
+			"name": "PS01"
+		}, {
+			"id": 2,
+			"name": "PS02"
+		}, {
+			"id": 3,
+			"name": "PS03"
+		}, {
+			"id": 4,
+			"name": "PS04"
+		}, {
+			"id": 5,
+			"name": "PS05"
+		}, {
+			"id": 11,
+			"name": "PS11"
+		}, {
+			"id": 12,
+			"name": "PS12"
+		}, {
+			"id": 13,
+			"name": "PS13"
+		}, {
+			"id": 14,
+			"name": "PS14"
+		}, {
+			"id": 15,
+			"name": "PS15"
+		}, {
+			"id": 16,
+			"name": "PS16"
+		}];
 		// create array and loop through each item in object in GROUPINGS to set up the mysql text query, then join array to create string
 		let requestText = [];
 		groupings.forEach(function (element) {
@@ -329,7 +367,7 @@ module.exports = function (app, connection, fs) {
 		});
 		singleText = singleText.join(`, `);
 
-		connection.query(`SELECT ${requestText} FROM dailySumExport dg JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySumExport WHERE (date BETWEEN ${date1} AND ${date1})) gg ON dg.date = gg.date JOIN (SELECT date, ${singleText} FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de on dg.date = de.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailyEsol WHERE (date BETWEEN ${date1} AND ${date1})) ge ON dg.date = ge.date JOIN dailySolarGis ds on dg.date = ds.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySolarGis WHERE (date BETWEEN ${date1} AND ${date1})) gs ON dg.date = gs.date WHERE dg.date = ${date1};`, function (err, rows) {
+		connection.query(`SELECT ${requestText} FROM dailySumExport dg JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySumExport WHERE (date BETWEEN ${date5} AND ${date1})) gg ON dg.date = gg.date JOIN (SELECT date, ${singleText} FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de ON dg.date = de.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailyEsol WHERE (date BETWEEN ${date5} AND ${date1})) ge ON dg.date = ge.date JOIN dailySolarGis ds ON dg.date = ds.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySolarGis WHERE (date BETWEEN ${date5} AND ${date1})) gs ON dg.date = gs.date WHERE dg.date = ${date1};`, function (err, rows) {
 			if (err) {
 				return res.status(500).json(err);
 			} else {
@@ -383,6 +421,8 @@ module.exports = function (app, connection, fs) {
 
 			querySelectText = querySelectText.join(`, `); //turn array in to string
 			queryTableText = queryTableText.join(`, `); //turn array in to string
+			console.log(`SELECT date, ${querySelectText} FROM (SELECT t.dateTime AS date, ${queryTableText} ${queryTables} where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;`);
+
 			connection.query(`SELECT date, ${querySelectText} FROM (SELECT t.dateTime AS date, ${queryTableText} ${queryTables} where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;`, function (err, rows) {
 				if (err) {
 					return res.status(500).json(err);
@@ -412,7 +452,7 @@ module.exports = function (app, connection, fs) {
 
 			querySelectText = querySelectText.join(`, `); //turn array in to string
 			queryTableText = queryTableText.join(`, `); //turn array in to string
-
+			console.log(`SELECT date, ${querySelectText} FROM (SELECT t.dateTime AS date, ${queryTableText} ${queryTables} where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;`);
 			connection.query(`SELECT date, ${querySelectText} FROM (SELECT t.dateTime AS date, ${queryTableText} ${queryTables} where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;`, function (err, rows) {
 				if (err) {
 					return res.status(500).json(err);
@@ -429,7 +469,8 @@ module.exports = function (app, connection, fs) {
 				'inv': 6
 			}, {
 				'id': 13,
-				'inv': 4
+				'inv': 4,
+				'convert': '/60'
 			}, {
 				'id': 14,
 				'inv': 4
@@ -454,11 +495,10 @@ module.exports = function (app, connection, fs) {
 					AsInverter = i;
 				}
 				querySelectText.push(`inverter_${AsInverter}`);
-				queryTableText.push(`ROUND(SUM(If(inverter = ${i}, generation, 0 ))${convertToMWh}, 2 ) AS inverter_${AsInverter}`);
+				queryTableText.push(`ROUND(SUM(If(inverter = ${i}, generation, 0 ))${convertToMWh}, 2 )${site.convert || ''} AS inverter_${AsInverter}`);
 			}
 			querySelectText = querySelectText.join(`, `);
 			queryTableText = queryTableText.join(`, `);
-
 			connection.query(`SELECT date, ${querySelectText} FROM (SELECT dateTime AS date, ${queryTableText} FROM inverter_generation_${id} WHERE dateTime > now() - INTERVAL 31 DAY GROUP BY date(dateTime), hour(dateTime) ORDER BY dateTime DESC) AS sums;`, function (err, rows) {
 				if (err) {
 					return res.status(500).json(err);

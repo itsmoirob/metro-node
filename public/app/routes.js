@@ -9,7 +9,7 @@ angular.module('routes', [
 				url: '',
 				abstract: true
 			})
-			.state('parent.listSites', { //list sites at the side of the bar on the fron page
+			.state('parent.listSites', { //list sites at the side of the bar on the front page
 				url: '',
 				views: {
 					'display@': {
