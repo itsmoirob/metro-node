@@ -66,9 +66,9 @@ if (window.location.pathname === "/upload") { //only run for "upload" page
 }
 
 function refreshData(id, dataType) { // a function to refresh data on press
+	$('div.uploadMessage').html('Working');
+	console.log('Working');
 	$.getJSON('./api/mySQL/' + dataType + 'Upload/' + id, function (data) {
-
-		console.log(id);
-
+		$('div.uploadMessage').html(data.message);
 	});
 }

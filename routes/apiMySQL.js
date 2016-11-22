@@ -485,7 +485,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							console.log(err);
 						} else {
 							console.log(result);
-							res.send(data[1][0]);
+							res.json({message:`Pyro data for PS${id} has been uploaded.`});
 						}
 					});
 				}
@@ -639,7 +639,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								if (err) throw err;
 								console.log('inverter upload for PS' + id + ' : ');
 								console.log(result);
-								res.status(201).send("Done: INSERT INTO inverter_generation_" + id + sqlInputData[0]); //output to screen summary
+								res.json({message:`Data for PS${id} has been uploaded.`});
 							});
 						}
 					}

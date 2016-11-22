@@ -6,6 +6,7 @@ block content
 			form(method="post",enctype="multipart/form-data",action="/upload")
 				input(type="file",name="csvFile", multiple)
 				input(type="submit" value="Upload")
+		div(class="uploadMessage")
 		hr
 		div(class="row")
 			//- inputs jquery list of files currently on server
