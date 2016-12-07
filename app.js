@@ -156,7 +156,7 @@ app.use(function (err, req, res, next) {
 // 			hostname: 'primrose-metro.elasticbeanstalk.com',
 // 			// hostname: 'localhost',
 // 			// port: 3000,
-// 			path: '/api/mySQL/exportUpload/' + site,
+// 			path: '/api/mySQL/upload/export/' + site,
 // 			method: 'GET',
 // 			headers: {
 // 				'Content-Type': 'application/x-www-form-urlencoded'
@@ -186,7 +186,7 @@ app.use(function (err, req, res, next) {
 // 			hostname: 'primrose-metro.elasticbeanstalk.com',
 // 			// hostname: 'localhost',
 // 			// port: 3000,
-// 			path: '/api/mySQL/importUpload/' + site,
+// 			path: '/api/mySQL/upload/import/' + site,
 // 			method: 'GET',
 // 			headers: {
 // 				'Content-Type': 'application/x-www-form-urlencoded'

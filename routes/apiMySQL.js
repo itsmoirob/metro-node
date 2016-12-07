@@ -100,9 +100,9 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 	solarGisFtp.keepAlive();
 
 	app.get(`/api/ftp/:id`, function (req, res) {
-		var id = req.params.id;
-		var fileName;
-		var site = mpanList.filter(function (site) {
+		let id = req.params.id;
+		let fileName;
+		let site = mpanList.filter(function (site) {
 			return site.id == id;
 		})[0];
 		if (id === `NonHH`) {
@@ -121,36 +121,36 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		});
 	});
 
-	app.get('/api/solarGisFtp/:id', function (req, res) {
-		var id = req.params.id;
-		var site = mpanList.filter(function (site) {
+	app.get(`/api/solarGisFtp/:id`, function (req, res) {
+		let id = req.params.id;
+		let site = mpanList.filter(function (site) {
 			return site.id == id;
 		})[0];
 
-		var day = moment().subtract(1, 'days').format('YYYYMMDD');
-		var fileName = site.solarGis + day + '.csv';
+		let day = moment().subtract(1, `days`).format(`YYYYMMDD`);
+		let fileName = `${site.solarGis}${day}.csv`;
 
-		solarGisFtp.get('/CLIMDATA/' + fileName, './files/solarGis/' + site.id + '_' + fileName, function (hadErr) {
+		solarGisFtp.get(`/CLIMDATA/${fileName}`, `./files/solarGis/${site.id}_${fileName}`, function (hadErr) {
 			if (hadErr) {
-				console.error('There was an error retrieving the file.' + hadErr);
-				res.send('There was an error retrieving the file.' + hadErr);
+				console.error(`There was an error retrieving the file. ${hadErr}`);
+				res.send(`There was an error retrieving the file. ${hadErr}`);
 			} else {
 				console.log('File copied successfully!');
-				res.send('File ' + fileName + ' has been downloaded');
+				res.send(`File ${fileName} has been downloaded`);
 			}
 		});
 	});
 
 	// upload solargis data to database tables export_# and dailySumExport
-	app.get('/api/mySQL/solarGisUpload/:id', function (req, res) {
+	app.get(`/api/mySQL/solarGisUpload/:id`, function (req, res) {
 
-		var id = req.params.id;
-		var site = mpanList.filter(function (site) {
+		let id = req.params.id;
+		let site = mpanList.filter(function (site) {
 			return site.id == id;
 		})[0];
-		var day = moment().subtract(1, 'days').format('YYYYMMDD');
-		var mySQLDay = moment(day).format('YYYY-MM-DD');
-		var filePath = './files/solarGis/' + site.id + '_' + site.solarGis + day + '.csv';
+		let day = moment().subtract(1, 'days').format('YYYYMMDD');
+		let mySQLDay = moment(day).format('YYYY-MM-DD');
+		let filePath = `./files/solarGis/${id}_${site.solarGis}${day}.csv`;
 
 		try {
 			fs.readFile(filePath, {
@@ -166,35 +166,43 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 					if (err) {
 						console.log(err);
 					} else {
-						var solarGisSum = 0;
-						for (var j = 1; j < data.length; j++) {
+						let solarGisSum = 0;
+						for (let j = 1; j < data.length; j++) {
 							solarGisSum = solarGisSum + parseInt(data[j][4]);
 						}
 						solarGisSum = solarGisSum / 4000;
-						connection.query('Start transaction; INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + site.id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + site.id + '` = \'' + solarGisSum + '\'; INSERT INTO `dev`.`dailyEsol` (`date`, `ps' + site.id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + site.id + '` = if(`ps' + site.id + '` > 0.000009, `ps' + site.id + '`, \'' + solarGisSum + '\'); Commit;', function (err, result) {
+						connection.query(`INSERT INTO dailySolarGis (date, ps${id}) VALUES ('${mySQLDay}', ${solarGisSum}) on duplicate key update ps${id} = ${solarGisSum}; INSERT INTO dailyEsol (date, ps${id}) VALUES ('${mySQLDay}', ${solarGisSum}) on duplicate key update ps${site.id} = if(ps${site.id} > 0.000009, ps${id}, ${solarGisSum});`, function (err, result) {
 							if (err) throw err;
+							console.log(`Solargis upload for site PS${id}`);
 							console.log(result);
-							res.send('INSERT INTO `dev`.`dailySolarGis` (`date`, `ps' + site.id + '`) VALUES (\'' + mySQLDay + '\', \'' + solarGisSum + '\') on duplicate key update `ps' + site.id + '` = \'' + solarGisSum + '\';');
-						});
+							res.json({message:`Solargis data for PS${id} has been uploaded.`});
+						}); //end connection.query
 					}
 				});
 				try {
 					fs.unlinkSync(filePath);
 				} catch (err) {
-					console.log('fs.unlinkSync(filePath) did not work for ' + filePath);
+					console.log(`fs.unlinkSync(filePath) did not work for ${filePath}`);
 				}
 			});
 		} catch (err) {
-			console.log('fs.readFile(filePath) ' + filePath);
+			console.log(`fs.readFile(filePath) ${filePath}`);
 		}
 	});
 
-	// upload export to database tables export_# and dailySumExport
-	app.get('/api/mySQL/exportUpload/:id', function (req, res) {
+		// upload exportimport to database tables export_# and dailySumExport
+	app.get('/api/mySQL/upload/:type/:id', function (req, res) {
 
-		var id = req.params.id;
-		var filePath = "./files/Primrose Solar Limited.csv";
-		var startIndex = 3;
+		let id = req.params.id;
+		let type = req.params.type;
+		let mpanType;
+		if(req.params.type === `export`) {
+			mpanType = 'mpan';
+		} else {
+			mpanType = 'importMpan';
+		}
+		let filePath = `./files/Primrose Solar Limited.csv`;
+		let startIndex = 3;
 		fs.readFile(filePath, {
 			encoding: 'utf-8'
 		}, function (err, csvData) {
@@ -208,113 +216,63 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				if (err) {
 					console.log(err);
 				} else {
-					var readingsForExport = mpanList.map(function (mpan) {
-						var readingsForOneExport = data.filter(function (item) {
-							return item[0] === mpan.mpan;
+					let readingsForExport = mpanList.map(function (mpan) {
+						let readingsForOneExport = data.filter(function (item) {
+							return item[0] === mpan[mpanType];
 						});
 						return {
 							id: mpan.id,
 							data: readingsForOneExport
 						};
 					});
-					var site = readingsForExport.filter(function (site) {
+					let site = readingsForExport.filter(function (site) {
 						return site.id == id;
 					})[0];
-					var sqlInputData = [];
-					var n = 0;
-					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
-						var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
-						var hour = moment("00:30", "HH:mm").format("HH:mm");
-						for (var i = startIndex; i < site.data[j].length; i++) {
+					let sqlInputData = [];
+					let n = 0;
+					for (let j = 0; j < site.data.length; j++) { // use this line only for histroical data
+						let day = moment(site.data[j][startIndex - 1], `DD/MM/YYYY`).format(`YYYY-MM-DD`);
+						let hour = moment(`00:30`, `HH:mm`).format(`HH:mm`);
+						for (let i = startIndex; i < site.data[j].length; i++) {
 
-							if (site.data[j][i] === "-") {
-								site.data[j][i] = "NULL";
+							if (site.data[j][i] === `-`) {
+								site.data[j][i] = `NULL`;
 							}
 
-							sqlInputData[n] = ["('" + day + "','" + hour + "'," + site.data[j][i] + ")"];
-							hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
+							sqlInputData[n] = [`('${day}', '${hour}', ${site.data[j][i]})`];
+							hour = moment(hour, `HH:mm`).add(30, `minutes`).format(`HH:mm`);
 							n++;
 						}
 					}
-					connection.query('INSERT INTO export_' + site.id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS' + site.id + ') select date, sum(generation) from export_' + site.id + ' where date > NOW() - INTERVAL 30 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
+					connection.query(`INSERT INTO ${type}_${id} VALUES ${sqlInputData} ON DUPLICATE KEY UPDATE generation=VALUES(generation); INSERT INTO dailySum${type.charAt(0).toUpperCase() + type.slice(1)} (date,PS${id}) SELECT date, SUM(generation) FROM ${type}_${id} WHERE date > NOW() - INTERVAL 30 DAY GROUP BY DATE ORDER BY date ASC ON DUPLICATE KEY UPDATE PS${id} = VALUES (PS${id});`, function (err, result) {
 						if (err) {
-							console.log('Error auto export upload file ' + site.exportMpan + ' : ' + err);
-							res.send('ERROR file ' + site.exportMpan + ' : INSERT INTO export_' + site.id + ' VALUES ' + sqlInputData);
+							console.log(`ERROR ${type} upload file PS${id} : ${err}.`);
+							res.json({message:`ERROR ${type} upload file PS${id}.`});
 						} else {
-							console.log('Site: ' + site.id + '; ExportHHSQL: ' + result[0].message + '; ExportDailySumSQL: ' + result[1].message);
-							res.send('COMPLETE: INSERT INTO export_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ExportHHSQL: ' + result[0].message + '; ExportDailySumSQL: ' + result[1].message);
+							console.log(`Site: ${id} ; ${type}HHSQL: ${result[0].message}; ${type}DailySumSQL: ${result[1].message}`);
+							res.json({message:`${type} data for PS${id} has been uploaded.`});
 						}
-					});
+					}); //end connection.query
 
 				}
 			});
 		});
 	});
 
-	// upload export to database tables export_# and dailySumExport
-	app.get('/api/mySQL/importUpload/:id', function (req, res) {
-		var id = req.params.id;
-		var filePath = "./files/Primrose Solar Limited.csv";
-		var startIndex = 3;
-		fs.readFile(filePath, {
-			encoding: 'utf-8'
-		}, function (err, csvData) {
-			if (err) {
-				console.log(err);
-			}
-			csvParse(csvData, {
-				separator: ',',
-				newline: '\n'
-			}, function (err, data) {
-				if (err) {
-					console.log(err);
-				} else {
-					var readingsForExport = mpanList.map(function (mpan) {
-						var readingsForOneExport = data.filter(function (item) {
-							return item[0] === mpan.importMpan;
-						});
-						return {
-							id: mpan.id,
-							data: readingsForOneExport
-						};
-					});
-					var site = readingsForExport.filter(function (site) {
-						return site.id == id;
-					})[0];
-					var sqlInputData = [];
-					var n = 0;
-					for (var j = 0; j < site.data.length; j++) { // use this line only for histroical data
-						var day = moment(site.data[j][startIndex - 1], "DD/MM/YYYY").format("YYYY-MM-DD");
-						var hour = moment("00:30", "HH:mm").format("HH:mm");
-						for (var i = startIndex; i < site.data[j].length; i++) {
-							if (site.data[j][i] === "-") {
-								site.data[j][i] = "NULL";
-							}
-							sqlInputData[n] = ["('" + day + "','" + hour + "'," + site.data[j][i] + ")"];
-							hour = moment(hour, "HH:mm").add(30, 'minutes').format("HH:mm");
-							n++;
-						}
-					}
-					connection.query('INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' where date > NOW() - INTERVAL 100 DAY group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + ');', function (err, result) {
-						if (err) {
-							console.log('Error auto import upload file ' + site.id + ' : ' + err);
-							res.send('ERROR file ' + site.id + ' : INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData);
-						} else {
-							console.log('Site: ' + site.id + '; ImportHHSQL: ' + result[0].message + '; ImportDailySumSQL: ' + result[1].message);
-							res.send('COMPLETE: INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData[0] + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); <br> ImportHHSQL: ' + result[0].message + '; ImportDailySumSQL: ' + result[1].message);
-						}
-					});
-				}
-			});
-		});
-	});
-
-	app.get('/api/mySQL/manualImportUpload/:id', function (req, res) {
-		var id = req.params.id;
-		var site = mpanList.filter(function (site) {
+	//manually upload csv files for import or export file.
+	app.get('/api/mySQL/manualUpload/:type/:id', function (req, res) {
+		let id = req.params.id;
+		let type = req.params.type;
+		let mpanType;
+		if(req.params.type === `export`) {
+			mpanType = 'mpan';
+		} else {
+			mpanType = 'importMpan';
+		}
+		let site = mpanList.filter(function (site) {
 			return site.id == id;
 		})[0];
-		var filePath = "./files/" + site.importMpan + ".csv";
+		let filePath = `./files/${site[mpanType]}.csv`;
 		fs.readFile(filePath, {
 			encoding: 'utf-8'
 		}, function (err, csvData) {
@@ -328,81 +286,40 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				if (err) {
 					console.log(err);
 				} else {
-					var sqlInputData = [];
-					var n = 0;
-
-					for (j = 1; j < data.length; j++) { // use this line only for histroical data
-						var day = moment(data[j][7], "DD/MM/YYYY").format("YYYY-MM-DD");
-						for (i = 8; i < data[j].length; i++) {
-							var hour = data[7][i];
-							if (data[j][i] === "-") {
-								data[j][i] = "NULL";
-							}
-							sqlInputData[n] = ["('" + day + "','" + hour + "'," + data[j][i] + ")"];
-							n++;
-						}
-					}
-					connection.query('Start transaction; INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData + '  ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumImport(date,PS' + site.id + ') select date, sum(generation) from import_' + site.id + ' group by date order by date asc on duplicate key update PS' + site.id + '=VALUES(PS' + site.id + '); commit;', function (err, result) {
-						if (err) {
-							console.log('Error manual import upload file ' + site.importMpan + ' : ' + err);
-							res.send('ERROR file ' + site.importMpan + ' : INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData);
-						} else {
-							console.log(result.insertId);
-							res.send('Done: INSERT INTO import_' + site.id + ' VALUES ' + sqlInputData[0]);
-						}
-					});
-				}
-			});
-		});
-	});
-
-	app.get('/api/mySQL/manualExportUpload/:id', function (req, res) {
-		var id = req.params.id - 1;
-		var filePath = './files/' + mpanList[id].mpan + '.csv';
-		fs.readFile(filePath, {
-			encoding: 'utf-8'
-		}, function (err, csvData) {
-			if (err) {
-				console.log(err);
-			}
-			csvParse(csvData, {
-				separator: ',',
-				newline: '\n'
-			}, function (err, data) {
-				if (err) {
-					console.log(err);
-				} else {
-					var sqlInputData = [];
-					var n = 0;
+					let sqlInputData = [];
+					let n = 0;
 
 					for (j = 8; j < data.length; j++) { // use this line only for histroical data
-						var day = moment(data[j][7], 'DD/MM/YYYY').format('YYYY-MM-DD');
+						let day = moment(data[j][7], 'DD/MM/YYYY').format('YYYY-MM-DD');
+						if (day === 'Invalid date') { continue; }
 						for (i = 8; i < data[j].length; i++) {
-							var hour = data[7][i];
-							if (data[j][i] === '-') {
-								data[j][i] = 'NULL';
+							let hour = data[7][i];
+							if (data[j][i] === `-`) {
+								data[j][i] = `NULL`;
 							}
-							sqlInputData[n] = ['(\'' + day + '\', \'' + hour + '\',' + data[j][i] + ')'];
-							// hour = moment(hour,"DD/MM/YYYY").add(30,'minutes');
+							sqlInputData[n] = [`('${day}', '${hour}', ${data[j][i]})`];
 							n++;
 						}
 					}
-					connection.query('INSERT INTO export_' + mpanList[id].id + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); insert into dailySumExport(date,PS' + mpanList[id].id + ') select date, sum(generation) from export_' + mpanList[id].id + ' group by date order by date asc on duplicate key update PS' + mpanList[id].id + '=VALUES(PS' + mpanList[id].id + ');', function (err, result) {
-						if (err) throw err;
-						console.log(result);
-						res.send('Done: INSERT INTO export_' + mpanList[id].id + ' VALUES ' + sqlInputData);
+					connection.query(`INSERT INTO ${type}_${id} VALUES ${sqlInputData} ON DUPLICATE KEY UPDATE generation = VALUES(generation); insert into dailySum${type.charAt(0).toUpperCase() + type.slice(1)} (date,PS${id}) SELECT date, SUM(generation) FROM ${type}_${id} GROUP BY DATE ORDER BY DATE ASC ON DUPLICATE KEY UPDATE PS${id} = VALUES(PS${id});`, function (err, result) {
+						if (err) {
+							console.log(`ERROR ${type} upload file PS${id} : ${err}.`);
+							res.json({message:`ERROR ${type} upload file PS${id}.`});
+						} else {
+							console.log(`Site: ${id} ; ${type}HHSQL: ${result[0].message}; ${type}DailySumSQL: ${result[1].message}`);
+							res.json({message:`${type} data for PS${id} has been uploaded.`});
+						}
 					});
 				}
 			});
 		});
 	});
-
 
 	// upload pyro data. Will grab a csv file from server that was previously uploaded and it will store the contents in to the specific site pyro table, and update the dailyEsol table
 	app.get('/api/mySQL/pyroUpload/:id', function (req, res) {
-		var id = req.params.id; //get ID from url
-		var filePath = "./files/PS" + id + " Pyro.csv"; //locate correct CSV for uploading data
-		var site = mpanList.filter(function (site) {
+		let id = req.params.id; //get ID from url
+		let filePath = "./files/PS" + id + " Pyro.csv"; //locate correct CSV for uploading data
+		let site = mpanList.filter(function (site) {
 			return site.id == id;
 		})[0]; //filter the correct site for extra params
 
@@ -419,36 +336,33 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 				if (err) {
 					console.log(err);
 				} else {
-					var sqlInputData = []; //this array will store the data to send to query
-					var sqlDupeText = []; //base text array for DUPLCIATE text of query
-					var sqlValueText = []; //base text array for storing text for VALUE statement
-					var sqlEsolText = []; //base text array for storing text for calculation on dailyEsol table
-					var sqlEsolText2 = []; //base text array for storing text for calculation on dailyEsol table
+					let sqlInputData = []; //this array will store the data to send to query
+					let sqlDupeText = []; //base text array for DUPLCIATE text of query
+					let sqlValueText = []; //base text array for storing text for VALUE statement
+					let sqlEsolText = []; //base text array for storing text for calculation on dailyEsol table
+					let sqlEsolText2 = []; //base text array for storing text for calculation on dailyEsol table
 
 					// loop through each row and get text ready for data to be uploaded to database tables
-					for (var j = 1; j < data.length; j++) {
-						if (data[j][0] === '') {
-							continue;
-						} // If there are any extra rows that contain no date/data, this will skip them
-
-						var sqlText = ''; //base text variable for individual lines of CSV
-
+					for (let j = 1; j < data.length; j++) {
+						if (data[j][0] === '') { continue; } // If there are any extra rows that contain no date/data, this will skip them
+						let sqlText = ''; //base text variable for individual lines of CSV
+						let day;
 						//the below IFs will modify the date format to work with sql format YYYY-MM-DD HH:mm as different CSV files have different date formats
 						if (moment(data[j][0], 'DD/MM/YYYY HH:mm', true).isValid()) {
-							data[j][0] = moment(data[j][0], 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
+							day = moment(data[j][0], 'DD/MM/YYYY HH:mm').format('YYYY-MM-DD HH:mm');
 						} else {
-							data[j][0] = moment(data[j][0]).format('YYYY-MM-DD HH:mm');
+							day = moment(data[j][0]).format('YYYY-MM-DD HH:mm');
 						}
 
-						sqlText = sqlText + '(\'' + data[j][0] + '\''; //add in date that has been set up in correct format
+						sqlText = sqlText + `('${day}'`; //add in date that has been set up in correct format
 
 						// loop through each column per row and add in data as different CSVS have different column numbers per row
-						for (var k = 1; k < data[0].length; k++) {
+						for (let k = 1; k < data[0].length; k++) {
 							//loop through however many columns there are and get the text prepared for sql queries depending on column numbers.
 							if (j === 1) {
 								if (isNaN(data[0][k]) || data[0][k] === '') {
-									sqlDupeText.push('pyro_' + k + '= VALUES (pyro_' + k + ')');
-									sqlValueText.push('pyro_' + k);
+									sqlDupeText.push(`pyro_${k} = VALUES (pyro_${k})`);
+									sqlValueText.push(`pyro_${k}`);
 								} else {
 									sqlDupeText.push('pyro_' + data[0][k] + '= VALUES (pyro_' + data[0][k] + ')');
 									sqlValueText.push('pyro_' + data[0][k]);
@@ -464,13 +378,13 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 							sqlText = sqlText + ', ' + data[j][k];
 						}
 						//loop through however many columns there are and get the text prepared for sql queries depending on column numbers. This is seperated from the above as Canworthy is a unique case in that the uploaded file will have fewer columns than what is in database, so the INSERT TO ESOL table needs to be changed for this one site.
-						var esolQueryLength;
+						let esolQueryLength;
 						if (id == 5) {
 							esolQueryLength = 5; // Although the number of pyros is 4, Ive used 5 as the FOR code only uses LESS THAN
 						} else {
 							esolQueryLength = data[0].length;
 						}
-						for (var m = 1; m < esolQueryLength; m++) {
+						for (let m = 1; m < esolQueryLength; m++) {
 							if (j === 1) {
 								sqlEsolText.push('ifnull(pyro_' + m + ',0)');
 								sqlEsolText2.push('(case when pyro_' + m + ' >= 0 then 1 else 0 end)');
@@ -479,6 +393,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						sqlText = sqlText + ')'; // this just adds a final bracket on the end of the text query
 						sqlInputData.push(sqlText); // push the statement to the array of statements
 					}
+					// res.send('INSERT INTO pyro_site_' + id + ' (`dateTime`, ' + sqlValueText.join(', ') + ') VALUES ' + sqlInputData.join(', ') + ' ON DUPLICATE KEY UPDATE ' + sqlDupeText.join(', ') + '; INSERT INTO dailyEsol (date, ps' + id + ') SELECT date(dateTime), SUM((' + sqlEsolText.join(' + ') + ')/(' + sqlEsolText2.join(' + ') + '))/' + site.pyroMinutes + ' FROM pyro_site_' + id + ' WHERE date(dateTime) > NOW() - INTERVAL 14 DAY GROUP BY date(dateTime) ORDER BY dateTime DESC ON DUPLICATE KEY UPDATE PS' + id + ' = VALUES(ps' + id + ');');
 					connection.query('INSERT INTO pyro_site_' + id + ' (`dateTime`, ' + sqlValueText.join(', ') + ') VALUES ' + sqlInputData.join(', ') + ' ON DUPLICATE KEY UPDATE ' + sqlDupeText.join(', ') + '; INSERT INTO dailyEsol (date, ps' + id + ') SELECT date(dateTime), SUM((' + sqlEsolText.join(' + ') + ')/(' + sqlEsolText2.join(' + ') + '))/' + site.pyroMinutes + ' FROM pyro_site_' + id + ' WHERE date(dateTime) > NOW() - INTERVAL 14 DAY GROUP BY date(dateTime) ORDER BY dateTime DESC ON DUPLICATE KEY UPDATE PS' + id + ' = VALUES(ps' + id + ');', function (err, result) {
 						if (err) {
 							res.send('id: ' + id + ' ; ' + err);
@@ -613,7 +528,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 								if (err) throw err;
 								console.log('inverter upload for PS' + id + ' : ' + singleTransData['inverter_generation_' + id + '_T01'][0]);
 								console.log(result);
-								res.send('Done ' + id + ' > ' + singleTransData['inverter_generation_' + id + '_T01'][0]);
+								res.json({message:`Data for PS${id} has been uploaded.`});
 							});
 						} else { //how to query for all sites that arent using multiple tables
 							// collect data and format it in array to use in sqlquery

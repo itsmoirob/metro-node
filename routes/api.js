@@ -14,7 +14,7 @@ module.exports = function (app, connection, fs) {
 
 
 	// api for getting summary of specific site
-	app.get('/api/displaySite/site/:id', function (req, res) {
+	app.get(`/api/displaySite/site/:id`, function (req, res) {
 		let id = req.params.id;
 		connection.query(`SELECT name, id, latitude, longitude, location, tic_mwp, dnc_mw, homes_powered, carbon_saved_tones, (select epcName from epc where epcIndex = epc) as epc, dno, mpan_export, postcode from top_table where id = ${id};`, function (err, rows) {
 			if (err) {
@@ -421,8 +421,6 @@ module.exports = function (app, connection, fs) {
 
 			querySelectText = querySelectText.join(`, `); //turn array in to string
 			queryTableText = queryTableText.join(`, `); //turn array in to string
-			console.log(`SELECT date, ${querySelectText} FROM (SELECT t.dateTime AS date, ${queryTableText} ${queryTables} where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;`);
-
 			connection.query(`SELECT date, ${querySelectText} FROM (SELECT t.dateTime AS date, ${queryTableText} ${queryTables} where date(dateTime) > now() - interval 3 month GROUP BY date(t.dateTime), hour(t.dateTime) ORDER BY dateTime desc) AS sums;`, function (err, rows) {
 				if (err) {
 					return res.status(500).json(err);

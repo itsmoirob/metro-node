@@ -15,7 +15,7 @@ html
 					li(class=(title == 'Login' ? 'active' : ''))
 						a(href='/users/login') Log In
 				if user
-					if user.username == 'db'
+					if user.username == 'db' || user.username == 'greencoat' 
 						li
 							a(href="#") Home
 						li 
@@ -42,7 +42,7 @@ html
 						li(class=(title == 'Login' ? 'active' : ''))
 							a(href='/users/login') Log In
 					if user
-						if user.username == 'db'
+						if user.username == 'db' || user.username == 'greencoat' 
 							li
 								a(href="#") Home
 							li 
