@@ -293,8 +293,14 @@ module.exports = function (app, connection, fs) {
 	});
 
 
-	app.get(`/api/displaySite/allSiteCoords`, function (req, res) {
-		connection.query(`SELECT id, name, latitude, longitude FROM top_table WHERE primrose_company > 0`, function (err, rows) {
+	app.get(`/api/displaySite/allSiteCoords/:limit?`, function (req, res) {
+		let query;
+		if(req.params.limit) {
+			query = `SELECT id, name, latitude, longitude FROM top_table WHERE primrose_company > 0 AND id >= 11`;
+		} else {
+			query = `SELECT id, name, latitude, longitude FROM top_table WHERE primrose_company > 0`;
+		}
+		connection.query(query, function (err, rows) {
 			if (err) {
 				return res.status(500).json(err);
 			} else {
