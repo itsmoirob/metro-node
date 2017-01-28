@@ -73,7 +73,8 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 		"id": 15,
 		"mpan": "1640000523609",
 		"solarGis": "SolarGIS_min15_7_Morecambe_",
-		"importMpan": "1640000523593"
+		"importMpan": "1640000523593",
+		"pyroMinutes": 12000
 	}, {
 		"id": 16,
 		"mpan": "2000056474812",
@@ -455,7 +456,7 @@ module.exports = function (app, connection, csvParse, fs, moment, pool, config, 
 						previousGen = currentGen; // store currentGen as previousGen
 					}
 					connection.query('INSERT INTO inverter_generation_12_T' + transformer + ' VALUES ' + sqlInputData + ' ON DUPLICATE KEY UPDATE generation=VALUES(generation); delete from inverter_generation_12_T' + transformer + ' where generation is null;', function (err, result) { //Run query to upload inverter data to table
-						if (err) throw err;
+						if (err) {return res.status(400).send(err);};
 						console.log('Done ' + filePath);
 					});
 				}

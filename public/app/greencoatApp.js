@@ -1,7 +1,74 @@
 const app = angular.module('greencoatApp', ['greencoatFactory']);
 
-app.controller('greencoatCtrl', ['$scope', 'dataFactory', function ($scope, dataFactory) {
+app.controller('greencoatCtrl', ['$scope', 'dataFactory', '$filter', function ($scope, dataFactory, $filter) {
 	$scope.test = 'greencoat Angular';
+
+	let yesterday = new Date();
+	yesterday.setDate(yesterday.getDate() - 1);
+	$scope.date = yesterday;
+
+	getPickUp();
+	function getPickUp() {
+		dataFactory.getPickUp()
+			.success(function (res) {
+				$scope.sitesInfo = res.filter((site) => site.id >10);
+				var totalMWp = 0;
+				angular.forEach(res, function (res) {
+					if(res.id>10){
+						totalMWp = totalMWp + res.tic_mwp;
+					}
+				});
+				$scope.totalMWp = totalMWp;
+			});
+	}
+
+	$scope.getDailyProductionReport = (date) => {
+		date = $filter('date')(date, "yyyy-MM-dd");
+		dataFactory.dailyProductionReport(date)
+			.success(function (res) {
+				var totalDailyExport = 0;
+				var totalGroupExport = 0;
+				var expectedExport = 0;
+				var totalDailyEsol = 0;
+				var totalGroupEsol = 0;
+
+				var newObj = _.reduce(res[0], function (accumulator, value, key) {
+					var group = key.substring(0, 4);
+					var property = key.substring(5);
+
+					if (key.substring(5) === 'Day') {
+						totalDailyExport = totalDailyExport + value;
+					}
+					if (key.substring(5) === 'Group') {
+						totalGroupExport = totalGroupExport + value;
+					}
+					if (key.substring(5) === 'PredictDay') {
+						expectedExport = expectedExport + value;
+					}
+					if (key.substring(5) === 'DailyEsol') {
+						totalDailyEsol = totalDailyEsol + value;
+					}
+					if (key.substring(5) === 'GroupEsol') {
+						totalGroupEsol = totalGroupEsol + value;
+					}
+
+					if (!accumulator[group]) accumulator[group] = {};
+					if (!accumulator[group].site) accumulator[group].site = group;
+					accumulator[group][property] = value;
+
+					return accumulator;
+				}, {});
+
+				$scope.dailyProductionReport = newObj;
+				$scope.totalDailyExport = totalDailyExport;
+				$scope.totalGroupExport = totalGroupExport;
+				$scope.expectedExport = expectedExport;
+				$scope.totalDailyEsol = totalDailyEsol;
+				$scope.totalGroupEsol = totalGroupEsol;
+
+			});
+	}
+	$scope.getDailyProductionReport($scope.date); // call function to access date depending on parameter date, or defaults to yesteday
 
 }]);
 
@@ -15,6 +82,7 @@ app.controller('greencoatSiteCtrl', ['$scope', 'dataFactory', '$filter', functio
 		'eveley': 16
 	};
 	let SP = siteArray[local_data.site];
+	$scope.test = chart_data.data[2];
 
 	let sliceArr = [];
 	let sliceDate = [];
@@ -36,6 +104,7 @@ app.controller('greencoatSiteCtrl', ['$scope', 'dataFactory', '$filter', functio
 				sliceDate = sliceDate.reverse();
 			});
 	}
+
 
 	$scope.reverse = true;
 	$scope.order = function () {

@@ -3,16 +3,20 @@ angular.module('greencoatFactory', [])
 		var urlBase = ('./api/');
 		var dataFactory = {};
 
-		dataFactory.getPickUp = function () { //GET all of the basic info for front page
+		dataFactory.getPickUp = () => { //GET all of the basic info for front page
 			return $http.get(urlBase + 'pickUp');
 		};
 
-		dataFactory.getSiteSummary = function (id) {
+		dataFactory.getSiteSummary = (id) => {
 			return $http.get(urlBase + 'displaySite/site/' + id);
 		};
 
-		dataFactory.getMKReport = function (id) {
+		dataFactory.getMKReport = (id) => {
 			return $http.get('/api/displaySite/report/' + id);
+		};
+
+		dataFactory.dailyProductionReport = (date) => {
+			return $http.get('/api/reports/dailyProductionReportGC/' + date);
 		};
 	
 		

@@ -9,7 +9,9 @@ html
 		link(rel="stylesheet" href="/stylesheets/style.css")
 		link(rel='shortcut icon' type='image/x-icon' href='./favicon.ico')
 		script(type='text/javascript').
-			var local_data =!{JSON.stringify(data)}
+			var local_data = !{JSON.stringify(info)}
+		script(type='text/javascript').
+			var chart_data = !{chart}
 	body(ng-app="greencoatApp", ng-controller="greencoatSiteCtrl")
 		nav(class="primroseYellow")
 			ul(class="right hide-on-med-and-down")
@@ -49,7 +51,7 @@ html
 
 		.container(class="container")
 			!= messages()
-			div
+			div 
 			//- div#chart(style="min-width: 500px; height: 500px; margin: 0 auto")
 			div
 				table( class="metroTable" id="datatable")
@@ -78,6 +80,9 @@ html
 		script.
 			
 			$(function () {
+				let chartData = [];
+				chartData.push('#{chart.data}');
+				console.log(chartData);
 				$('#chart').highcharts({
 					chart: {
 						type: 'column'
@@ -89,7 +94,7 @@ html
 						text: 'Source: Internal DB'
 					},
 						xAxis: {
-						type: 'category',          
+						type: 'category',
 						labels: {
 							rotation: -45,
 							style: {
@@ -109,7 +114,7 @@ html
 					},
 					series: [{
 						name: '#{seriesName}',
-						data: [],
+						data: [1,2,3],
 						dataGrouping: {
 							enabled: true
 						},

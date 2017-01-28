@@ -149,220 +149,190 @@ app.use(function (err, req, res, next) {
 	});
 });
 
-// var liveSites = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16];
-// liveSites.map(function (site) {
-// 	new CronJob('59 */30 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
-// 		var options = {
-// 			hostname: 'primrose-metro.elasticbeanstalk.com',
-// 			// hostname: 'localhost',
-// 			// port: 3000,
-// 			path: '/api/mySQL/upload/export/' + site,
-// 			method: 'GET',
-// 			headers: {
-// 				'Content-Type': 'application/x-www-form-urlencoded'
-// 			}
-// 		};
-// 		var req = http.request(options, function (res) {
-// 			console.log('STATUS: ' + res.statusCode);
-// 			console.log('HEADERS: ' + JSON.stringify(res.headers));
-// 			res.setEncoding('utf8');
-// 			res.on('data', function (chunk) {
-// 				console.log('BODY: ' + chunk);
-// 			});
-// 			res.on('end', function () {
-// 				console.log('No more data in response.')
-// 			})
-// 		});
-// 		req.on('error', function (e) {
-// 			console.log('problem with request: ' + e.message);
-// 		});
-// 		req.end();
-// 	}, null, true, 'UTC');
-// });
-
-// liveSites.map(function (site) {
-// 	new CronJob('45 */42 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
-// 		var options = {
-// 			hostname: 'primrose-metro.elasticbeanstalk.com',
-// 			// hostname: 'localhost',
-// 			// port: 3000,
-// 			path: '/api/mySQL/upload/import/' + site,
-// 			method: 'GET',
-// 			headers: {
-// 				'Content-Type': 'application/x-www-form-urlencoded'
-// 			}
-// 		};
-// 		var req = http.request(options, function (res) {
-// 			console.log('STATUS: ' + res.statusCode);
-// 			console.log('HEADERS: ' + JSON.stringify(res.headers));
-// 			res.setEncoding('utf8');
-// 			res.on('data', function (chunk) {
-// 				console.log('BODY: ' + chunk);
-// 			});
-// 			res.on('end', function () {
-// 				console.log('No more data in response.')
-// 			})
-// 		});
-// 		req.on('error', function (e) {
-// 			console.log('problem with request: ' + e.message);
-// 		});
-// 		req.end();
-// 	}, null, true, 'UTC');
-// });
 
 
+var liveSites = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16];
+liveSites.map(function (site) {
+	new CronJob('59 */30 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
+		var options = {
+			hostname: 'primrose-metro.elasticbeanstalk.com',
+			// hostname: 'localhost',
+			// port: 3000,
+			path: '/api/mySQL/upload/export/' + site,
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		};
+		var req = http.request(options, function (res) {
+			console.log('STATUS: ' + res.statusCode);
+			console.log('HEADERS: ' + JSON.stringify(res.headers));
+			res.setEncoding('utf8');
+			res.on('data', function (chunk) {
+				console.log('BODY: ' + chunk);
+			});
+			res.on('end', function () {
+				console.log('No more data in response.')
+			})
+		});
+		req.on('error', function (e) {
+			console.log('problem with request: ' + e.message);
+		});
+		req.end();
+	}, null, true, 'UTC');
+});
 
-// new CronJob('0 */30 * * * *', function () {
-// 	var options = {
-// 		hostname: 'primrose-metro.elasticbeanstalk.com',
-// 		// hostname: 'localhost',
-// 		// port: 3000,
-// 		path: '/api/ftp/HH',
-// 		method: 'GET',
-// 		headers: {
-// 			'Content-Type': 'application/x-www-form-urlencoded'
-// 		}
-// 	};
-// 	var req = http.request(options, function (res) {
-// 		console.log('/api/ftp/HH');
-// 		console.log('STATUS: ' + res.statusCode);
-// 		console.log('HEADERS: ' + JSON.stringify(res.headers));
-// 		res.setEncoding('utf8');
-// 		res.on('data', function (chunk) {
-// 			console.log('BODY: ' + chunk);
-// 		});
-// 		res.on('end', function () {
-// 			console.log('No more data in response.')
-// 		})
-// 	});
-// 	req.on('error', function (e) {
-// 		console.log('problem with request: ' + e.message);
-// 	});
-// 	req.end();
-// }, null, true, 'UTC');
-
-// liveSites.map(function (site, index) {
-// 	new CronJob('0 ' + (parseInt(index) + 10) + ' 7,8,9,10,11,13,14 * * *', function () {
-// 		var options = {
-// 			hostname: 'primrose-metro.elasticbeanstalk.com',
-// 			// hostname: 'localhost',
-// 			// port: 3000,
-// 			path: '/api/solarGisFtp/' + site,
-// 			method: 'GET',
-// 			headers: {
-// 				'Content-Type': 'application/x-www-form-urlencoded'
-// 			}
-// 		};
-// 		var req = http.request(options, function (res) {
-// 			console.log('/api/solarGisFtp/' + site);
-// 			console.log('STATUS: ' + res.statusCode);
-// 			console.log('HEADERS(' + site + '): ' + JSON.stringify(res.headers));
-// 			res.setEncoding('utf8');
-// 			res.on('data', function (chunk) {
-// 				console.log('BODY: ' + chunk);
-// 			});
-// 			res.on('end', function () {
-// 				console.log('No more data in response.')
-// 			})
-// 		});
-// 		req.on('error', function (e) {
-// 			console.log('problem with request: ' + e.message);
-// 		});
-// 		req.end();
-// 	}, null, true, 'UTC');
-// });
+liveSites.map(function (site) {
+	new CronJob('45 */42 * * * *', function () { //https://nodejs.org/api/http.html#http_http_request_options_callback
+		var options = {
+			hostname: 'primrose-metro.elasticbeanstalk.com',
+			// hostname: 'localhost',
+			// port: 3000,
+			path: '/api/mySQL/upload/import/' + site,
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		};
+		var req = http.request(options, function (res) {
+			console.log('STATUS: ' + res.statusCode);
+			console.log('HEADERS: ' + JSON.stringify(res.headers));
+			res.setEncoding('utf8');
+			res.on('data', function (chunk) {
+				console.log('BODY: ' + chunk);
+			});
+			res.on('end', function () {
+				console.log('No more data in response.')
+			})
+		});
+		req.on('error', function (e) {
+			console.log('problem with request: ' + e.message);
+		});
+		req.end();
+	}, null, true, 'UTC');
+});
 
 
-// liveSites.map(function (site) {
-// 	new CronJob('0 35 8,9,10,11,13,14 * * *', function () {
-// 		var options = {
-// 			hostname: 'primrose-metro.elasticbeanstalk.com',
-// 			// hostname: 'localhost',
-// 			// port: 3000,
-// 			path: '/api/mySQL/solarGisUpload/' + site,
-// 			method: 'GET',
-// 			headers: {
-// 				'Content-Type': 'application/x-www-form-urlencoded'
-// 			}
-// 		};
-// 		var req = http.request(options, function (res) {
-// 			console.log('/api/mySQL/solarGisUpload/' + site);
-// 			console.log('STATUS: ' + res.statusCode);
-// 			console.log('HEADERS: ' + JSON.stringify(res.headers));
-// 			res.setEncoding('utf8');
-// 			res.on('data', function (chunk) {
-// 				console.log('BODY: ' + chunk);
-// 			});
-// 			res.on('end', function () {
-// 				console.log('No more data in response.')
-// 			})
-// 		});
-// 		req.on('error', function (e) {
-// 			console.log('problem with request: ' + e.message);
-// 		});
-// 		req.end();
-// 	}, null, true, 'UTC');
-// });
 
-// new CronJob('0 */30 * * * *', function () {
-// 	var options = {
-// 		hostname: 'primrose-metro.elasticbeanstalk.com',
-// 		// hostname: 'localhost',
-// 		// port: 3000,
-// 		path: '/api/mySQL/autopyroUpload/5',
-// 		method: 'GET',
-// 		headers: {
-// 			'Content-Type': 'application/x-www-form-urlencoded'
-// 		}
-// 	};
-// 	var req = http.request(options, function (res) {
-// 		console.log('/api/mySQL/autopyroUpload/');
-// 		console.log('STATUS: ' + res.statusCode);
-// 		console.log('HEADERS: ' + JSON.stringify(res.headers));
-// 		res.setEncoding('utf8');
-// 		res.on('data', function (chunk) {
-// 			console.log('BODY: ' + chunk);
-// 		});
-// 		res.on('end', function () {
-// 			console.log('No more data in response.')
-// 		})
-// 	});
-// 	req.on('error', function (e) {
-// 		console.log('problem with request: ' + e.message);
-// 	});
-// 	req.end();
-// }, null, true, 'UTC');
+new CronJob('0 */30 * * * *', function () {
+	var options = {
+		hostname: 'primrose-metro.elasticbeanstalk.com',
+		// hostname: 'localhost',
+		// port: 3000,
+		path: '/api/ftp/HH',
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	};
+	var req = http.request(options, function (res) {
+		console.log('/api/ftp/HH');
+		console.log('STATUS: ' + res.statusCode);
+		console.log('HEADERS: ' + JSON.stringify(res.headers));
+		res.setEncoding('utf8');
+		res.on('data', function (chunk) {
+			console.log('BODY: ' + chunk);
+		});
+		res.on('end', function () {
+			console.log('No more data in response.')
+		})
+	});
+	req.on('error', function (e) {
+		console.log('problem with request: ' + e.message);
+	});
+	req.end();
+}, null, true, 'UTC');
 
-// var metSites = [1, 2, 3, 4, 5, 11];
-// metSites.map(function (site, index) {
-// 	new CronJob((parseInt(index) + 10) + ' 21 14 * * *', function () {
-// 		var options = {
-// 			hostname: 'primrose-metro.elasticbeanstalk.com',
-// 			// hostname: 'localhost',
-// 			// port: 3000,
-// 			path: '/api/mySQL/metExport/' + site,
-// 			method: 'GET',
-// 			headers: {
-// 				'Content-Type': 'application/x-www-form-urlencoded'
-// 			}
-// 		};
-// 		var req = http.request(options, function (res) {
-// 			console.log('/api/mySQL/metExport/' + site);
-// 			console.log('STATUS: ' + res.statusCode);
-// 			console.log('HEADERS: ' + JSON.stringify(res.headers));
-// 			res.setEncoding('utf8');
-// 			res.on('data', function (chunk) {
-// 				console.log('BODY: ' + chunk);
-// 			});
-// 			res.on('end', function () {
-// 				console.log('No more data in response.')
-// 			})
-// 		});
-// 		req.on('error', function (e) {
-// 			console.log('problem with request: ' + e.message);
-// 		});
-// 		req.end();
-// 	}, null, true, 'UTC');
-// });
+liveSites.map(function (site, index) {
+	new CronJob('0 ' + (parseInt(index) + 10) + ' 7,8,9,10,11,13,14 * * *', function () {
+		var options = {
+			hostname: 'primrose-metro.elasticbeanstalk.com',
+			// hostname: 'localhost',
+			// port: 3000,
+			path: '/api/solarGisFtp/' + site,
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		};
+		var req = http.request(options, function (res) {
+			console.log('/api/solarGisFtp/' + site);
+			console.log('STATUS: ' + res.statusCode);
+			console.log('HEADERS(' + site + '): ' + JSON.stringify(res.headers));
+			res.setEncoding('utf8');
+			res.on('data', function (chunk) {
+				console.log('BODY: ' + chunk);
+			});
+			res.on('end', function () {
+				console.log('No more data in response.')
+			})
+		});
+		req.on('error', function (e) {
+			console.log('problem with request: ' + e.message);
+		});
+		req.end();
+	}, null, true, 'UTC');
+});
+
+
+liveSites.map(function (site) {
+	new CronJob('0 35 8,9,10,11,13,14 * * *', function () {
+		var options = {
+			hostname: 'primrose-metro.elasticbeanstalk.com',
+			// hostname: 'localhost',
+			// port: 3000,
+			path: '/api/mySQL/solarGisUpload/' + site,
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}
+		};
+		var req = http.request(options, function (res) {
+			console.log('/api/mySQL/solarGisUpload/' + site);
+			console.log('STATUS: ' + res.statusCode);
+			console.log('HEADERS: ' + JSON.stringify(res.headers));
+			res.setEncoding('utf8');
+			res.on('data', function (chunk) {
+				console.log('BODY: ' + chunk);
+			});
+			res.on('end', function () {
+				console.log('No more data in response.')
+			})
+		});
+		req.on('error', function (e) {
+			console.log('problem with request: ' + e.message);
+		});
+		req.end();
+	}, null, true, 'UTC');
+});
+
+new CronJob('0 */30 * * * *', function () {
+	var options = {
+		hostname: 'primrose-metro.elasticbeanstalk.com',
+		// hostname: 'localhost',
+		// port: 3000,
+		path: '/api/mySQL/autopyroUpload/5',
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		}
+	};
+	var req = http.request(options, function (res) {
+		console.log('/api/mySQL/autopyroUpload/');
+		console.log('STATUS: ' + res.statusCode);
+		console.log('HEADERS: ' + JSON.stringify(res.headers));
+		res.setEncoding('utf8');
+		res.on('data', function (chunk) {
+			console.log('BODY: ' + chunk);
+		});
+		res.on('end', function () {
+			console.log('No more data in response.')
+		})
+	});
+	req.on('error', function (e) {
+		console.log('problem with request: ' + e.message);
+	});
+	req.end();
+}, null, true, 'UTC');
 
 module.exports = app;

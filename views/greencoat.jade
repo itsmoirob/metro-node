@@ -8,7 +8,7 @@ html
 		link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css")
 		link(rel="stylesheet" href="/stylesheets/style.css")
 		link(rel='shortcut icon' type='image/x-icon' href='./favicon.ico')
-	body(ng-app="greencoatApp", ng-controller="greencoatCtrl")
+	body(ng-app="greencoatApp", ng-controller="greencoatCtrl" ng-cloak)
 		nav(class="primroseYellow")
 			ul(class="right hide-on-med-and-down")
 				li
@@ -47,6 +47,106 @@ html
 					a(href='/greencoat/fannyHouse') Fanny House
 				h5
 					a(href='/greencoat/eveley') Eveley
+			.page
+				.row
+					.col.s6.m4
+						label(for='selectStartDate') Select report date: 
+						input(type='date', ng-model='date', name='input', required='')
+						button.btn.waves-effect.waves-light.indigo.accent-3(ng-click="getDailyProductionReport(date)") Submit
+				.row(ng-show='!dailyProductionReport.PS11')
+					p Data not availble for {{displayDate}}.
+				div(ng-show='dailyProductionReport.PS11')
+					.row
+						table#dailyProductionReportTable.metroTable(style='width:100%')
+							caption
+								| Production report for {{displayDate}}. 
+								a(download='1 day {{displayDate}}.csv', href='', onclick="return ExcellentExport.csv(this, 'dailyProductionReportTable');") Export to CSV
+							tr
+								th Site
+								th TIC
+								th Export
+								th Expected
+								th Deviation
+								th Irridiation
+								th SolarGis
+								th Irr PR
+								th SG PR
+							tr
+								th
+								th MWp
+								th kWh
+								th kWh
+								th %
+								th kW/m2
+								th kW/m2
+								th %
+								th %
+							tr(ng-repeat='site in dailyProductionReport')
+								td {{sitesInfo[$index].name }}
+								td {{sitesInfo[$index].tic_mwp | number:1 }}
+								td {{site.Day | number:0 }}
+								td {{site.PredictDay | number:0 }}
+								td {{(site.Day-site.PredictDay)/site.PredictDay*100 | number:2 }}
+								td(ng-init='$parent.aveDailyEsol = $parent.aveDailyEsol + (site.DailyEsol * site.Mwp)') {{site.DailyEsol | number:2 }}
+								td(ng-init='$parent.aveDailySolarGis = $parent.aveDailySolarGis + (site.DailySolarGis * site.Mwp)') {{site.DailySolarGis | number:2 }}
+								td {{site.PR*100 | number:2 }}%
+								td {{site.PRSolarGis*100 | number:2 }}%
+							tr
+								th Total
+								th {{totalMWp | number : 1}}
+								th {{totalDailyExport | number : 0}}
+								th {{expectedExport | number : 0}}
+								th {{(totalDailyExport-expectedExport)/expectedExport*100 | number:2 }}
+								th {{aveDailyEsol/totalMWp | number:2}}
+								th {{aveDailySolarGis/totalMWp | number:2}}
+								th {{totalDailyExport/(aveDailyEsol*1000)*100 | number:2}}%
+								th {{totalDailyExport/(aveDailySolarGis*1000)*100 | number:2}}%
+					.row
+						table#sumProductionReportTable.metroTable(style='width:100%')
+							caption
+								| Production report for seven previous days. 
+								a(download='7 day {{displayDate}}.csv', href='', onclick="return ExcellentExport.csv(this, 'sumProductionReportTable');") Export to CSV
+							tr
+								th Site
+								th TIC
+								th Export
+								th Expected
+								th Deviation
+								th Irridiation
+								th SolarGis
+								th Irr PR
+								th SG PR
+							tr
+								th
+								th MWp
+								th kWh
+								th kWh
+								th %
+								th kW/m2
+								th kW/m2
+								th %
+								th %
+							tr(ng-repeat='site in dailyProductionReport')
+								td {{sitesInfo[$index].name }}
+								td {{sitesInfo[$index].tic_mwp | number:1 }}
+								td {{site.Group | number:0 }}
+								td {{site.PredictDay*7 | number:0 }}
+								td {{(site.Group-(site.PredictDay*7))/(site.PredictDay*7)*100 | number:2 }}
+								td(ng-init='$parent.aveGroupEsol = $parent.aveGroupEsol + (site.GroupEsol * site.Mwp)') {{site.GroupEsol | number:2 }}
+								td(ng-init='$parent.aveGroupSolarGis = $parent.aveGroupSolarGis + (site.GroupSolarGis * site.Mwp)') {{site.GroupSolarGis | number:2 }}
+								td {{site.GroupPR*100 | number:2 }}%
+								td {{site.GroupPRSolarGis*100 | number:2 }}%
+							tr
+								th Total
+								th {{totalMWp | number : 1}}
+								th {{totalGroupExport | number : 0}}
+								th {{expectedExport*7 | number : 0}}
+								th {{(totalGroupExport-(expectedExport*7))/(expectedExport*7)*100 | number:2 }}
+								th {{aveGroupEsol/totalMWp | number:2}}
+								th {{aveGroupSolarGis/totalMWp | number:2}}
+								th {{totalGroupExport/(aveGroupEsol*1000)*100 | number:2}}%
+								th {{totalGroupExport/(aveGroupSolarGis*1000)*100 | number:2}}%
+
 					
 				
 		.container(class="footer")
@@ -73,3 +173,4 @@ html
 		script(src="//code.highcharts.com/stock/highstock.src.js")
 		script(src="//code.highcharts.com/adapters/standalone-framework.js")
 		script(src="../javascripts/highcharts-ng.js")
+		script(src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.8.0/lodash.min.js")

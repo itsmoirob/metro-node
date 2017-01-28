@@ -61,7 +61,8 @@ router.get('/greencoat/:site?', ensureAuthenticated, function (req, res, next) {
     let site = req.params.site;
     res.render(`greencoatSite`, {
       'title': `${site.capitalize()}`,
-      'data':{'site':site}
+      'info':{'site':site},
+      'chart':JSON.stringify({'data':[1,2,3]})
     });
   } else {
     res.render('greencoat', {

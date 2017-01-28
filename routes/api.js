@@ -315,10 +315,10 @@ module.exports = function (app, connection, fs) {
 		let date1, date5;
 		if (req.params.date) {
 			date1 = `'${req.params.date}'`;
-			date5 = `DATE('${req.params.date}' - INTERVAL 5 DAY)`;
+			date5 = `DATE('${req.params.date}' - INTERVAL 7 DAY)`;
 		} else {
 			date1 = `DATE(NOW() - INTERVAL 1 DAY)`;
-			date5 = `DATE(NOW() - INTERVAL 5 DAY)`;
+			date5 = `DATE(NOW() - INTERVAL 7 DAY)`;
 		}
 		let groupings = [{
 			"id": 1,
@@ -357,7 +357,7 @@ module.exports = function (app, connection, fs) {
 		// create array and loop through each item in object in GROUPINGS to set up the mysql text query, then join array to create string
 		let requestText = [];
 		groupings.forEach(function (element) {
-			requestText.push(`(SELECT tic_mwp FROM top_table WHERE id = ${element.id}) as ${element.name}_Mwp, dg.ps${element.id} AS ${element.name}_Day, gg.ps${element.id} AS ${element.name}_Group, mp.ps${element.id} / DAY(LAST_DAY(NOW() - INTERVAL 1 DAY)) AS ${element.name}_PredictDay, de.ps${element.id} AS ${element.name}_DailyEsol, ge.ps${element.id} AS ${element.name}_GroupEsol, dg.ps${element.id} / (de.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_PR, gg.ps${element.id} / (ge.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_GroupPR, ds.ps${element.id} AS ${element.name}_DailySolarGis, gs.ps${element.id} AS ${element.name}_GroupSolarGis, dg.ps${element.id} / (ds.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_PRSolarGis, gg.ps${element.id} / (gs.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_GroupPRSolarGis`);
+			requestText.push(`(SELECT tic_mwp FROM top_table WHERE id = ${element.id}) as ${element.name}_Mwp, dg.ps${element.id} AS ${element.name}_Day, gg.ps${element.id} AS ${element.name}_Group, mp.ps${element.id} / DAY(LAST_DAY(${date1} - INTERVAL 1 DAY)) AS ${element.name}_PredictDay, de.ps${element.id} AS ${element.name}_DailyEsol, ge.ps${element.id} AS ${element.name}_GroupEsol, dg.ps${element.id} / (de.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_PR, gg.ps${element.id} / (ge.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_GroupPR, ds.ps${element.id} AS ${element.name}_DailySolarGis, gs.ps${element.id} AS ${element.name}_GroupSolarGis, dg.ps${element.id} / (ds.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_PRSolarGis, gg.ps${element.id} / (gs.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_GroupPRSolarGis`);
 		});
 		requestText = requestText.join(`, `);
 		// create array and loop through each item in object in GROUPINGS to set up the mysql text query, then join array to create string
@@ -373,7 +373,64 @@ module.exports = function (app, connection, fs) {
 		});
 		singleText = singleText.join(`, `);
 
-		connection.query(`SELECT ${requestText} FROM dailySumExport dg JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySumExport WHERE (date BETWEEN ${date5} AND ${date1})) gg ON dg.date = gg.date JOIN (SELECT date, ${singleText} FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(NOW()) AND MONTH(date) = MONTH(NOW())) mp JOIN dailyEsol de ON dg.date = de.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailyEsol WHERE (date BETWEEN ${date5} AND ${date1})) ge ON dg.date = ge.date JOIN dailySolarGis ds ON dg.date = ds.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySolarGis WHERE (date BETWEEN ${date5} AND ${date1})) gs ON dg.date = gs.date WHERE dg.date = ${date1};`, function (err, rows) {
+		connection.query(`SELECT ${requestText} FROM dailySumExport dg JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySumExport WHERE (date BETWEEN ${date5} AND ${date1})) gg ON dg.date = gg.date JOIN (SELECT date, ${singleText} FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(${date1}) AND MONTH(date) = MONTH(${date1})) mp JOIN dailyEsol de ON dg.date = de.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailyEsol WHERE (date BETWEEN ${date5} AND ${date1})) ge ON dg.date = ge.date JOIN dailySolarGis ds ON dg.date = ds.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySolarGis WHERE (date BETWEEN ${date5} AND ${date1})) gs ON dg.date = gs.date WHERE dg.date = ${date1};`, function (err, rows) {
+			if (err) {
+				return res.status(500).json(err);
+			} else {
+				return res.json(rows);
+			}
+		});
+	});
+
+		// gets data the daily/5 day table All Site Report
+	app.get(`/api/reports/dailyProductionReportGC/:date?`, function (req, res) {
+		//set date1 to param date or default to yesterday
+		let date1, date5;
+		if (req.params.date) {
+			date1 = `'${req.params.date}'`;
+			date5 = `DATE('${req.params.date}' - INTERVAL 7 DAY)`;
+		} else {
+			date1 = `DATE(NOW() - INTERVAL 1 DAY)`;
+			date5 = `DATE(NOW() - INTERVAL 7 DAY)`;
+		}
+		let groupings = [{
+			"id": 11,
+			"name": "PS11"
+		}, {
+			"id": 12,
+			"name": "PS12"
+		}, {
+			"id": 13,
+			"name": "PS13"
+		}, {
+			"id": 14,
+			"name": "PS14"
+		}, {
+			"id": 15,
+			"name": "PS15"
+		}, {
+			"id": 16,
+			"name": "PS16"
+		}];
+		// create array and loop through each item in object in GROUPINGS to set up the mysql text query, then join array to create string
+		let requestText = [];
+		groupings.forEach(function (element) {
+			requestText.push(`(SELECT tic_mwp FROM top_table WHERE id = ${element.id}) as ${element.name}_Mwp, dg.ps${element.id} AS ${element.name}_Day, gg.ps${element.id} AS ${element.name}_Group, mp.ps${element.id} / DAY(LAST_DAY(${date1} - INTERVAL 1 DAY)) AS ${element.name}_PredictDay, de.ps${element.id} AS ${element.name}_DailyEsol, ge.ps${element.id} AS ${element.name}_GroupEsol, dg.ps${element.id} / (de.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_PR, gg.ps${element.id} / (ge.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_GroupPR, ds.ps${element.id} AS ${element.name}_DailySolarGis, gs.ps${element.id} AS ${element.name}_GroupSolarGis, dg.ps${element.id} / (ds.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_PRSolarGis, gg.ps${element.id} / (gs.ps${element.id} * (SELECT tic_mwp FROM top_table WHERE id = ${element.id})*1000) AS ${element.name}_GroupPRSolarGis`);
+		});
+		requestText = requestText.join(`, `);
+		// create array and loop through each item in object in GROUPINGS to set up the mysql text query, then join array to create string
+		let sumText = [];
+		groupings.forEach(function (element) {
+			sumText.push(`SUM(ps${element.id}) AS ps${element.id}`);
+		});
+		sumText = sumText.join(`, `);
+		// create array and loop through each item in object in GROUPINGS to set up the mysql text query, then join array to create string
+		let singleText = [];
+		groupings.forEach(function (element) {
+			singleText.push(`ps${element.id}`);
+		});
+		singleText = singleText.join(`, `);
+		connection.query(`SELECT ${requestText} FROM dailySumExport dg JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySumExport WHERE (date BETWEEN ${date5} AND ${date1})) gg ON dg.date = gg.date JOIN (SELECT date, ${singleText} FROM monthlyPredictedGeneration WHERE YEAR(date) = YEAR(${date1}) AND MONTH(date) = MONTH(${date1})) mp JOIN dailyEsol de ON dg.date = de.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailyEsol WHERE (date BETWEEN ${date5} AND ${date1})) ge ON dg.date = ge.date JOIN dailySolarGis ds ON dg.date = ds.date JOIN (SELECT ${date1} AS date, ${sumText} FROM dailySolarGis WHERE (date BETWEEN ${date5} AND ${date1})) gs ON dg.date = gs.date WHERE dg.date = ${date1};`, function (err, rows) {
 			if (err) {
 				return res.status(500).json(err);
 			} else {
